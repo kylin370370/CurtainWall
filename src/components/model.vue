@@ -5,9 +5,7 @@ import Unity from "vue-unity-webgl";
     name: 'UnityModel',
     methods:{
       sendOrders(order){
-        //unityIframe.contentWindow.myInstance.SendMessage('Canvas', 'getOrders', 'vue');
         this.$refs.unityIframe.contentWindow.sendOrders(order);
-        //this.$refs.unityIframe.contentWindow.unityInstance.SendMessage('GameObject', 'getOrders', 'vue');
       }
     },
   }

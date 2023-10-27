@@ -10,6 +10,8 @@
   "dependencies": {
     "element-plus": "^2.3.14",
     "mockjs": "^1.1.0",
+    "papaparse": "^5.4.1",
+    "vite-plugin-csv": "^1.0.0",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",
     "vue-unity-webgl": "^1.2.0"

@@ -138,7 +138,7 @@ export default {
       that.url = imageURL;
       that.srcList = [imageURL];
 
-      var des = imageURL.split('/');        //    ['DZGCG', 'Pictures', 'A', 'a_004.JPG']
+      var des = imageURL.slice(1).split('/');        //    ['DZGCG', 'Pictures', 'A', 'a_004.JPG']
       var datalist = [];
       if(des[2] === 'A')
         datalist = data_A;      

@@ -5,8 +5,28 @@ import Unity from "vue-unity-webgl";
     name: 'UnityModel',
     methods:{
       sendOrders(order){
-        this.$refs.unityIframe.contentWindow.sendOrders(order);
-      }
+        //this.$refs.unityIframe.contentWindow.sendOrders(order);
+      },
+      draw_des(des){
+        this.$refs.unityIframe.contentWindow.draw_des(des);
+      },
+      hide_des(des){
+        this.$refs.unityIframe.contentWindow.hide_des(des);
+      },
+      specialize_des(des){
+        this.$refs.unityIframe.contentWindow.specialize_des(des);
+      },
+      changeUse(type, state){
+        if(type === 'key'){
+          //alert('键盘' + state);
+          this.$refs.unityIframe.contentWindow.useKeyboard(state);
+        }
+        else if(type === 'mouse'){
+          //alert('鼠标' + state);
+          this.$refs.unityIframe.contentWindow.useMouse(state);
+        }
+      },
+
     },
   }
 </script>

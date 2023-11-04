@@ -17,17 +17,20 @@ import Unity from "vue-unity-webgl";
         this.$refs.unityIframe.contentWindow.specialize_des(des);
       },
       changeUse(type, state){
-        var mess = 'true';
-        if(!state)
-          mess = 'false';
         if(type === 'key'){
           //alert('键盘' + state);
-          this.$refs.unityIframe.contentWindow.useKeyboard(mess);
+          this.$refs.unityIframe.contentWindow.useKeyboard(state);
         }
         else if(type === 'mouse'){
           //alert('鼠标' + state);
-          this.$refs.unityIframe.contentWindow.useMouse(mess);
+          this.$refs.unityIframe.contentWindow.useMouse(state);
         }
+      },
+      changeMode(value) {
+        this.$refs.unityIframe.contentWindow.changeMode(value);
+      },
+      reset() {
+        this.$refs.unityIframe.contentWindow.reset();
       },
 
     },

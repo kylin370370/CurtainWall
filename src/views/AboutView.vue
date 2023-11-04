@@ -49,6 +49,11 @@ export default {
       },//其他按钮： 重置
       is_keyboard: false,         //是否允许使用键盘
       is_mouse:false,             //是否允许使用鼠标
+      selectedOption: '0',
+      modeSelections: [
+        { value: '0', label: '靠近' },
+        { value: '1', label: '降落' }
+      ],
 
       setting_compare:{
         is_open: false,         //是否开启对比
@@ -84,13 +89,17 @@ export default {
   watch: {
     is_keyboard: function () {
       //alert('键盘' + this.is_keyboard);
-      var that = this; 
-      that.$refs.unityModel.changeUse('key', that.is_keyboard);
+      var that = this;
+      that.$refs.unityModel.changeUse('key', that.is_keyboard.toString());
     },
     is_mouse: function(){
       //alert('鼠标' + this.is_mouse);
-      var that = this; 
-      that.$refs.unityModel.changeUse('mouse', that.is_mouse);
+      var that = this;
+      that.$refs.unityModel.changeUse('mouse', that.is_mouse.toString());
+    },
+    selectedOption: function () {
+      var that = this;
+      that.$refs.unityModel.changeMode(that.selectedOption);
     },
   },
   methods:{
@@ -111,6 +120,7 @@ export default {
       that.setting_camera.is_keyboard = false;
       that.setting_camera.is_mouse = false;
       that.setting_camera.rotating = 0;
+      that.$refs.unityModel.reset();
     },
     handleClick_clear(){              //对比--清空按钮
       var that = this;
@@ -136,7 +146,6 @@ export default {
     handleClick_info(){               //相机--是否显示使用说明
       var that = this;
       that.setting_camera.is_info = !that.setting_camera.is_info;
-
     },
     format_rotating(value){         //格式化角度显示
       return `${value}°`;
@@ -325,7 +334,12 @@ export default {
                 label="启用鼠标控制" 
                 size="large" 
               /> 
-              <br> 
+              <br>
+              <el-select v-model="selectedOption" placeholder="请选择">
+                <el-option v-for="option in modeSelections" :key="option.value" :value="option.value"
+                  :label="option.label">
+                </el-option>
+              </el-select> 
             </a>
             <!--
             <span>旋转角度：  {{ setting_camera.rotating }}°</span>

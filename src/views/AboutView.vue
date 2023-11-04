@@ -121,6 +121,7 @@ export default {
       that.setting_compare.points = [];
     },
     handleClick_search(index){        //对比--显示特定位点
+      var that = this;
       var des = this.setting_compare.points[index];
       that.$refs.unityModel.specialize_des(des.info[0].data + "," + des.info[1].data + "," + des.info[2].data);
       //alert("specialize_des: " + des.info[0].data + "," + des.info[1].data + "," + des.info[2].data);

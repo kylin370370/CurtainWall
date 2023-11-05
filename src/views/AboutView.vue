@@ -117,9 +117,9 @@ export default {
     handleClick_reset(){              //相机--重置按钮
       var that = this;
       that.setting_camera.is_info = false;
-      that.setting_camera.is_keyboard = false;
-      that.setting_camera.is_mouse = false;
-      that.setting_camera.rotating = 0;
+      //that.setting_camera.is_keyboard = false;
+      //that.setting_camera.is_mouse = false;
+      //that.setting_camera.rotating = 0;
       that.$refs.unityModel.reset();
     },
     handleClick_clear(){              //对比--清空按钮

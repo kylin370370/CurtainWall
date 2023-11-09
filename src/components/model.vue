@@ -33,15 +33,15 @@ import Unity from "vue-unity-webgl";
         this.$refs.unityIframe.contentWindow.reset();
       },
       setRotating(type){
-        alert('旋转' + type);
+        //alert('旋转' + type);
         this.$refs.unityIframe.contentWindow.setRotating(type);
       },
       setSize(type){
-        alert('调整' + type);
+        //alert('调整' + type);
         this.$refs.unityIframe.contentWindow.setSize(type);
       },
       setQuick(type){
-        alert(type);
+        //alert(type);
         this.$refs.unityIframe.contentWindow.setQuick(type);
       },
     },

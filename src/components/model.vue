@@ -7,7 +7,7 @@ import Unity from "vue-unity-webgl";
       sendOrders(order){
         //this.$refs.unityIframe.contentWindow.sendOrders(order);
       },
-      draw_des(des){
+      draw_des(des){        
         this.$refs.unityIframe.contentWindow.draw_des(des);
       },
       hide_des(des){
@@ -32,7 +32,18 @@ import Unity from "vue-unity-webgl";
       reset() {
         this.$refs.unityIframe.contentWindow.reset();
       },
-
+      setRotating(type){
+        alert('旋转' + type);
+        this.$refs.unityIframe.contentWindow.setRotating(type);
+      },
+      setSize(type){
+        alert('调整' + type);
+        this.$refs.unityIframe.contentWindow.setSize(type);
+      },
+      setQuick(type){
+        alert(type);
+        this.$refs.unityIframe.contentWindow.setQuick(type);
+      },
     },
   }
 </script>

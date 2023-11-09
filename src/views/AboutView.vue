@@ -1,5 +1,6 @@
 <script>
-import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled } from '@element-plus/icons-vue';
+import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,Histogram,
+  RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place } from '@element-plus/icons-vue';
 import Model from '@/components/model.vue';
 import data_A from '@/assets/imageCSV/A.csv';
 import data_B from '@/assets/imageCSV/B.csv';
@@ -35,6 +36,13 @@ export default {
     Delete,
     QuestionFilled,
     InfoFilled,
+    VideoCamera,
+    Histogram,
+    RefreshLeft,
+    RefreshRight,
+    ZoomIn,
+    ZoomOut,
+    Place,
   },
   data() {
     return {
@@ -43,17 +51,13 @@ export default {
       setting_type: 'camera',     //设置--相机/对比
       setting_camera:{
         is_info: false,           //是否显示使用说明
-        //is_keyboard: false,       
+        //is_keyboard: false,     //放此处watch不到所以挪出
         //is_mouse: false,          
         rotating: 0,              //旋转角度  0-360   xz面
+        modeSelection: '0',       //  靠近/降落
       },//其他按钮： 重置
-      is_keyboard: false,         //是否允许使用键盘
-      is_mouse:false,             //是否允许使用鼠标
-      selectedOption: '0',
-      modeSelections: [
-        { value: '0', label: '靠近' },
-        { value: '1', label: '降落' }
-      ],
+      is_keyboard: true,         //是否允许使用键盘
+      is_mouse: true,            //是否允许使用鼠标
 
       setting_compare:{
         is_open: false,         //是否开启对比
@@ -97,16 +101,12 @@ export default {
       var that = this;
       that.$refs.unityModel.changeUse('mouse', that.is_mouse.toString());
     },
-    selectedOption: function () {
-      var that = this;
-      that.$refs.unityModel.changeMode(that.selectedOption);
-    },
   },
   methods:{
     handleClick_setting(){            //设置按钮
       this.setting_is_open = !this.setting_is_open;
     },
-    handleClick_type(tab, event) {    //设置类型--相机/对比
+    handleClick_type(tab, event){    //设置类型--相机/对比
       console.log(tab, event);
     },
     handleClick_compare(){            //对比--开启对比按钮
@@ -117,9 +117,6 @@ export default {
     handleClick_reset(){              //相机--重置按钮
       var that = this;
       that.setting_camera.is_info = false;
-      //that.setting_camera.is_keyboard = false;
-      //that.setting_camera.is_mouse = false;
-      //that.setting_camera.rotating = 0;
       that.$refs.unityModel.reset();
     },
     handleClick_clear(){              //对比--清空按钮
@@ -146,6 +143,23 @@ export default {
     handleClick_info(){               //相机--是否显示使用说明
       var that = this;
       that.setting_camera.is_info = !that.setting_camera.is_info;
+    },
+    handleClick_mode(){               //相机-模式选择 靠近/降落
+      //alert(this.setting_camera.modeSelection);
+      var that = this;
+      that.$refs.unityModel.changeMode(that.setting_camera.modeSelection);
+    },
+    handleClick_rotating(type){       //相机--旋转    0顺时针 / 1逆时针
+      var that = this;
+      that.$refs.unityModel.setRotating(type.toString());
+    },
+    handleClick_size(type){           //相机--调整    1放大 / 0缩小
+      var that = this;
+      that.$refs.unityModel.setSize(type.toString());
+    },
+    handleClick_quick(type){          //相机--快捷选择    'A' 'B' 'C'
+      var that = this;
+      that.$refs.unityModel.setQuick(type.toString());
     },
     format_rotating(value){         //格式化角度显示
       return `${value}°`;
@@ -265,8 +279,8 @@ export default {
     },
   },
   mounted(){
-      window.addEventListener("message",this.recieve)
-    },
+    window.addEventListener("message",this.recieve);
+  },
 }
 </script>
 
@@ -320,8 +334,13 @@ export default {
     <div class="setting_and_model">
       <el-card v-if="setting_is_open" class="setting_wrapper">
         <el-tabs v-model="setting_type" @tab-click="handleClick_type">
-          <el-tab-pane label="相机" name="camera">
-            
+          <el-tab-pane name="camera">
+            <template #label>
+              <span class="custom-tabs-label">
+                <el-icon><VideoCamera /></el-icon>
+                <span>相机</span>
+              </span>
+            </template>          
             <a>
               <el-checkbox 
                 v-model="is_keyboard" 
@@ -335,34 +354,123 @@ export default {
                 size="large" 
               /> 
               <br>
-              <el-select v-model="selectedOption" placeholder="请选择">
-                <el-option v-for="option in modeSelections" :key="option.value" :value="option.value"
-                  :label="option.label">
-                </el-option>
-              </el-select> 
+              <a class="text_2">
+                移动方式：
+                <el-row :span="24" style="margin-top: -5%;">
+                  <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode">
+                    <el-radio label="0" size="large">靠近</el-radio>
+                    <el-radio label="1" size="large">降落</el-radio>
+                  </el-radio-group>
+                </el-row>
+              </a>
+              <a class="text_2">
+                旋转：
+                <el-button @click="handleClick_rotating(0)">
+                  <el-icon><RefreshRight /></el-icon>&ensp;90°
+                </el-button>
+                <el-button @click="handleClick_rotating(1)">
+                  <el-icon><RefreshLeft /></el-icon>&ensp;90°
+                </el-button>
+                <br>
+              </a>
+              <a class="text_2">
+                调整：
+                <el-button @click="handleClick_size(1)">
+                  <el-icon><ZoomIn /></el-icon>放大
+                </el-button>
+                <el-button @click="handleClick_size(0)">
+                  <el-icon><ZoomOut /></el-icon>缩小
+                </el-button>
+                <br>
+              </a>
+              <a class="text_2">
+                快捷选择：
+                <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
+                <el-button  @click="handleClick_quick('A')">
+                  <el-icon><Place /></el-icon>&ensp;A
+                </el-button>
+                <el-button @click="handleClick_quick('B')">
+                  <el-icon><Place /></el-icon>&ensp;B
+                </el-button>
+                <el-button @click="handleClick_quick('C')">
+                  <el-icon><Place /></el-icon>&ensp;C
+                </el-button>
+                </el-row>
+              </a>
+
             </a>
             <!--
-            <span>旋转角度：  {{ setting_camera.rotating }}°</span>
-            <a class="rotating_slider">
-              &emsp;
-              <el-slider 
-              v-model="setting_camera.rotating"
-              @change="handleClick_compare"
-              :min="0"
-              :max="360"
-              :format-tooltip="format_rotating($event)"
-              :disabled="setting_camera.is_keyboard || setting_camera.is_mouse"/>
-            </a>
+            <client-only>
+            <span><a class="text_2">旋转角度：</a> {{ setting_camera.rotating }}°</span>
+            <el-row :span="24" style="margin-top: -5%;">
+              <a class="rotating_slider">
+                &emsp;
+                <el-slider 
+                v-model="setting_camera.rotating"
+                @change="handleClick_rotating_2"
+                :min="0"
+                :max="360"
+                :format-tooltip="format_rotating"
+                :disabled="is_keyboard || is_mouse"/>
+              </a>
+            </el-row>
+            </client-only>
             -->
+            <el-row style="margin-top: 5%; margin-bottom: 5%">
             <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
             <el-button @click="handleClick_info" size="small" round>
                   <el-icon><InfoFilled /></el-icon>
             </el-button>
-            <p v-if="setting_camera.is_info">这里是使用说明</p>
+            </el-row>
+            <a v-if="setting_camera.is_info" class="text_info">
+              <el-scrollbar height="160px">
+                <li>键盘控制：</li>
+                <a class="text_3">
+                  <el-row>
+                    <el-col :span="12">
+                      <br>&emsp;启用键盘后，使用
+                    </el-col>
+                    <el-col :span="8.5">
+                      <el-row justify="center">
+                        <el-tag>W</el-tag>
+                      </el-row>
+                      <el-row>
+                        <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
+                      </el-row>
+                    </el-col>
+                    <br>&ensp;可移
+                  </el-row>
+                  <el-row>
+                    动镜头,使用&ensp;
+                    <el-tag>Q</el-tag><el-tag>E</el-tag>
+                    &ensp;可水平旋转镜头
+                  </el-row>
+                </a>
+                <li>鼠标控制：</li>
+                <a class="text_3">
+                  &emsp;启用鼠标后，按住鼠标左键拖动镜头，滚轮调整镜头距离，
+                  按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
+                </a>
+                <li>快捷选择：</li>
+                <a class="text_3">
+                  &emsp;快捷切换至所选立面
+                </a>
+                <li>重置：</li>
+                <a class="text_3">
+                  &emsp;可使模型位置回归初始状态
+                </a>
+              </el-scrollbar>
+            </a>
 
           </el-tab-pane>
-          <el-tab-pane label="对比" name="compare">
 
+          <el-tab-pane name="compare">
+            <template #label>
+              <span class="custom-tabs-label">
+                <el-icon><Histogram /></el-icon>
+                <span>对比</span>
+              </span>
+            </template> 
             <a> 
               开启对比： 
               <el-switch 
@@ -496,16 +604,34 @@ export default {
   width:300px;
   margin-top: -35px;
   height: 660px;
-  line-height: 50px;
+  line-height: 45px;
+}
+.setting_wrapper .custom-tabs-label .el-icon {
+  vertical-align: middle;
 }
 .el-checkbox__label {
   font-size: 16px !important; /* 使用 !important 来提高优先级 */
 }
-
+.el-radio.el-radio--large .el-radio__label {
+  font-size: 15px !important; 
+}
+.text_2{
+  font-size: 15px;
+  font-weight: bold;
+}
 .rotating_slider{
   display: flex;
   align-items: center;
   width: 90%;
+}
+.text_info{
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: bold;
+}
+.text_3{
+  font-weight: normal;
+  line-height: 26px;
 }
 
 .model-from-unity{

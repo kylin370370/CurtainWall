@@ -159,13 +159,20 @@
       myInstance.SendMessage('CameraSystem', 'ResetCamerasystem');
     };
     function useKeyboard(state) {
-
       myInstance.SendMessage('CameraSystem', 'SetKey', state);
-
     };
     function useMouse(state) {
       myInstance.SendMessage('CameraSystem', 'SetMouse', state);
+    };
 
+    function setRotating(type) {      //旋转-- '0'顺时针90°  '1'逆时针90°
+      myInstance.SendMessage('CameraSystem', 'SetRotating', type);
+    };
+    function setSize(type) {          // '1'放大    '0'缩小
+      myInstance.SendMessage('CameraSystem', 'SetSize', type);
+    };
+    function setQuick(type) {         //'A' 'B' 'C'
+      myInstance.SendMessage('CanvasWall', 'SetQuick', type);
     };
   </script>
 </head>

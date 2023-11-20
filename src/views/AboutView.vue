@@ -109,6 +109,7 @@ export default {
           no:[],        //要显示的块block_data中位置
           options:[],   //选项
         },
+        success:false,  //请求接口是否成功
       },
     }
   },
@@ -198,6 +199,7 @@ export default {
       SCD.des.z = info[2].data;
       SCD.onshow.no = [];
       SCD.onshow.options = [];
+      SCD.success = false;
       if(path){
         //alert(path);                           // /DZGCG/Pictures/A/a_004.JPG
         SCD.path = path.split("/DZGCG/Pictures/")[1];
@@ -208,6 +210,7 @@ export default {
           //alert(SCD.raw_path);
           if(res.data.has_crack)
             SCD.crack_data = res.data.crack_data;
+          SCD.success = true;
         });
         axios.get('/api/StoneCrackDetect/block_data?image_name='+ SCD.path).then(res=>{
           SCD.seg_path = res.data.seg_process_image_path;
@@ -226,6 +229,7 @@ export default {
       that.StoneCrackDetect.is_show = false;
       that.StoneCrackDetect.onshow.no = [];
       that.StoneCrackDetect.onshow.options = [];
+      that.StoneCrackDetect.success = false;
     },
     format_rotating(value){         //格式化角度显示
       return `${value}°`;
@@ -632,9 +636,11 @@ export default {
                 <el-button @click="handleClick_search(index)">
                   <el-icon><Search/></el-icon>
                 </el-button>
-                <el-button @click="handleClick_divide(point.url,point.info)">
-                  <el-icon><Scissor /></el-icon>
-                </el-button>
+                <a v-if="point.url">
+                  <el-button @click="handleClick_divide(point.url,point.info)">
+                    <el-icon><Scissor /></el-icon>
+                  </el-button>
+                </a>
                 <el-button @click="handleClick_delete(index)">
                   <el-icon><Delete/></el-icon>
                 </el-button>
@@ -678,32 +684,36 @@ export default {
             </el-col>
             <el-col :span="8">
               <p class="text_2">分割情况</p>
-              <el-image
-                style="width: 200px; height: 200px"
-                :src="StoneCrackDetect.seg_path"
-                :zoom-rate="1.2"
-                :preview-src-list="[StoneCrackDetect.seg_path]"
-                :initial-index="4"
-                fit="cover"
-              />
-              <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
+              <a v-if="StoneCrackDetect.success">
+                <el-image
+                  style="width: 200px; height: 200px"
+                  :src="StoneCrackDetect.seg_path"
+                  :zoom-rate="1.2"
+                  :preview-src-list="[StoneCrackDetect.seg_path]"
+                  :initial-index="4"
+                  fit="cover"
+                />
+                <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
+              </a>
             </el-col>
             <el-col :span="8">
               <p class="text_2">裂缝情况</p>
-              <el-row>
-                存在裂缝：
-                <a v-if="StoneCrackDetect.has_crack">是</a>
-                <a v-else>否</a>
-              </el-row>
-              <a v-if="StoneCrackDetect.has_crack">
-                <el-row>裂痕像素面积：{{ StoneCrackDetect.crack_data.crack_pixel_area }}</el-row>
-                <el-row>裂痕物理面积：{{StoneCrackDetect.crack_data.crack_physical_area}}</el-row>
-                <el-row>裂痕像素长度：{{StoneCrackDetect.crack_data.crack_pixel_length}}</el-row>
-                <el-row>裂痕物理长度：{{StoneCrackDetect.crack_data.crack_physical_length}}</el-row>
-                <el-row>裂痕像素平均宽度：{{StoneCrackDetect.crack_data.crack_pixel_average_width}}</el-row>
-                <el-row>裂痕物理平均宽度：{{StoneCrackDetect.crack_data.crack_physical_average_width}}</el-row>
-                <el-row>裂痕像素最大宽度：{{StoneCrackDetect.crack_data. crack_pixel_max_width}}</el-row>
-                <el-row>裂痕物理最大宽度：{{StoneCrackDetect.crack_data.crack_physical_max_width}}</el-row>
+              <a v-if="StoneCrackDetect.success">
+                <el-row>
+                  存在裂缝：
+                  <a v-if="StoneCrackDetect.has_crack">是</a>
+                  <a v-else>否</a>
+                </el-row>
+                <a v-if="StoneCrackDetect.has_crack">
+                  <el-row>裂痕像素面积：{{ StoneCrackDetect.crack_data.crack_pixel_area }}</el-row>
+                  <el-row>裂痕物理面积：{{StoneCrackDetect.crack_data.crack_physical_area}}</el-row>
+                  <el-row>裂痕像素长度：{{StoneCrackDetect.crack_data.crack_pixel_length}}</el-row>
+                  <el-row>裂痕物理长度：{{StoneCrackDetect.crack_data.crack_physical_length}}</el-row>
+                  <el-row>裂痕像素平均宽度：{{StoneCrackDetect.crack_data.crack_pixel_average_width}}</el-row>
+                  <el-row>裂痕物理平均宽度：{{StoneCrackDetect.crack_data.crack_physical_average_width}}</el-row>
+                  <el-row>裂痕像素最大宽度：{{StoneCrackDetect.crack_data. crack_pixel_max_width}}</el-row>
+                  <el-row>裂痕物理最大宽度：{{StoneCrackDetect.crack_data.crack_physical_max_width}}</el-row>
+                </a>
               </a>
             </el-col>
           </el-row>

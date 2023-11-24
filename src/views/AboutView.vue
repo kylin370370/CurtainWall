@@ -50,8 +50,8 @@ export default {
   data() {
     return {
 
-      setting_is_open: false,     //是否打开设置边栏
-      setting_type: 'camera',     //设置--相机/对比
+      setting_is_open: true,     //是否打开设置边栏
+      setting_type: 'compare',     //设置--相机/对比/测距
       setting_camera:{
         is_info: false,           //是否显示使用说明
         //is_keyboard: false,     //放此处watch不到所以挪出
@@ -69,6 +69,13 @@ export default {
         points:[],
       },//其他按钮： 清空
 
+      setting_measure:{
+        is_open: false,
+        step:'0',             //当前完成步数  '0' '1' '2'
+        distance:['0.0','0.0','0.0'],  //水平/垂直/直线距离
+        has_data: false,      //是否接收到距离数据
+      },
+
       select_1: null,
       select_2: null,
       select_3: null,
@@ -83,7 +90,7 @@ export default {
       ],
 
       url: '',        //图片url
-      srcList: [],    //打开图片预览，可以放入多张图片
+      //srcList: [],    //打开图片预览，可以放入多张图片
       info: [
         {name:'x', data: 0},
         {name:'y', data: 0},
@@ -124,12 +131,26 @@ export default {
       var that = this;
       that.$refs.unityModel.changeUse('mouse', that.is_mouse.toString());
     },
+    setting_type: function(){
+      var that  = this;
+      if(that.setting_type === 'measure'){
+        that.setting_measure.step = '0';
+        that.setting_measure.is_open = true;    //切换至测距即开始测距
+        that.$refs.unityModel.isMeasuring(that.setting_measure.is_open.toString());
+      }
+      else{
+        that.setting_measure.is_open = false;  //切换至切换即关闭测距
+        that.setting_measure.step = '0';
+        that.setting_measure.has_data = false;
+        that.$refs.unityModel.isMeasuring(that.setting_measure.is_open.toString());
+      }
+    },
   },
   methods:{
     handleClick_setting(){            //设置按钮
       this.setting_is_open = !this.setting_is_open;
     },
-    handleClick_type(tab, event){    //设置类型--相机/对比
+    handleClick_type(tab, event){    //设置类型--相机/对比/测距
       console.log(tab, event);
     },
     handleClick_compare(){            //对比--开启对比按钮
@@ -231,6 +252,14 @@ export default {
       that.StoneCrackDetect.onshow.options = [];
       that.StoneCrackDetect.success = false;
     },
+    handleClick_measure(){            //测距--开启测距
+      var that = this;
+      that.$refs.unityModel.isMeasuring(that.setting_measure.is_open.toString());
+      if(!that.setting_measure.is_open){    //关闭
+        that.setting_measure.step = '0';
+        that.setting_measure.has_data = false;
+      }
+    },
     format_rotating(value){         //格式化角度显示
       return `${value}°`;
     },
@@ -244,7 +273,7 @@ export default {
       }
       that.setting_compare.points.push({            //添加新元素
           url:image_url,
-          srcList:[ image_url ],
+          //srcList:[ image_url ],
           info:[        
             {name:'x', data: x},
             {name:'y', data: y},
@@ -322,7 +351,7 @@ export default {
       var imageURL = "/DZGCG/Pictures/" + that.select_1 +"/" + that.select_3.split(".")[1] + ".JPG";   
       //alert(imageURL);
       that.url = imageURL;
-      that.srcList = [imageURL];
+      //that.srcList = [imageURL];
       that.info[0].data = mess.x;
       that.info[1].data = mess.y;
       that.info[2].data = mess.z;
@@ -338,14 +367,36 @@ export default {
       that.info[2].data = des_url[2] - 0;
       var imageURL = des_url[3].split('\r')[0];
       that.url = imageURL;
-      that.srcList = [imageURL];
+      //that.srcList = [imageURL];
       that.add_points(imageURL, des_url[0] - 0, des_url[1] - 0, des_url[2] - 0);      //加入对比列表并在模型上显示
+    },
+    updateDistance(){         //接收unity信息后更新测距步骤条与测距结果
+      var that = this;
+      if(that.unityMessage[0] === '1'){
+        that.setting_measure.step = '1';
+        that.setting_measure.has_data = false;
+      }
+      else if(that.unityMessage[0] === '2'){          //'2,6,8,10/r'
+        that.setting_measure.step = '2';
+        var dis = that.unityMessage.split(',');       //["2","6","8","10/r"]
+        that.setting_measure.distance[0] = dis[1] - 0;
+        that.setting_measure.distance[1] = dis[2] - 0;
+        that.setting_measure.distance[2] = dis[3].split('\r')[0] - 0;
+        that.setting_measure.has_data = true;
+      }
     },
     recieve(event){
         var that = this;
         that.unityMessage = event.data.handle;
-        that.updatePicture();
-        console.log('(来自vue)' + that.unityMessage);  
+        //alert(event.data.type); 
+        if(event.data.type === '0')
+          that.updatePicture();
+        else if(event.data.type === '1')   //测距相关      '1/r'   '2,6,8,10/r'
+          that.updateDistance();
+        
+        console.log('(来自vue)' + that.unityMessage); 
+        //console.log('(来自vue)' + event.data.type); 
+        
     },
   },
   mounted(){
@@ -574,6 +625,37 @@ export default {
             </el-button>
             
           </el-tab-pane>
+
+          <el-tab-pane name="measure">
+            <template #label>
+              <span class="custom-tabs-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M16.2929 1.29289C16.6834 0.902369 17.3166 0.902369 17.7071 1.29289L22.7071 6.29289C23.0976 6.68342 23.0976 7.31658 22.7071 7.70711L7.70711 22.7071C7.31658 23.0976 6.68342 23.0976 6.29289 22.7071L1.29289 17.7071C0.902369 17.3166 0.902369 16.6834 1.29289 16.2929L3.79275 13.793L13.7928 3.79303L16.2929 1.29289ZM14.5 5.91421L13.4142 7L15.7071 9.29289C16.0976 9.68342 16.0976 10.3166 15.7071 10.7071C15.3166 11.0976 14.6834 11.0976 14.2929 10.7071L12 8.41421L10.9142 9.5L12.2071 10.7929C12.5976 11.1834 12.5976 11.8166 12.2071 12.2071C11.8166 12.5976 11.1834 12.5976 10.7929 12.2071L9.5 10.9142L8.41421 12L10.7071 14.2929C11.0976 14.6834 11.0976 15.3166 10.7071 15.7071C10.3166 16.0976 9.68342 16.0976 9.29289 15.7071L7 13.4142L5.91421 14.5L7.20711 15.7929C7.59763 16.1834 7.59763 16.8166 7.20711 17.2071C6.81658 17.5976 6.18342 17.5976 5.79289 17.2071L4.5 15.9142L3.41421 17L7 20.5858L20.5858 7L17 3.41421L15.9142 4.5L17.2071 5.79289C17.5976 6.18342 17.5976 6.81658 17.2071 7.20711C16.8166 7.59763 16.1834 7.59763 15.7929 7.20711L14.5 5.91421Z" fill="black" fill-opacity="0.85"/>
+                </svg>
+                <span>测距</span>
+              </span>
+            </template>
+
+            <a> 
+              开启测距： 
+              <el-switch 
+              v-model="setting_measure.is_open" 
+              @click="handleClick_measure" />
+            </a>
+
+            <div class="measure_steps">  
+              <el-steps direction="vertical" :active="Number(setting_measure.step)" finish-status="success">
+                <el-step title="选择第一个点位" />
+                <el-step title="选择第二个点位" />
+              </el-steps>
+            </div>
+            <a v-if="setting_measure.has_data">
+              <a>水平距离：{{ setting_measure.distance[0] }}</a><br>
+              <a>垂直距离：{{ setting_measure.distance[1] }}</a><br>
+              <a>直线距离：{{ setting_measure.distance[2] }}</a><br>
+            </a>
+          </el-tab-pane>
+
         </el-tabs>
       </el-card>
       <div class="model-from-unity">
@@ -582,27 +664,32 @@ export default {
     </div>
 
     <div class="details_and_compare">
-      <p v-if="url" class="text_1">当前查看：</p>
-      <div v-if="url" class="details">
+      <p class="text_1">当前查看：</p>
+      <div class="details">
         <div class="image">
           <el-image
             style="width: 200px; height: 200px"
             :src="url"
             :zoom-rate="1.2"
-            :preview-src-list="srcList"
+            :preview-src-list="[url]"
             :initial-index="4"
             fit="cover"
-          />
+          >
+            <template #error>
+              <div class="image-slot">NULL</div>
+            </template>
+          </el-image>
         </div>
         <div class="info">
           <p v-for="data in info" :key="data">
             <a>{{ data.name }}:</a>
             <a>&emsp;{{ data.data }}</a>
           </p>
-          <el-button @click="handleClick_divide(url,info)" round> 
-            <el-icon><Scissor /></el-icon>进行分割 
-          </el-button>
-          
+          <a v-if="url">
+            <el-button @click="handleClick_divide(url,info)" round> 
+              <el-icon><Scissor /></el-icon>进行分割 
+            </el-button>
+          </a>
         </div>
       </div>
       <div v-if="setting_compare.is_open" class="compare">
@@ -621,10 +708,14 @@ export default {
                   style="width: 200px; height: 200px"
                   :src="point.url"
                   :zoom-rate="1.2"
-                  :preview-src-list="point.srcList"
+                  :preview-src-list="[point.url]"
                   :initial-index="4"
                   fit="cover"
-                />
+                >
+                  <template #error>
+                    <div class="image-slot">NULL</div>
+                  </template>
+                </el-image>
               </div>
               <div v-if="setting_compare.is_show" class="compare_info">
                 <p v-for="data in point.info" :key="data">
@@ -675,7 +766,11 @@ export default {
                 :preview-src-list="[StoneCrackDetect.raw_path]"
                 :initial-index="4"
                 fit="cover"
-              />
+              >
+                <template #error>
+                  <div class="image-slot">NULL</div>
+                </template>
+              </el-image>
               <el-row>
                 x: {{ StoneCrackDetect.des.x }}&emsp;
                 y: {{ StoneCrackDetect.des.y }}&emsp;
@@ -692,7 +787,11 @@ export default {
                   :preview-src-list="[StoneCrackDetect.seg_path]"
                   :initial-index="4"
                   fit="cover"
-                />
+                >
+                  <template #error>
+                    <div class="image-slot">NULL</div>
+                  </template>
+                </el-image>
                 <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
               </a>
             </el-col>
@@ -752,7 +851,11 @@ export default {
                       :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
                       :initial-index="4"
                       fit="cover"
-                    />
+                    >
+                    <template #error>
+                      <div class="image-slot">NULL</div>
+                    </template>
+                    </el-image>
                   </el-row>
                   <el-row style="margin-top: 1%;">
                     <el-image
@@ -762,7 +865,11 @@ export default {
                       :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
                       :initial-index="4"
                       fit="cover"
-                    />
+                    >
+                      <template #error>
+                        <div class="image-slot">NULL</div>
+                      </template>
+                    </el-image>
                   </el-row>
                 </el-col>
                 <el-col :span="7" style="margin-left: 1%;">
@@ -804,6 +911,17 @@ export default {
   margin-left: 30px;
   width: 100%;
 }
+.image-slot {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  background: var(--el-fill-color-light);
+  color: var(--el-text-color-secondary);
+  font-size: 20px;
+}
+
 .select-wrapper{
   height: 80px;
   display: flex;
@@ -850,6 +968,26 @@ export default {
   font-weight: normal;
   line-height: 26px;
 }
+.measure_steps{
+  margin-top: 10%;
+  margin-left: 5%;
+  margin-bottom: 5%;
+  height: 100px;
+}
+
+.el-step.is-vertical .el-step__line {
+    width: 2px;
+    top: 15px;
+    bottom: -15px;
+    left: 11px;
+}
+.el-step__icon.is-text {
+    border-radius: 50%;
+    border: 2px solid;
+    border-color: inherit;
+    top:-10%;
+}
+
 
 .model-from-unity{
   margin-left: 10px;
@@ -897,8 +1035,11 @@ export default {
 }
 
 .divide{
-  line-height: 25px;
-  
+  line-height: 25px; 
 }
+.divide.steps.el-step__line {
+      top: 50% !important;
+      height: 4px;
+    }
 
 </style>

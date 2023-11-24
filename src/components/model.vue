@@ -44,6 +44,10 @@ import Unity from "vue-unity-webgl";
         //alert(type);
         this.$refs.unityIframe.contentWindow.setQuick(type);
       },
+      isMeasuring(state){
+        this.$refs.unityIframe.contentWindow.isMeasuring(state);
+        //alert(state);
+      },
     },
   }
 </script>

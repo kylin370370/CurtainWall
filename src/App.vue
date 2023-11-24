@@ -15,9 +15,6 @@ const handleSelect = (key: string, keyPath: string[]) => {
     :default-active="selected_item"
     class="el-menu-demo"
     mode="horizontal"
-    background-color="#545c64"
-    text-color="#fff"
-    active-text-color="#ffd04b"
     @select="handleSelect"
   >
     <el-menu-item index="1"><RouterLink to="/">Home</RouterLink></el-menu-item>
@@ -33,12 +30,15 @@ const handleSelect = (key: string, keyPath: string[]) => {
 </template>
 
 <style scoped>
+.el-menu{
+  background: linear-gradient(270deg, rgba(172, 176, 255, 0.94) 3.68%, rgba(209, 241, 255, 0.97) 34.53%, rgba(210, 241, 255, 0.97) 34.54%, rgba(251, 254, 255, 0.98) 58.26%, rgba(254, 254, 255, 1.00) 94.07%, #D8E6FF 99.65%, #FEFEFF 99.87%);
+}
 .router-link-active {
   text-decoration: none;
-  color: rgb(248, 209, 53);
+  color: #409EFF;
 }
 a{
   text-decoration: none;
-  color: white;
+  color: black;
 }
 </style>

@@ -2,10 +2,13 @@
 </script>
 
 <template>
-  <main>
-  <p>首页</p>    
-  </main>
+  <div class="home">
+     <p>首页</p>  
+  </div>
 </template>
 <style>
+.home {
+  height: 89vh;
+}
 
 </style>

@@ -20,8 +20,9 @@ const handleSelect = (key: string, keyPath: string[]) => {
     <el-menu-item index="1"><RouterLink to="/">Home</RouterLink></el-menu-item>
     <el-sub-menu index="2">
       <template #title>About</template>
-      <el-menu-item index="2-1"><RouterLink to="/about">地震工程馆</RouterLink></el-menu-item>
-      <el-menu-item index="2-2" disabled>敬请期待</el-menu-item>
+      <el-menu-item index="2-1"><RouterLink to="/about/QuakeEngMuseum">地震工程馆</RouterLink></el-menu-item>
+      <el-menu-item index="2-2"><RouterLink to="/about/Library">图书馆</RouterLink></el-menu-item>
+      <el-menu-item index="2-3" disabled>敬请期待</el-menu-item>
     </el-sub-menu>
   </el-menu>
   </header>
@@ -32,6 +33,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
 <style scoped>
 .el-menu{
   background: linear-gradient(270deg, rgba(172, 176, 255, 0.94) 3.68%, rgba(209, 241, 255, 0.97) 34.53%, rgba(210, 241, 255, 0.97) 34.54%, rgba(251, 254, 255, 0.98) 58.26%, rgba(254, 254, 255, 1.00) 94.07%, #D8E6FF 99.65%, #FEFEFF 99.87%);
+  height: 7vh;
 }
 .router-link-active {
   text-decoration: none;

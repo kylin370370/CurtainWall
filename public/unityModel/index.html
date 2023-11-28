@@ -125,9 +125,10 @@
     document.body.appendChild(script);
 
     // Unity传给web
-    function VueShow(str) {
+    function VueShow(str, type) {
       //alert(str)
-      window.parent.postMessage({ handle: str, type: '0' }, '*')
+      window.parent.postMessage({ handle: str, type: type }, '*')
+      //window.parent.postMessage({ handle: str, type: '0' }, '*')
       //window.parent.postMessage({ handle: '2,3,4,5\r', type: '1' }, '*')
     };
 

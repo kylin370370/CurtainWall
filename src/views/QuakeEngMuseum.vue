@@ -135,7 +135,7 @@ export default {
       var that  = this;
       if(that.setting_type === 'measure'){
         that.setting_measure.step = '0';
-        that.setting_measure.is_open = true;    //切换至测距即开始测距
+        that.setting_measure.is_open = false;    
         that.$refs.unityModel.isMeasuring(that.setting_measure.is_open.toString());
       }
       else{

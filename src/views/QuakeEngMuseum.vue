@@ -1,6 +1,6 @@
 <script>
 import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,Histogram,
-  RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place,Scissor,Hide } from '@element-plus/icons-vue';
+  RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place,Scissor,Hide,More } from '@element-plus/icons-vue';
 import axios  from "axios";
 import Model from '@/components/model.vue';
 import data_A from '@/assets/imageCSV/A.csv';
@@ -46,6 +46,7 @@ export default {
     Place,
     Scissor,
     Hide,
+    More,
   },
   data() {
     return {
@@ -56,7 +57,6 @@ export default {
         is_info: false,           //是否显示使用说明
         //is_keyboard: false,     //放此处watch不到所以挪出
         //is_mouse: false,          
-        rotating: 0,              //旋转角度  0-360   xz面
         modeSelection: '0',       //  靠近/降落
       },//其他按钮： 重置
       is_keyboard: true,         //是否允许使用键盘
@@ -66,8 +66,10 @@ export default {
         is_open: false,         //是否开启对比
         is_show: true,          //是否显示坐标等信息
         max_num: 1,             //对比数量      1-10
-        points:[],
+        points:[],              //url,info,state  state各点位card显示状态['1'显示, '0'不显示, '2'中间态(显示卡片不显示详细内容)]
+        type: false,             
       },//其他按钮： 清空
+      type_compare: false,      //对比显示形式  false逐个/true全部
 
       setting_measure:{
         is_open: false,
@@ -135,7 +137,7 @@ export default {
       var that  = this;
       if(that.setting_type === 'measure'){
         that.setting_measure.step = '0';
-        that.setting_measure.is_open = false;    
+        that.setting_measure.is_open = false;   
         that.$refs.unityModel.isMeasuring(that.setting_measure.is_open.toString());
       }
       else{
@@ -143,6 +145,22 @@ export default {
         that.setting_measure.step = '0';
         that.setting_measure.has_data = false;
         that.$refs.unityModel.isMeasuring(that.setting_measure.is_open.toString());
+      }
+    },
+    type_compare: function(){
+      var that = this;
+      var points = that.setting_compare.points;
+      if(that.type_compare){      //全部--全为1
+        for (let i = 0; i < points.length; i++){
+          points[i].state = '1';
+        }
+      }
+      else{                       //逐个--  0,0,0,2,1
+        for (let i = 0; i < points.length; i++){
+          points[i].state = '0';
+        }
+        points[points.length - 2].state = '2';
+        points[points.length - 1].state = '1';
       }
     },
   },
@@ -260,29 +278,46 @@ export default {
         that.setting_measure.has_data = false;
       }
     },
-    format_rotating(value){         //格式化角度显示
-      return `${value}°`;
+    handleClick_more(){               //对比--逐个显示--点击查看更多
+      var that = this;
+      var points = that.setting_compare.points;
+      for (let i = points.length - 1; i >= 0; i--){
+        if(points[i].state === '2'){
+          points[i].state = '1';
+          if(i)
+            points[i - 1].state = '2';
+          break;
+        }
+      }
     },
     add_points(image_url, x, y, z){       //对比的信息列表    添加新元素+显示在模型上
       var that = this;
-      while(that.setting_compare.points.length >= that.setting_compare.max_num){     //已满，删去第一个         //在模型上隐藏位点
-        var points = that.setting_compare.points; 
+      var points = that.setting_compare.points;
+      while(points.length >= that.setting_compare.max_num){     //已满，删去第一个         //在模型上隐藏位点
         that.$refs.unityModel.hide_des(points[0].info[0].data + "," + points[0].info[1].data + "," + points[0].info[2].data);      
         //alert("hide_des: " + points[0].info[0].data + "," + points[0].info[1].data + "," + points[0].info[2].data);
         that.setting_compare.points.splice(0, 1);                       //列表中删去
       }
-      that.setting_compare.points.push({            //添加新元素
+
+      var len = points.length;
+      if(!that.type_compare && len){          //逐个显示时,最后一个点位state为'1',倒数第二个为'2',其余均为'0'
+        for (let i = 0; i < len; i++){
+          points[i].state = '0';
+        }
+        points[len - 1].state = '2';
+      }
+      points.push({            //添加新元素
           url:image_url,
           //srcList:[ image_url ],
           info:[        
             {name:'x', data: x},
             {name:'y', data: y},
-            {name:'z', data: z}  ]
+            {name:'z', data: z}  ],
+          state: '1',
       });
       that.$refs.unityModel.draw_des(x + "," + y + "," + z);    //在模型上显示
       //alert("draw_des" + x + "," + y + "," + z);
     },
-
     addSelections(index, datalist){     //更新选项
       var that = this;
       that.selections[index] = [];
@@ -520,23 +555,6 @@ export default {
               </a>
 
             </a>
-            <!--
-            <client-only>
-            <span><a class="text_2">旋转角度：</a> {{ setting_camera.rotating }}°</span>
-            <el-row :span="24" style="margin-top: -5%;">
-              <a class="rotating_slider">
-                &emsp;
-                <el-slider 
-                v-model="setting_camera.rotating"
-                @change="handleClick_rotating_2"
-                :min="0"
-                :max="360"
-                :format-tooltip="format_rotating"
-                :disabled="is_keyboard || is_mouse"/>
-              </a>
-            </el-row>
-            </client-only>
-            -->
             <el-row style="margin-top: 5%; margin-bottom: 5%">
             <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
             <el-button @click="handleClick_info" size="small" round>
@@ -614,6 +632,19 @@ export default {
               <el-switch 
               v-model="setting_compare.is_show" 
               :disabled="!setting_compare.is_open" />
+            </a>
+            <br>
+            <a>
+              显示形式：
+              <el-switch
+                v-model="type_compare"
+                class="ml-2"
+                inline-prompt
+                style="--el-switch-on-color: #6A8BFF; --el-switch-off-color: #75D9D3"
+                active-text="显示全部"
+                inactive-text="逐个显示"
+                :disabled="!setting_compare.is_open" 
+              />
             </a>
             <br>
             <el-button 
@@ -697,12 +728,22 @@ export default {
         <p class="text_1">最近查看：</p>
         <el-scrollbar>
           <div style="display: flex;">
-            <el-card 
-              v-for="(point, index) in setting_compare.points" 
+            <a
+              v-for="(point, index) in setting_compare.points.slice().reverse()" 
               :key="index" 
+            >
+            <el-card
+              v-if="point.state === '1'"
               :body-style="{ padding: '0px' }"
               class="compare_card">
-              <a>NO. {{ index + 1 }}</a>
+              <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
+                <a>NO. {{ setting_compare.points.length - index }}</a>
+                <a v-if="!index" style="position: absolute; right: 1%;">
+                  <el-tag type="danger" class="mx-1" effect="plain" round>
+                    new
+                  </el-tag>
+                </a>
+              </el-row>
               <div class="compare_image">
                 <el-image
                   style="width: 200px; height: 200px"
@@ -724,7 +765,7 @@ export default {
                 </p>
               </div>
               <div class="compare_operation">
-                <el-button @click="handleClick_search(index)">
+                <el-button @click="handleClick_search(setting_compare.points.length - index - 1)">
                   <el-icon><Search/></el-icon>
                 </el-button>
                 <a v-if="point.url">
@@ -732,11 +773,22 @@ export default {
                     <el-icon><Scissor /></el-icon>
                   </el-button>
                 </a>
-                <el-button @click="handleClick_delete(index)">
+                <el-button @click="handleClick_delete(setting_compare.points.length - index - 1)">
                   <el-icon><Delete/></el-icon>
                 </el-button>
               </div>
             </el-card>
+            <el-card
+              v-else-if="point.state === '2'"
+              :body-style="{ padding: '0px' }"
+              class="compare_card">
+              <a>
+                <el-icon color="#939393" :size="65" @click="handleClick_more">
+                  <More />
+                </el-icon>
+              </a>
+            </el-card>
+            </a>
           </div>
         </el-scrollbar>
       </div>
@@ -954,11 +1006,6 @@ export default {
   font-size: 15px;
   font-weight: bold;
 }
-.rotating_slider{
-  display: flex;
-  align-items: center;
-  width: 90%;
-}
 .text_info{
   font-size: 14px;
   line-height: 20px;
@@ -1021,6 +1068,8 @@ export default {
   justify-content: center;
   width: 210px;
   margin: 10px;
+  height: 410px;
+  margin-left: 1%;
 }
 .compare_image{
 

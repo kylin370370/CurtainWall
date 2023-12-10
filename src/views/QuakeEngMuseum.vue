@@ -3,26 +3,29 @@ import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,His
   RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place,Scissor,Hide,More } from '@element-plus/icons-vue';
 import axios  from "axios";
 import Model from '@/components/model.vue';
-import data_A from '@/assets/imageCSV/A.csv';
-import data_B from '@/assets/imageCSV/B.csv';
-import data_C from '@/assets/imageCSV/C.csv';
+import data_A from '@/assets/imageCSV/new_A.csv';
+import data_B from '@/assets/imageCSV/new_B.csv';
+import data_C from '@/assets/imageCSV/new_C.csv';
 
 /* 处理数据，获得选项2 */
 var uniqueSet = new Set();    // 创建一个空Set对象
 for (let i = 0; i < data_A.length; i++){
-  uniqueSet.add(data_A[i].name[0]);   // 将字母添加到Set对象中，重复的字母不会被重复添加
+  if(data_A[i].state === '1')
+    uniqueSet.add(data_A[i].name[0]);   // 将字母添加到Set对象中，重复的字母不会被重复添加
 }
 var sel_2_A = Array.from(uniqueSet);
 
 var uniqueSet = new Set();    
 for (let i = 0; i < data_B.length; i++){
-  uniqueSet.add(data_B[i].name[0]);  
+  if(data_B[i].state === '1')
+    uniqueSet.add(data_B[i].name[0]);  
 }
 var sel_2_B = Array.from(uniqueSet);
 
 var uniqueSet = new Set();    
 for (let i = 0; i < data_C.length; i++){
-  uniqueSet.add(data_C[i].name[0]);  
+  if(data_C[i].state === '1')
+    uniqueSet.add(data_C[i].name[0]);  
 }
 var sel_2_C = Array.from(uniqueSet);
 //console.log(sel_2_C);
@@ -362,7 +365,7 @@ export default {
           datalist = data_C;
     
         for (let i = 0; i < datalist.length; i++){
-          if(datalist[i].name.startsWith(that.select_2)){     //a_004.JPG =>  0.a_004  (index.name)
+          if(datalist[i].name.startsWith(that.select_2) && datalist[i].state === '1'){     //a_004.JPG =>  0.a_004  (index.name)
             sel_3.push(i + "." +datalist[i].name.split(".")[0]);
           }
         }
@@ -955,6 +958,9 @@ export default {
 </template>
 
 <style>
+.about{
+  background-color: white;
+}
 .some-text{
   height: 80px;
   font-size: 40px;

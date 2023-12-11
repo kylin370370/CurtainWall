@@ -65,6 +65,7 @@ export default {
       is_keyboard: true,         //是否允许使用键盘
       is_mouse: true,            //是否允许使用鼠标
       is_rotating:'0',         //是否正在旋转
+      rotating:null,           //记录一下旋转面
       skyType: true ,         //false白天，true为晚间
 
 
@@ -238,6 +239,13 @@ export default {
     },
     handleClick_quick(type){          //相机--快捷选择    'A' 'B' 'C'
       var that = this;
+      if(type==='A')//记录旋转的面
+        this.rotating='A'
+      else if(type==='B')
+        this.rotating='B'
+      else if(type==='C')
+        this.rotating='C'
+
       that.$refs.unityModel.setQuick(type.toString());
     },
     handleClick_divide(path,info){         //进行图像分割        path路径 info坐标
@@ -567,19 +575,19 @@ export default {
               <a class="text_2">
                 快捷选择：
                 <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
-                <el-button  @click="handleClick_quick('A')" :loading="this.is_rotating==='1'">
+                <el-button  @click="handleClick_quick('A')" :loading="(this.is_rotating==='1')&&(this.rotating==='A')">
                   <el-icon><Place /></el-icon>&ensp;A
                 </el-button>
-                <el-button @click="handleClick_quick('B')" :loading="this.is_rotating==='1'">
+                <el-button @click="handleClick_quick('B')" :loading="(this.is_rotating==='1')&&(this.rotating==='B')">
                   <el-icon><Place /></el-icon>&ensp;B
                 </el-button>
-                <el-button @click="handleClick_quick('C')" :loading="this.is_rotating==='1'">
+                <el-button @click="handleClick_quick('C')" :loading="(this.is_rotating==='1')&&(this.rotating==='C')">
                   <el-icon><Place /></el-icon>&ensp;C
                 </el-button>
                 </el-row>
               </a>
               <a class="text_2">
-                <a> 切换天气： 
+                <a> 切换模式： 
                   <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />
                 </a>
               </a>

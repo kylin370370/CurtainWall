@@ -64,6 +64,9 @@ export default {
       },//其他按钮： 重置
       is_keyboard: true,         //是否允许使用键盘
       is_mouse: true,            //是否允许使用鼠标
+      is_rotating:'0',         //是否正在旋转
+      skyType: true ,         //false白天，true为晚间
+
 
       setting_compare:{
         is_open: false,         //是否开启对比
@@ -214,6 +217,11 @@ export default {
     handleClick_info(){               //相机--是否显示使用说明
       var that = this;
       that.setting_camera.is_info = !that.setting_camera.is_info;
+    },
+    handleClick_setSky(){             //相机--改变天空背景
+      var that = this;
+      that.$refs.unityModel.setSky((this.skyType ? 1 : 0 ).toString());//true的话传1，false传0
+      
     },
     handleClick_mode(){               //相机-模式选择 靠近/降落
       //alert(this.setting_camera.modeSelection);
@@ -443,6 +451,8 @@ export default {
           that.updatePicture();
         else if(event.data.type === '1')   //测距相关      '1/r'   '2,6,8,10/r'
           that.updateDistance();
+        else if(event.data.type === '2')   //提示当前是否正在旋转
+          that.is_rotating=that.unityMessage ;
 
         console.log('(来自vue)' + that.unityMessage);
         //console.log('(来自vue)' + event.data.type);
@@ -557,16 +567,21 @@ export default {
               <a class="text_2">
                 快捷选择：
                 <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
-                <el-button  @click="handleClick_quick('A')">
+                <el-button  @click="handleClick_quick('A')" :loading="this.is_rotating==='1'">
                   <el-icon><Place /></el-icon>&ensp;A
                 </el-button>
-                <el-button @click="handleClick_quick('B')">
+                <el-button @click="handleClick_quick('B')" :loading="this.is_rotating==='1'">
                   <el-icon><Place /></el-icon>&ensp;B
                 </el-button>
-                <el-button @click="handleClick_quick('C')">
+                <el-button @click="handleClick_quick('C')" :loading="this.is_rotating==='1'">
                   <el-icon><Place /></el-icon>&ensp;C
                 </el-button>
                 </el-row>
+              </a>
+              <a class="text_2">
+                <a> 切换天气： 
+                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />
+                </a>
               </a>
 
             </a>

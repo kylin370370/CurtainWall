@@ -48,6 +48,9 @@ import Unity from "vue-unity-webgl";
         this.$refs.unityIframe.contentWindow.isMeasuring(state);
         //alert(state);
       },
+      setSky(idx){
+        this.$refs.unityIframe.contentWindow.setSky(idx);
+      },
     },
   }
 </script>

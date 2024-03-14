@@ -15,7 +15,7 @@ if (useMock) {
       let imagePath = '/DZGCG/Pictures/' + imageName;
       // 返回结果
       return {
-          image_path: imagePath,
+          image_path: '/DZGCG/Pictures/A/a_017.JPG',
           image_width: 0,
           image_height: 0,
           has_crack: true,

@@ -21,8 +21,10 @@ const handleSelect = (key: string, keyPath: string[]) => {
     <el-sub-menu index="2">
       <template #title>About</template>
       <el-menu-item index="2-1"><RouterLink to="/about/QuakeEngMuseum">地震工程馆</RouterLink></el-menu-item>
-      <el-menu-item index="2-2"><RouterLink to="/about/Library">图书馆</RouterLink></el-menu-item>
-      <el-menu-item index="2-3" disabled>敬请期待</el-menu-item>
+      <el-menu-item index="2-2"><RouterLink to="/about/Composite">衷和楼</RouterLink></el-menu-item>
+      <el-menu-item index="2-3"><RouterLink to="/about/Library" disabled>图书馆</RouterLink></el-menu-item>
+      <el-menu-item index="2-4"><RouterLink to="/about/Office" disabled>政府大楼</RouterLink></el-menu-item>
+      <el-menu-item index="2-5" disabled>敬请期待</el-menu-item>
     </el-sub-menu>
   </el-menu>
   </header>

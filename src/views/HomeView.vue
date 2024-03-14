@@ -5,6 +5,9 @@ import { RouterLink, RouterView } from 'vue-router'
 var imageURL = ["/home/carousel_1.png","/home/carousel_2.png","/home/carousel_3.png",
   "/home/carousel_4.png","/home/carousel_5.png","/home/carousel_6.png"];
 
+var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carousel_2_3.png",
+  "/home/carousel_2_4.png"];
+
   export default {
   name: 'about',
   components:{
@@ -17,12 +20,26 @@ var imageURL = ["/home/carousel_1.png","/home/carousel_2.png","/home/carousel_3.
   },
   data(){
     return{
+      option:'0',
       imageBox: imageURL,
     }
   },
   methods: {
+    handleClick_change(){
+      if(this.option === '0'){
+        this.imageBox = imageURL;
+      }
+      else{
+        this.imageBox = imageURL_2;
+      }
+    },
     changePage() {
-      this.$router.push('/about/QuakeEngMuseum')
+      if(this.option === '0'){
+        this.$router.push('/about/QuakeEngMuseum')
+      }
+      else{
+        this.$router.push('/about/Composite')
+      }
     }
   },
   }
@@ -31,7 +48,17 @@ var imageURL = ["/home/carousel_1.png","/home/carousel_2.png","/home/carousel_3.
 <template>
   <div class="home">
     <img class="bk_image" src="../assets/home/bk.png">
-    <div class="quake_info">      
+
+    <div class="option_wrapper">
+      <div class="mb-2 flex items-center text-sm">
+        <el-radio-group v-model="option" class="ml-4" @change="handleClick_change">
+          <el-radio label="0" size="large">地震工程馆</el-radio>
+          <el-radio label="1" size="large">衷和楼</el-radio>
+        </el-radio-group>
+      </div>  
+    </div>
+
+    <div v-if="option==='0'" class="quake_info">   
       <div class="text_1_1">
         <el-row style="margin-bottom: 2%">地震工程馆</el-row>
       </div>
@@ -69,6 +96,39 @@ var imageURL = ["/home/carousel_1.png","/home/carousel_2.png","/home/carousel_3.
         </el-button>
       </div>
     </div>
+    <div v-else class="quake_info">   
+      <div class="text_1_1">
+        <el-row style="margin-bottom: 2%">衷和楼</el-row>
+      </div>
+      <div class="text_1_2">
+        衷和楼原为综合楼，取同济当发展为综合型科研型大学之义，为教学科研综合楼。现改为衷和楼，又与原音接近，取自《尚书·皋陶谟》：“同寅协恭和衷哉”，寓意和衷共济，契合同济精神。于2007年百年校庆前建成并投入使用, 是百年校庆的标志性建筑。
+        综合楼的大投资以及建立在大投资基础上的体量都是有史以来之最,其高度创造了同济校本部的新地标,无论空间的塑造方式还是立面用材分割都具时代感,但立面的分割方式、色彩又与五、六十年代建成的南北教学楼、图书馆以及八十年代末期的行政楼相协调,又从老建筑的立面中获得自身的设计依据。
+      </div>
+      
+      <el-divider />
+      <el-row class="text_fun">
+        <el-col :span="7">
+          <el-icon><Search /></el-icon><br>
+          查看幕墙
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="7">
+          <el-icon><Histogram /></el-icon><br>
+          图片对比
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="7">
+          <el-icon><Moon /></el-icon><br>
+          夜景模式
+        </el-col>
+      </el-row> 
+      <div class="router_button">
+        <el-button @click="changePage" size="large" color="#EEFFFF" round>
+          <el-icon><Pointer /></el-icon>前往体验
+        </el-button>
+      </div>
+    </div>
+
     
     <div class="carousel">
       <el-carousel :interval="3000" type="card" height="65vh"  direction="vertical">
@@ -94,7 +154,12 @@ body{
   bottom: 0; 
   left: 0;
 }
-
+.option_wrapper{
+  position: absolute;
+  width: 44vw;
+  left:6%;
+  top:5%;
+}
 .quake_info{
   position: absolute;
   width: 44vw;

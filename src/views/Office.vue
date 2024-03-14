@@ -2,36 +2,34 @@
 import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,Histogram,
   RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place,Scissor,Hide,More } from '@element-plus/icons-vue';
 import axios  from "axios";
-import Model from '@/components/model_1.vue';
-import data_A from '@/assets/imageCSV_1/new_A.csv';
-import data_B from '@/assets/imageCSV_1/new_B.csv';
-import data_C from '@/assets/imageCSV_1/new_C.csv';
+import Model from '@/components/model_3.vue';
+import data_SE from '@/assets/imageCSV_3/SE.csv';
+import data_SW from '@/assets/imageCSV_3/SW.csv';
 
 /* 处理数据，获得选项2 */
-var uniqueSet = new Set();    // 创建一个空Set对象
-for (let i = 0; i < data_A.length; i++){
-  if(data_A[i].state === '1')
-    uniqueSet.add(data_A[i].name[0]);   // 将字母添加到Set对象中，重复的字母不会被重复添加
+var sel_2_SE = [];
+var middle = new Set();
+for (let i = 0; i < data_SE.length; i++) {
+  var middle_part = data_SE[i].name.split("_")[1];    // SE-20_01-03F_i_001.jpg   ['SE-20', '01-03F', 'i', '001.jpg']
+  if (!middle.has(middle_part)) {
+    middle.add(middle_part);
+    sel_2_SE.push(middle_part);
+  }
 }
-var sel_2_A = Array.from(uniqueSet);
-
-var uniqueSet = new Set();
-for (let i = 0; i < data_B.length; i++){
-  if(data_B[i].state === '1')
-    uniqueSet.add(data_B[i].name[0]);
+//console.log(sel_2_SE);
+var sel_2_SW = [];
+var middle = new Set();
+for (let i = 0; i < data_SW.length; i++) {
+  var middle_part = data_SW[i].name.split("_")[1];
+  if (!middle.has(middle_part)) {
+    middle.add(middle_part);
+    sel_2_SW.push(middle_part);
+  }
 }
-var sel_2_B = Array.from(uniqueSet);
-
-var uniqueSet = new Set();
-for (let i = 0; i < data_C.length; i++){
-  if(data_C[i].state === '1')
-    uniqueSet.add(data_C[i].name[0]);
-}
-var sel_2_C = Array.from(uniqueSet);
-//console.log(sel_2_C);
+//console.log(sel_2_SW);
 
 export default {
-  name: 'quake',
+  name: 'comp',
   components: {
     Model,
     Location,
@@ -85,19 +83,18 @@ export default {
         has_data: false,      //是否接收到距离数据
       },
 
-      select_1: null,
-      select_2: null,
+      select_1: null,           // SE-20/SW-20
+      select_2: null,           // 01-03F/...
       select_3: null,
       selections:[
         [
-          {value: 'A',label: 'A (NE-1.5°)'},
-          {value: 'B',label: 'B (SW-1.5°)'},
-          {value: 'C', label: 'C (SE-1.5°)'}
+          {value: 'SE-20',label: 'SE-20'},
+          {value: 'SW-20',label: 'SW-20'},
         ],
         [],
         []
       ],
-      urlList:[],
+
       url: '',        //图片url
       //srcList: [],    //打开图片预览，可以放入多张图片
       info: [
@@ -108,27 +105,6 @@ export default {
       ],
       unityMessage: '',     //来自unity
 
-      StoneCrackDetect:{
-        is_show: false,      //是否开启图像分割栏
-        raw_path: '',       //原图路径
-        path: '',           //原图路径(请求接口时使用)
-        des:{               //原图坐标
-          x:0,
-          y:0,
-          z:0
-        },
-        has_crack: false,   //有无裂痕
-        crack_data: {},     //裂痕数据
-        seg_path: '',       //图像分割中间结果图片
-        detect_path:'',
-        seg_count: 0,       //分割块数
-        block_data: [{}],   //每块数据
-        onshow:{
-          no:[],        //要显示的块block_data中位置
-          options:[],   //选项
-        },
-        success:false,  //请求接口是否成功
-      },
     }
   },
   watch: {
@@ -201,9 +177,9 @@ export default {
     handleClick_search(index){        //对比--显示特定位点    index>=0对比处search按钮  index=-1图像分割处search按钮
       var that = this;
       if(index >= 0){   //对比处search按钮
-      var des = this.setting_compare.points[index];
-      that.$refs.unityModel.specialize_des(des.info[0].data + "," + des.info[1].data + "," + des.info[2].data);
-      //alert("specialize_des: " + des.info[0].data + "," + des.info[1].data + "," + des.info[2].data);
+        var des = this.setting_compare.points[index];
+        that.$refs.unityModel.specialize_des(des.info[0].data + "," + des.info[1].data + "," + des.info[2].data);
+        //alert("specialize_des: " + des.info[0].data + "," + des.info[1].data + "," + des.info[2].data);
       }
       else{       //图像分割处search按钮
         var SCD = that.StoneCrackDetect;
@@ -234,102 +210,15 @@ export default {
       var that = this;
       that.$refs.unityModel.setSize(type.toString());
     },
-    handleClick_quick(type){          //相机--快捷选择    'A' 'B' 'C'
+    handleClick_quick(type){          //相机--快捷选择    'SE' 'SW'
       var that = this;
 
-      if(type==='A')//记录旋转的面
-        this.rotating='A';
-      else if(type==='B')
-        this.rotating='B';
-      else if(type==='C')
-        this.rotating='C';
+      if(type==='SE')//记录旋转的面
+        this.rotating='SE';
+      else if(type==='SW')
+        this.rotating='SW';
 
       that.$refs.unityModel.setQuick(type.toString());
-    },
-    handleClick_divide(path,info){         //进行图像分割        path路径 info坐标
-      var that = this;
-      var SCD = that.StoneCrackDetect;
-      SCD.is_show = true;           //显示分隔栏
-      SCD.des.x = info[0].data;     //保存坐标
-      SCD.des.y = info[1].data;
-      SCD.des.z = info[2].data;
-      SCD.onshow.no = [];
-      SCD.onshow.options = [];
-      SCD.success = false;
-      if(path){         // /DZGCG/Pictures/A/a_004.JPG
-        SCD.path = path.split("/DZGCG/source_image/")[1];
- // console.log( SCD.path)
-        SCD.raw_path = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image/"+SCD.path;
-
-        SCD.seg_path =  SCD.raw_path.replace('.JPG',"/segment_whole.png");
-        SCD.seg_path =  SCD.seg_path.replace('source_image',"segment_image");
-        SCD.detect_path="https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/detect_image/"+SCD.path;
-        SCD.detect_path=SCD.detect_path.replace('JPG','png');
-        SCD.path= SCD.path.replace('/','_')
-        SCD.path= SCD.path.replace('.JPG','')
-        console.log(SCD.path)
-        var  urlList=that. urlList;
-        // alert(SCD.path);
-        //alert(that.StoneCrackDetect.path);    //  A/a_004.JPG
-          axios
-              .get(`http://localhost:8443/api/image/${SCD.path}`)
-              // .get(`http://120.46.136.85:8443/api/image/${SCD.path}`)
-              .then((response) => {
-                SCD.seg_count = response.data.length;
-                SCD.block_data = response.data.map((item, index) => {
-                  const block = {
-                    has_crack: item.hasCrack,
-                    block_num:index,
-                    block_seg_image_path:item.imagePath,
-                    block_detect_image_path: item.binaryImagePath,
-                    crack_data: {
-                      crackArea: item.crackArea,
-                      crackLength: item.crackLength,
-                      crackAverageWidth: item.crackAverageWidth,
-                      crackMaxWidth: item.crackMaxWidth
-                    }
-                  };
-
-                  // 打印每个block块
-                  console.log('Block 数据:', block);
-                  SCD.onshow.options.push({
-                    value: index.toString(),
-                    label: 'Block ' + index.toString() // 如果有具体的block_num，请使用 item.block_num
-                  });
-                  return block;
-
-                });
-              })
-              .catch((error) => {
-                console.error('获取URL列表失败：', error);
-              });
-        SCD.success = true;
-        // axios.get('/api/StoneCrackDetect/data?image_name='+ SCD.path).then(res =>{
-        //   SCD.has_crack = res.data.has_crack;
-        //
-        //   //alert(SCD.raw_path);
-        //   if(res.data.has_crack)
-        //     SCD.crack_data = res.data.crack_data;
-        //   SCD.success = true;
-        // });
-        // axios.get('/api/StoneCrackDetect/block_data?image_name='+ SCD.path).then(res=>{
-        //
-        //   SCD.seg_count = res.data.seg_count;
-        //   SCD.block_data = res.data.block_data;
-        //   for(let i=0; i< SCD.seg_count; i++){
-        //     SCD.onshow.options.push(
-        //       {value: i.toString(), label: SCD.block_data[i].block_num.toString()}
-        //     );
-        //   }
-        // });
-      }
-    },
-    handleClick_hideDivide(){         //隐藏分割栏
-      var that = this;
-      that.StoneCrackDetect.is_show = false;
-      that.StoneCrackDetect.onshow.no = [];
-      that.StoneCrackDetect.onshow.options = [];
-      that.StoneCrackDetect.success = false;
     },
     handleClick_measure(){            //测距--开启测距
       var that = this;
@@ -371,91 +260,106 @@ export default {
         }
         points[len - 1].state = '2';
       }
-      //alert(image_url);
       points.push({            //添加新元素
-          url:image_url,
-          //srcList:[ image_url ],
-          info:[
-            {name:'x', data: x},
-            {name:'y', data: y},
-            {name:'z', data: z},
-            {name:'path', data: path} ],
-          state: '1',
+        url:image_url,
+        //srcList:[ image_url ],
+        info:[
+          {name:'x', data: x},
+          {name:'y', data: y},
+          {name:'z', data: z},
+          {name:'path',data: path}  ],
+        state: '1',
       });
       that.$refs.unityModel.draw_des(x + "," + y + "," + z);    //在模型上显示
       //alert("draw_des" + x + "," + y + "," + z);
     },
-    addSelections(index, datalist){     //更新选项
+    addSelections(index, datalist, child){     //更新选项
       var that = this;
       that.selections[index] = [];
       if(index === 1){
         for (let i = 0; i < datalist.length; i++){
           that.selections[index].push(
-            {value: datalist[i], label: datalist[i]}
+              {value: datalist[i], label: datalist[i]}
           );
         }
       }
       else{     //记录在data_X中的位置,便于发送信息
-        for (let i = 0; i < datalist.length; i++){     //0.a_004  (index.name)  =>  0.a_004  a_004
+        for (let i = 0; i < datalist.length; i++){
+          var temp_children = [];
+          for(let j = 0; j < child[i].length; j++){     //0.i_001 => 0.i_001  i_001
+            temp_children.push({value: child[i][j], label: child[i][j].split(".")[1]});
+          }
           that.selections[index].push(
-            {value: datalist[i], label: datalist[i].split(".")[1]}
+              {
+                value: datalist[i],
+                label: datalist[i],
+                children: temp_children
+              }
           );
         }
       }
     },
     updateSelections(index){            //更新选项
       var that = this;
-      if(index === 0){        // A  B  C
+      if(index === 0){        // SE-20 SW-20
         that.select_2 = null;
         that.select_3 = null;
 
-        var sel_2 = sel_2_A;
-        if(that.select_1 === 'B')
-          sel_2 = sel_2_B;
-        else if(that.select_1 === 'C')
-          sel_2 = sel_2_C;
+        var sel_2 = sel_2_SE;
+        if(that.select_1 === 'SW-20')
+          sel_2 = sel_2_SW;
 
-        that.addSelections(1, sel_2);
+        that.addSelections(1, sel_2, []);
       }
-      else if(index === 1){   // A-a
+      else if(index === 1){   // 01-03F
         that.select_3 = null;
         var sel_3 = [];
+        var sel_3_children = [];
         var datalist = [];
-        if(that.select_1 === 'A')
-          datalist = data_A;
-        else if(that.select_1 === 'B')
-          datalist = data_B;
-        else if(that.select_1 === 'C')
-          datalist = data_C;
+        if(that.select_1 === 'SE-20')
+          datalist = data_SE;
+        else if(that.select_1 === 'SW-20')
+          datalist = data_SW;
 
+        var uniqueSet = new Set();    // 创建一个空Set对象
         for (let i = 0; i < datalist.length; i++){
-          if(datalist[i].name.startsWith(that.select_2) && datalist[i].state === '1'){     //a_004.JPG =>  0.a_004  (index.name)
-            sel_3.push(i + "." +datalist[i].name.split(".")[0]);
+          if(datalist[i].state === '0')
+            continue;
+          var parts = datalist[i].name.split("_");    // SE-20_01-03F_i_001.jpg   ['SE-20', '01-03F', 'i', '001.jpg']
+          if(that.select_2 === parts[1]){             // 01-03F
+            if (!uniqueSet.has(parts[2])) {
+              uniqueSet.add(parts[2]);
+              sel_3.push(parts[2]);
+              sel_3_children.push([]);
+            }
+            else{
+              var index = sel_3.indexOf(parts[2]);                    //  0.i_001
+              sel_3_children[index].push(i + "." + parts[2] + "_" + parts[3].split(".")[0]);
+            }
           }
         }
-        that.addSelections(2, sel_3);
+        that.addSelections(2, sel_3, sel_3_children);
       }
       else{     //index === 2   //A-a-a_004
       }
     },
     sendSelections(){       //  按钮“确定”    1.向unity发坐标   2. 更新图片
       var that = this;
-      //alert(that.select_1+" "+that.select_2+" "+that.select_3);
-      var index = that.select_3.split(".")[0] - 0;
-      var mess = data_A[index];
-      if(that.select_1 === 'B')
-        mess = data_B[index];
-        else if(that.select_1 === 'C')
-        mess = data_C[index];
+      //alert(that.select_1+" "+that.select_2+" "+that.select_3[1]);
+      //console.log(that.select_3);
+
+      var index = that.select_3[1].split(".")[0] - 0;
+      var mess = data_SE[index];
+      if(that.select_1 === 'SW-20')
+        mess = data_SW[index];
       //alert(mess.x + "," + mess.y + "," + mess.z);
       //this.$refs.unityModel.sendOrders(mess.x + "," + mess.y + "," + mess.z);
 
-      var imageURL = "Pictures/DZGCG/source_image/" + that.select_1 +"/" + that.select_3.split(".")[1] + ".JPG";
+      var baseURL = "https://zhl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/";
+      var imageURL = baseURL + that.select_1 + "/" + that.select_1 + "_" + that.select_2 + "_" + that.select_3[1].split(".")[1] + ".jpg";
 
-      //修改为OBS读取
-      var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com";
-      imageURL = imageURL.replace('Pictures', baseURL);
-
+      imageURL = imageURL.replace('SE-20/SE-20', 'SW205/SW205');    //替换为真实路径
+      imageURL = imageURL.replace('SW-20/SW-20', 'SE115/SE115');
 
       //alert(imageURL);
       that.url = imageURL;
@@ -463,25 +367,29 @@ export default {
       that.info[0].data = mess.x;
       that.info[1].data = mess.y;
       that.info[2].data = mess.z;
-      that.info[3].data = "/" + that.select_1 +"/" + that.select_3.split(".")[1] + ".JPG";
-
+      that.info[3].data = that.select_1 + "_" + that.select_2 + "_" + that.select_3[1].split(".")[1] + ".jpg";
+      //alert(that.info[3].data);
       that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
     },
 
     updatePicture(){            //接收unity信息后更新显示
-      var that = this;                              //"52.12,13.28,85.74,/DZGCG/Pictures/A/a_004.JPG\r"
-      var des_url = that.unityMessage.split(',');   //["52.12","13.28","85.74","/DZGCG/Pictures/A/a_004.JPG\r"]
+      var that = this;                              //"50.48,29.23,0.88,/ZHL/Pictures/SE-20/SE-20_01-06F_a_001.jpg\r"
+      var des_url = that.unityMessage.split(',');   //["50.48","29.23","0.88","/ZHL/Pictures/SE-20/SE-20_01-06F_a_001.jpg\r"]
       that.info[0].data = des_url[0] - 0;
       that.info[1].data = des_url[1] - 0;
       that.info[2].data = des_url[2] - 0;
-
       var imageURL = des_url[3].split('\r')[0];
-      that.info[3].data = imageURL.replace('/DZGCG/Pictures', '');
+      //that.info[3].data = imageURL.replace('/ZHL/Pictures/SE-20', '');
+      //that.info[3].data = imageURL.replace('/ZHL/Pictures/SW-20', '');
+      that.info[3].data = imageURL.split('/')[4];         //SE-20_01-06F_a_001.jpg
+
       //修改为OBS读取
-      var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image";
-      imageURL = imageURL.replace('/DZGCG/Pictures', baseURL);
-      // console.log("打印")
-      // console.log(imageURL)
+      var baseURL = "https://zhl-pictures.obs.cn-north-4.myhuaweicloud.com";
+      imageURL = imageURL.replace('/ZHL', baseURL);
+
+      imageURL = imageURL.replace('SE-20/SE-20', 'SW205/SW205');    //替换为真实路径
+      imageURL = imageURL.replace('SW-20/SW-20', 'SE115/SE115');
+
       that.url = imageURL;
       //that.srcList = [imageURL];
       that.add_points(imageURL, des_url[0] - 0, des_url[1] - 0, des_url[2] - 0, that.info[3].data);      //加入对比列表并在模型上显示
@@ -502,27 +410,20 @@ export default {
       }
     },
     recieve(event){
-        var that = this;
-        that.unityMessage = event.data.handle;
-        //alert(event.data.type);
-        if(event.data.type === '0')
-          that.updatePicture();
-        else if(event.data.type === '1')   //测距相关      '1/r'   '2,6,8,10/r'
-          that.updateDistance();
+      var that = this;
+      that.unityMessage = event.data.handle;
+      //alert(event.data.type);
+      if(event.data.type === '0')
+        that.updatePicture();
+      else if(event.data.type === '1')   //测距相关      '1/r'   '2,6,8,10/r'
+        that.updateDistance();
 
-        else if(event.data.type === '2')   //提示当前是否正在旋转
-          that.is_rotating=that.unityMessage ;
+      else if(event.data.type === '2')   //提示当前是否正在旋转
+        that.is_rotating=that.unityMessage ;
 
-        console.log('(来自vue)' + that.unityMessage);
-        //console.log('(来自vue)' + event.data.type);
+      console.log('(来自vue)' + that.unityMessage);
+      //console.log('(来自vue)' + event.data.type);
 
-    },
-    DoItYourself() {
-      // 获取路由路径
-      // const routePath = this.$router.resolve({ name: 'NewPage' }).href;
-      // 在新标签页中打开页面
-      // window.open(routePath, '_blank');
-      window.open('https://www.baidu.com', '_blank');
     },
   },
   mounted(){
@@ -535,7 +436,7 @@ export default {
   <div class="about">
     <div class="some-text">
       <el-icon><Location /></el-icon>
-      同济大学地震工程馆
+      经开区政府大楼
     </div>
 
     <div class="select-wrapper">
@@ -544,37 +445,38 @@ export default {
       </el-button>
       &emsp;
       <el-select-v2
-        v-model="select_1"
-        :options="selections[0]"
-        placeholder="Please select"
-        @change="updateSelections(0)"
-        size="large"
+          v-model="select_1"
+          :options="selections[0]"
+          placeholder="Please select"
+          @change="updateSelections(0)"
+          size="large"
       />
       &ensp;
       <el-select-v2
-        v-model="select_2"
-        :options="selections[1]"
-        placeholder="Please select"
-        @change="updateSelections(1)"
-        size="large"
-        :disabled="!select_1"
+          v-model="select_2"
+          :options="selections[1]"
+          placeholder="Please select"
+          @change="updateSelections(1)"
+          size="large"
+          :disabled="!select_1"
       />
       &ensp;
-      <el-select-v2
-        v-model="select_3"
-        :options="selections[2]"
-        placeholder="Please select"
-        @change="updateSelections(2)"
-        size="large"
-        :disabled="!select_2"
+      <el-cascader
+          v-model="select_3"
+          :options="selections[2]"
+          placeholder="Please select"
+          @change="updateSelections(2)"
+          size="large"
+          :show-all-levels="false"
+          :disabled="!select_2"
       />
       &ensp;
       <el-button
-      @click="sendSelections"
-      color="#626aef"
-      :disabled="!select_3"
+          @click="sendSelections"
+          color="#626aef"
+          :disabled="!select_3"
       >
-      确定
+        确定
       </el-button>
     </div>
 
@@ -590,15 +492,15 @@ export default {
             </template>
             <a>
               <el-checkbox
-                v-model="is_keyboard"
-                label="启用键盘控制"
-                size="large"
+                  v-model="is_keyboard"
+                  label="启用键盘控制"
+                  size="large"
               />
               <br>
               <el-checkbox
-                v-model="is_mouse"
-                label="启用鼠标控制"
-                size="large"
+                  v-model="is_mouse"
+                  label="启用鼠标控制"
+                  size="large"
               />
               <br>
               <a class="text_2">
@@ -633,29 +535,26 @@ export default {
               <a class="text_2">
                 快捷选择：
                 <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
-                <el-button  @click="handleClick_quick('A')" :loading="(this.is_rotating==='1')&&(this.rotating==='A')">
-                  <el-icon><Place /></el-icon>&ensp;A
-                </el-button>
-                <el-button @click="handleClick_quick('B')" :loading="(this.is_rotating==='1')&&(this.rotating==='B')">
-                  <el-icon><Place /></el-icon>&ensp;B
-                </el-button>
-                <el-button @click="handleClick_quick('C')" :loading="(this.is_rotating==='1')&&(this.rotating==='C')">
-                  <el-icon><Place /></el-icon>&ensp;C
-                </el-button>
+                  <el-button  @click="handleClick_quick('SE')" :loading="(this.is_rotating==='1')&&(this.rotating==='SE')">
+                    <el-icon><Place /></el-icon>&ensp;SE-20
+                  </el-button>
+                  <el-button @click="handleClick_quick('SW')" :loading="(this.is_rotating==='1')&&(this.rotating==='SW')">
+                    <el-icon><Place /></el-icon>&ensp;SW-20
+                  </el-button>
                 </el-row>
               </a>
-<!--              <a class="text_2">-->
-<!--                <a> 夜景模式：-->
-<!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
-<!--                </a>-->
-<!--              </a>-->
+              <a class="text_2">
+                <a> 夜景模式：
+                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />
+                </a>
+              </a>
 
             </a>
             <el-row style="margin-top: 5%; margin-bottom: 5%">
-            <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
-            <el-button @click="handleClick_info" size="small" round>
-                  <el-icon><InfoFilled /></el-icon>
-            </el-button>
+              <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
+              <el-button @click="handleClick_info" size="small" round>
+                <el-icon><InfoFilled /></el-icon>
+              </el-button>
             </el-row>
             <a v-if="setting_camera.is_info" class="text_info">
               <el-scrollbar height="130px">
@@ -709,51 +608,51 @@ export default {
             <a>
               开启对比：
               <el-switch
-              v-model="setting_compare.is_open"
-              @click="handleClick_compare" />
+                  v-model="setting_compare.is_open"
+                  @click="handleClick_compare" />
             </a>
             <br>
             <a>
               对比数：&emsp;
               <el-input-number
-              v-model="setting_compare.max_num"
-              :min="1"
-              :max="10"
-              :step="1"
-              :disabled="!setting_compare.is_open" />
+                  v-model="setting_compare.max_num"
+                  :min="1"
+                  :max="10"
+                  :step="1"
+                  :disabled="!setting_compare.is_open" />
             </a>
             <br>
             <a>
               显示坐标：
               <el-switch
-              v-model="setting_compare.is_show"
-              :disabled="!setting_compare.is_open" />
+                  v-model="setting_compare.is_show"
+                  :disabled="!setting_compare.is_open" />
             </a>
             <br>
             <a>
               显示形式：
               <el-switch
-                v-model="type_compare"
-                class="ml-2"
-                inline-prompt
-                style="--el-switch-on-color: #6A8BFF; --el-switch-off-color: #75D9D3"
-                active-text="显示全部"
-                inactive-text="逐个显示"
-                :disabled="!setting_compare.is_open"
+                  v-model="type_compare"
+                  class="ml-2"
+                  inline-prompt
+                  style="--el-switch-on-color: #6A8BFF; --el-switch-off-color: #75D9D3"
+                  active-text="显示全部"
+                  inactive-text="逐个显示"
+                  :disabled="!setting_compare.is_open"
               />
             </a>
             <br>
             <el-button
-              color="#626aef"
-              @click="handleClick_clear"
-              :dark="isDark"
-              :disabled="!setting_compare.is_open">
+                color="#626aef"
+                @click="handleClick_clear"
+                :dark="isDark"
+                :disabled="!setting_compare.is_open">
               清空
             </el-button>
 
           </el-tab-pane>
 
-          <el-tab-pane name="measure">
+          <el-tab-pane name="measure" v-if="0">
             <template #label>
               <span class="custom-tabs-label">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -766,8 +665,8 @@ export default {
             <a>
               开启测距：
               <el-switch
-              v-model="setting_measure.is_open"
-              @click="handleClick_measure" />
+                  v-model="setting_measure.is_open"
+                  @click="handleClick_measure" />
             </a>
 
             <div class="measure_steps">
@@ -795,12 +694,12 @@ export default {
       <div class="details">
         <div class="image">
           <el-image
-            style="width: 200px; height: 200px"
-            :src="url"
-            :zoom-rate="1.2"
-            :preview-src-list="[url]"
-            :initial-index="4"
-            fit="cover"
+              style="width: 200px; height: 200px"
+              :src="url"
+              :zoom-rate="1.2"
+              :preview-src-list="[url]"
+              :initial-index="4"
+              fit="cover"
           >
             <template #error>
               <div class="image-slot">NULL</div>
@@ -812,12 +711,6 @@ export default {
             <a>{{ data.name }}:</a>
             <a>&emsp;{{ data.data }}</a>
           </p>
-          <a v-if="url">
-            <el-button @click="handleClick_divide(url,info)" round>
-              <el-icon><Scissor /></el-icon>进行分割
-            </el-button>
-            <el-button @click="DoItYourself">Do-It-Yourself!</el-button>
-          </a>
         </div>
       </div>
       <div v-if="setting_compare.is_open" class="compare">
@@ -826,116 +719,27 @@ export default {
         <el-scrollbar>
           <div style="display: flex;">
             <a
-              v-for="(point, index) in setting_compare.points.slice().reverse()"
-              :key="index"
+                v-for="(point, index) in setting_compare.points.slice().reverse()"
+                :key="index"
             >
-            <el-card
-              v-if="point.state === '1'"
-              :body-style="{ padding: '0px' }"
-              class="compare_card">
-              <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
-                <a>NO. {{ setting_compare.points.length - index }}</a>
-                <a v-if="!index" style="position: absolute; right: 1%;">
-                  <el-tag type="danger" class="mx-1" effect="plain" round>
-                    new
-                  </el-tag>
-                </a>
-              </el-row>
-              <div class="compare_image">
-                <el-image
-                  style="width: 200px; height: 200px"
-                  :src="point.url"
-                  :zoom-rate="1.2"
-                  :preview-src-list="[point.url]"
-                  :initial-index="4"
-                  fit="cover"
-                >
-                  <template #error>
-                    <div class="image-slot">NULL</div>
-                  </template>
-                </el-image>
-              </div>
-              <div v-if="setting_compare.is_show" class="compare_info">
-                <p v-for="data in point.info" :key="data">
-                <a>{{ data.name }}:</a>
-                <a>&emsp;{{ data.data }}</a>
-                </p>
-              </div>
-              <div class="compare_operation">
-                <el-button @click="handleClick_search(setting_compare.points.length - index - 1)">
-                  <el-icon><Search/></el-icon>
-                </el-button>
-                <a v-if="point.url">
-                  <el-button @click="handleClick_divide(point.url,point.info)">
-                    <el-icon><Scissor /></el-icon>
-                  </el-button>
-                </a>
-                <el-button @click="handleClick_delete(setting_compare.points.length - index - 1)">
-                  <el-icon><Delete/></el-icon>
-                </el-button>
-              </div>
-            </el-card>
-            <el-card
-              v-else-if="point.state === '2'"
-              :body-style="{ padding: '0px' }"
-              class="compare_card">
-              <a>
-                <el-icon color="#939393" :size="65" @click="handleClick_more">
-                  <More />
-                </el-icon>
-              </a>
-            </el-card>
-            </a>
-          </div>
-        </el-scrollbar>
-      </div>
-
-      <div v-if="StoneCrackDetect.is_show" class="divide">
-        <el-divider />
-        <p class="text_1">
-          图像分割与裂缝识别
-          <el-icon color="#409EFF" @click="handleClick_hideDivide">
-            <Hide />
-          </el-icon>
-        </p>
-
-        <el-card>
-          <el-row>
-            <el-col :span="8">
-              <p class="text_2">
-                当前图片&ensp;
-                <el-button @click="handleClick_search(-1)" size="small" circle>
-                  <el-icon><Search /></el-icon>
-                </el-button>
-              </p>
-              <el-image
-                style="width: 200px; height: 200px"
-                :src="StoneCrackDetect.raw_path"
-                :zoom-rate="1.2"
-                :preview-src-list="[StoneCrackDetect.raw_path]"
-                :initial-index="4"
-                fit="cover"
-              >
-                <template #error>
-                  <div class="image-slot">NULL</div>
-                </template>
-              </el-image>
-              <el-row>
-                x: {{ StoneCrackDetect.des.x }}&emsp;
-                y: {{ StoneCrackDetect.des.y }}&emsp;
-                z: {{ StoneCrackDetect.des.z }}
-              </el-row>
-            </el-col>
-            <el-col :span="8">
-              <p class="text_2">检测图片</p>
-              <a v-if="StoneCrackDetect.success">
-                <el-row>
-
+              <el-card
+                  v-if="point.state === '1'"
+                  :body-style="{ padding: '0px' }"
+                  class="compare_card">
+                <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
+                  <a>NO. {{ setting_compare.points.length - index }}</a>
+                  <a v-if="!index" style="position: absolute; right: 1%;">
+                    <el-tag type="danger" class="mx-1" effect="plain" round>
+                      new
+                    </el-tag>
+                  </a>
+                </el-row>
+                <div class="compare_image">
                   <el-image
-                      style="width: 200px; height: 200px"
-                      :src="StoneCrackDetect.detect_path"
+                      style="width: 200px; height: 200px;"
+                      :src="point.url"
                       :zoom-rate="1.2"
-                      :preview-src-list="[StoneCrackDetect.detect_path]"
+                      :preview-src-list="[point.url]"
                       :initial-index="4"
                       fit="cover"
                   >
@@ -943,111 +747,42 @@ export default {
                       <div class="image-slot">NULL</div>
                     </template>
                   </el-image>
-                </el-row>
-              </a>
-            </el-col>
-            <el-col :span="8">
-              <p class="text_2">分割情况</p>
-              <a v-if="StoneCrackDetect.success">
-                <el-image
-                  style="width: 200px; height: 200px"
-                  :src="StoneCrackDetect.seg_path"
-                  :zoom-rate="1.2"
-                  :preview-src-list="[StoneCrackDetect.seg_path]"
-                  :initial-index="4"
-                  fit="cover"
-                >
-                  <template #error>
-                    <div class="image-slot">NULL</div>
-                  </template>
-                </el-image>
-                <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
-              </a>
-            </el-col>
-
-          </el-row>
-        </el-card>
-
-        <p class="text_2">
-          查看分割块：
-          <el-select
-            v-model="StoneCrackDetect.onshow.no"
-            multiple
-            collapse-tags
-            collapse-tags-tooltip
-            :max-collapse-tags="3"
-            placeholder="Select"
-            style="width: 260px"
-          >
-            <el-option
-              v-for="item in StoneCrackDetect.onshow.options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </p>
-        <div v-if="StoneCrackDetect.onshow.no[0]">
-          <el-scrollbar  height="500px">
-            <el-card v-for="block in StoneCrackDetect.onshow.no" :key="block">
-              <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
-              <el-row>
-                <el-col :span="16">
-                  <el-row>
-                    <el-image
-                      style="height: 100px"
-                      :src="StoneCrackDetect.block_data[block].block_seg_image_path"
-                      :zoom-rate="1.2"
-                      :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
-                      :initial-index="4"
-                      fit="cover"
-                    >
-                    <template #error>
-                      <div class="image-slot">NULL</div>
-                    </template>
-                    </el-image>
-                  </el-row>
-                  <el-row style="margin-top: 1%;">
-                    <el-image
-                      style="height: 100px"
-                      :src="StoneCrackDetect.block_data[block].block_detect_image_path"
-                      :zoom-rate="1.2"
-                      :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
-                      :initial-index="4"
-                      fit="cover"
-                    >
-                      <template #error>
-                        <div class="image-slot">NULL</div>
-                      </template>
-                    </el-image>
-                  </el-row>
-                </el-col>
-                <el-col :span="7" style="margin-left: 1%;">
-                  <el-row>
-                    存在裂缝：
-                    <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
-                    <a v-else>否</a>
-                  </el-row>
-                  <a v-if="StoneCrackDetect.block_data[block].has_crack">
-                    <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
-                    <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
-                    <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth  }}</el-row>
-
-                    <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
-
-                  </a>
-                </el-col>
-              </el-row>
-            </el-card>
-          </el-scrollbar>
-        </div>
+                </div>
+                <div v-if="setting_compare.is_show" class="compare_info">
+                  <p v-for="data in point.info" :key="data">
+                    <a>{{ data.name }}:</a>
+                    <a>&emsp;{{ data.data }}</a>
+                  </p>
+                </div>
+                <div class="compare_operation">
+                  <el-button @click="handleClick_search(setting_compare.points.length - index - 1)">
+                    <el-icon><Search/></el-icon>
+                  </el-button>
+                  <el-button @click="handleClick_delete(setting_compare.points.length - index - 1)">
+                    <el-icon><Delete/></el-icon>
+                  </el-button>
+                </div>
+              </el-card>
+              <el-card
+                  v-else-if="point.state === '2'"
+                  :body-style="{ padding: '0px' }"
+                  class="compare_card">
+                <a>
+                  <el-icon color="#939393" :size="65" @click="handleClick_more">
+                    <More />
+                  </el-icon>
+                </a>
+              </el-card>
+            </a>
+          </div>
+        </el-scrollbar>
       </div>
-
 
     </div>
 
-  <br><br><br>
+    <br><br><br>
   </div>
+
 </template>
 
 <style>
@@ -1123,16 +858,16 @@ export default {
 }
 
 .el-step.is-vertical .el-step__line {
-    width: 2px;
-    top: 15px;
-    bottom: -15px;
-    left: 11px;
+  width: 2px;
+  top: 15px;
+  bottom: -15px;
+  left: 11px;
 }
 .el-step__icon.is-text {
-    border-radius: 50%;
-    border: 2px solid;
-    border-color: inherit;
-    top:-10%;
+  border-radius: 50%;
+  border: 2px solid;
+  border-color: inherit;
+  top:-10%;
 }
 
 
@@ -1166,13 +901,15 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 210px;
+  width: 270px;
   margin: 10px;
   height: 430px;
   margin-left: 1%;
 }
 .compare_image{
-
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .compare_info{
   line-height: 18px;
@@ -1187,8 +924,7 @@ export default {
   line-height: 25px;
 }
 .divide.steps.el-step__line {
-      top: 50% !important;
-      height: 4px;
-    }
-
+  top: 50% !important;
+  height: 4px;
+}
 </style>

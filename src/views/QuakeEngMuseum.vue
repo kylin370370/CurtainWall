@@ -64,9 +64,6 @@ export default {
       },//其他按钮： 重置
       is_keyboard: true,         //是否允许使用键盘
       is_mouse: true,            //是否允许使用鼠标
-
-      is_rotating:'0',         //是否正在旋转
-      rotating:null,           //记录一下旋转面
       skyType: true ,         //false白天，true为晚间
 
       setting_compare:{
@@ -236,14 +233,6 @@ export default {
     },
     handleClick_quick(type){          //相机--快捷选择    'A' 'B' 'C'
       var that = this;
-
-      if(type==='A')//记录旋转的面
-        this.rotating='A';
-      else if(type==='B')
-        this.rotating='B';
-      else if(type==='C')
-        this.rotating='C';
-
       that.$refs.unityModel.setQuick(type.toString());
     },
     handleClick_divide(path,info){         //进行图像分割        path路径 info坐标
@@ -509,10 +498,6 @@ export default {
           that.updatePicture();
         else if(event.data.type === '1')   //测距相关      '1/r'   '2,6,8,10/r'
           that.updateDistance();
-
-        else if(event.data.type === '2')   //提示当前是否正在旋转
-          that.is_rotating=that.unityMessage ;
-
         console.log('(来自vue)' + that.unityMessage);
         //console.log('(来自vue)' + event.data.type);
 
@@ -633,13 +618,13 @@ export default {
               <a class="text_2">
                 快捷选择：
                 <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
-                <el-button  @click="handleClick_quick('A')" :loading="(this.is_rotating==='1')&&(this.rotating==='A')">
+                <el-button  @click="handleClick_quick('A')" >
                   <el-icon><Place /></el-icon>&ensp;A
                 </el-button>
-                <el-button @click="handleClick_quick('B')" :loading="(this.is_rotating==='1')&&(this.rotating==='B')">
+                <el-button @click="handleClick_quick('B')" >
                   <el-icon><Place /></el-icon>&ensp;B
                 </el-button>
-                <el-button @click="handleClick_quick('C')" :loading="(this.is_rotating==='1')&&(this.rotating==='C')">
+                <el-button @click="handleClick_quick('C')" >
                   <el-icon><Place /></el-icon>&ensp;C
                 </el-button>
                 </el-row>

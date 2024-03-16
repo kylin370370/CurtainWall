@@ -2,7 +2,8 @@
 import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,Histogram,
   RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place,Scissor,Hide,More } from '@element-plus/icons-vue';
 import axios  from "axios";
-import Model from '@/components/model_1.vue';
+//import Model from '@/components/model_1.vue';
+import Model from '@/components/model.vue';
 import data_A from '@/assets/imageCSV_1/new_A.csv';
 import data_B from '@/assets/imageCSV_1/new_B.csv';
 import data_C from '@/assets/imageCSV_1/new_C.csv';

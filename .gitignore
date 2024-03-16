@@ -26,3 +26,6 @@ coverage
 *.njsproj
 *.sln
 *.sw?
+
+#指定忽略模型文件
+public/**/StreamingAssets/

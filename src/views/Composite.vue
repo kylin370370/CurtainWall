@@ -16,7 +16,8 @@ for (let i = 0; i < data_SE.length; i++) {
         sel_2_SE.push(middle_part);
     }
 }
-//console.log(sel_2_SE);
+console.log("早上"+sel_2_SE);
+console.log("早上"+middle);
 var sel_2_SW = [];
 var middle = new Set();
 for (let i = 0; i < data_SW.length; i++) {
@@ -346,9 +347,9 @@ export default {
     sendSelections(){       //  按钮“确定”    1.向unity发坐标   2. 更新图片
       var that = this;
       //alert(that.select_1+" "+that.select_2+" "+that.select_3[1]);
-      //console.log(that.select_3);
-    
-      var index = that.select_3[1].split(".")[0] - 0;
+      //console.log("这里是"+that.select_3);
+      //这里是a,1.a_002
+       var index = that.select_3[1].split(".")[0] - 0;
       var mess = data_SE[index];
       if(that.select_1 === 'SW-20')
         mess = data_SW[index];
@@ -360,7 +361,9 @@ export default {
       
       imageURL = imageURL.replace('SE-20/SE-20', 'SW205/SW205');    //替换为真实路径
       imageURL = imageURL.replace('SW-20/SW-20', 'SE115/SE115');
-
+      //console.log("这里是"+imageURL);
+      //这里是https://zhl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/SW205/SW205_01-06F_a_002.jpg
+     
       //alert(imageURL);
       that.url = imageURL;
       //that.srcList = [imageURL];

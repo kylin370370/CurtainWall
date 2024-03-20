@@ -431,11 +431,14 @@ export default {
     sendSelections(){       //  按钮“确定”    1.向unity发坐标   2. 更新图片
       var that = this;
       //alert(that.select_1+" "+that.select_2+" "+that.select_3);
+      //console.log(that.select_3); =>1.a_005
+      //console.log(that.select_3.split(".")[0] - 0); =>2 即第三栏第二张
+      //console.log(that.select_3[1].split(".")[0] - 0); =>0
       var index = that.select_3.split(".")[0] - 0;
       var mess = data_A[index];
       if(that.select_1 === 'B')
         mess = data_B[index];
-        else if(that.select_1 === 'C')
+      else if(that.select_1 === 'C')
         mess = data_C[index];
       //alert(mess.x + "," + mess.y + "," + mess.z);
       //this.$refs.unityModel.sendOrders(mess.x + "," + mess.y + "," + mess.z);

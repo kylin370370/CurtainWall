@@ -3,30 +3,30 @@ import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,His
   RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place,Scissor,Hide,More } from '@element-plus/icons-vue';
 import axios  from "axios";
 import Model from '@/components/model_3.vue';
-import data_SE from '@/assets/imageCSV_3/SE.csv';
-import data_SW from '@/assets/imageCSV_3/SW.csv';
+import data_W from '@/assets/imageCSV_3/W.csv';
+import data_N from '@/assets/imageCSV_3/N.csv';
 
 /* 处理数据，获得选项2 */
-var sel_2_SE = [];
+var sel_2_W = [];
 var middle = new Set();
-for (let i = 0; i < data_SE.length; i++) {
-  var middle_part = data_SE[i].name.split("_")[1];    // SE-20_01-03F_i_001.jpg   ['SE-20', '01-03F', 'i', '001.jpg']
+for (let i = 0; i < data_W.length; i++) {
+  var middle_part = data_W[i].name.split("_")[1];    // W+4_d_041.JPG   ['W+4', '01-03F', 'i', '001.jpg']
   if (!middle.has(middle_part)) {
     middle.add(middle_part);
-    sel_2_SE.push(middle_part);
+    sel_2_W.push(middle_part);
   }
 }
-//console.log(sel_2_SE);
-var sel_2_SW = [];
+console.log("初始化"+sel_2_W);
+var sel_2_N = [];
 var middle = new Set();
-for (let i = 0; i < data_SW.length; i++) {
-  var middle_part = data_SW[i].name.split("_")[1];
+for (let i = 0; i < data_N.length; i++) {
+  var middle_part = data_N[i].name.split("_")[1];
   if (!middle.has(middle_part)) {
     middle.add(middle_part);
-    sel_2_SW.push(middle_part);
+    sel_2_N.push(middle_part);
   }
 }
-//console.log(sel_2_SW);
+console.log("初始化"+sel_2_N);
 
 export default {
   name: 'comp',
@@ -83,13 +83,13 @@ export default {
         has_data: false,      //是否接收到距离数据
       },
 
-      select_1: null,           // SE-20/SW-20
-      select_2: null,           // 01-03F/...
-      select_3: null,
+      select_1: null,           // W+4/N+4
+      select_2: null,           // a\b/c\d...
+      select_3: null,           //001.JPG
       selections:[
         [
-          {value: 'SE-20',label: 'SE-20'},
-          {value: 'SW-20',label: 'SW-20'},
+          {value: 'W+4',label: 'W+4'},
+          {value: 'N+4',label: 'N+4'},
         ],
         [],
         []
@@ -283,49 +283,41 @@ export default {
           );
         }
       }
-      else{     //记录在data_X中的位置,便于发送信息
-        for (let i = 0; i < datalist.length; i++){
-          var temp_children = [];
-          for(let j = 0; j < child[i].length; j++){     //0.i_001 => 0.i_001  i_001
-            temp_children.push({value: child[i][j], label: child[i][j].split(".")[1]});
-          }
+        else{     //记录在data_X中的位置,便于发送信息
+        for (let i = 0; i < datalist.length; i++){     //0.a_004  (index.name)  =>  0.a_004  a_004
           that.selections[index].push(
-              {
-                value: datalist[i],
-                label: datalist[i],
-                children: temp_children
-              }
+            {value: datalist[i], label: datalist[i].split(".")[0]}
           );
         }
       }
     },
     updateSelections(index){            //更新选项
       var that = this;
-      if(index === 0){        // SE-20 SW-20
+      if(index === 0){        // W+4 N+4
         that.select_2 = null;
         that.select_3 = null;
 
-        var sel_2 = sel_2_SE;
-        if(that.select_1 === 'SW-20')
-          sel_2 = sel_2_SW;
+        var sel_2 = sel_2_W;
+        if(that.select_1 === 'N+4')
+          sel_2 = sel_2_N;
 
         that.addSelections(1, sel_2, []);
       }
-      else if(index === 1){   // 01-03F
+      else if(index === 1){   // a b c d
         that.select_3 = null;
         var sel_3 = [];
         var sel_3_children = [];
         var datalist = [];
-        if(that.select_1 === 'SE-20')
-          datalist = data_SE;
-        else if(that.select_1 === 'SW-20')
-          datalist = data_SW;
+        if(that.select_1 === 'W+4')
+          datalist = data_W;
+        else if(that.select_1 === 'N+4')
+          datalist = data_N;
 
         var uniqueSet = new Set();    // 创建一个空Set对象
         for (let i = 0; i < datalist.length; i++){
           if(datalist[i].state === '0')
             continue;
-          var parts = datalist[i].name.split("_");    // SE-20_01-03F_i_001.jpg   ['SE-20', '01-03F', 'i', '001.jpg']
+          var parts = datalist[i].name.split("_");    // W+4_c_001.jpg   ['W+4', 'c', '001.jpg']
           if(that.select_2 === parts[1]){             // 01-03F
             if (!uniqueSet.has(parts[2])) {
               uniqueSet.add(parts[2]);
@@ -346,49 +338,54 @@ export default {
     sendSelections(){       //  按钮“确定”    1.向unity发坐标   2. 更新图片
       var that = this;
       //alert(that.select_1+" "+that.select_2+" "+that.select_3[1]);
-      //console.log(that.select_3);
-
-      var index = that.select_3[1].split(".")[0] - 0;
-      var mess = data_SE[index];
-      if(that.select_1 === 'SW-20')
-        mess = data_SW[index];
+      //console.log(that.select_3);  =>["002.JPG"]
+      var index = that.select_3[0].split(".")[0]-0; //获取选项再第三栏的索引
+      console.log(index+"类型"+typeof index);
+      var mess = data_W[index];
+      if(that.select_1 === 'N+4')
+        mess = data_N[index];
       //alert(mess.x + "," + mess.y + "," + mess.z);
       //this.$refs.unityModel.sendOrders(mess.x + "," + mess.y + "," + mess.z);
+      //https://jkqdl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/N%2B4/N%2B4_a_001.jpg
+      var baseURL = "https://jkqdl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/";
+      var imageURL = baseURL + that.select_1 + "/" + that.select_1 + "_" + that.select_2 + "_" + that.select_3[0].split(".")[0] + ".jpg";
 
-      var baseURL = "https://zhl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/";
-      var imageURL = baseURL + that.select_1 + "/" + that.select_1 + "_" + that.select_2 + "_" + that.select_3[1].split(".")[1] + ".jpg";
-
-      imageURL = imageURL.replace('SE-20/SE-20', 'SW205/SW205');    //替换为真实路径
-      imageURL = imageURL.replace('SW-20/SW-20', 'SE115/SE115');
-
+      imageURL = imageURL.replace('W+4/W+4', 'W%2B4/W%2B4');    //替换为真实路径
+      imageURL = imageURL.replace('N+4/N+4', 'N%2B4/N%2B4');
+      console.log("这里是"+imageURL);
+      //这里是https://zhl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/SW205/SW205_01-06F_a_002.jpg
+     
       //alert(imageURL);
       that.url = imageURL;
       //that.srcList = [imageURL];
       that.info[0].data = mess.x;
       that.info[1].data = mess.y;
       that.info[2].data = mess.z;
-      that.info[3].data = that.select_1 + "_" + that.select_2 + "_" + that.select_3[1].split(".")[1] + ".jpg";
+      that.info[3].data = that.select_1 + "_" + that.select_2 + "_" + that.select_3[0].split(".")[0] + ".JPG";
       //alert(that.info[3].data);
       that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
     },
 
     updatePicture(){            //接收unity信息后更新显示
-      var that = this;                              //"50.48,29.23,0.88,/ZHL/Pictures/SE-20/SE-20_01-06F_a_001.jpg\r"
-      var des_url = that.unityMessage.split(',');   //["50.48","29.23","0.88","/ZHL/Pictures/SE-20/SE-20_01-06F_a_001.jpg\r"]
+      var that = this;                              //"50.48,29.23,0.88,/ZHL/Pictures/W+4/SE-20_01-06F_a_001.jpg\r"
+      var des_url = that.unityMessage.split(',');   //["50.48","29.23","0.88","/ZHL/Pictures/W+4/SE-20_01-06F_a_001.jpg\r"]
+
       that.info[0].data = des_url[0] - 0;
       that.info[1].data = des_url[1] - 0;
       that.info[2].data = des_url[2] - 0;
       var imageURL = des_url[3].split('\r')[0];
-      //that.info[3].data = imageURL.replace('/ZHL/Pictures/SE-20', '');
-      //that.info[3].data = imageURL.replace('/ZHL/Pictures/SW-20', '');
+      //that.info[3].data = imageURL.replace('/ZHL/Pictures/W+4', '');
+      //that.info[3].data = imageURL.replace('/ZHL/Pictures/N+4', '');
       that.info[3].data = imageURL.split('/')[4];         //SE-20_01-06F_a_001.jpg
 
       //修改为OBS读取
-      var baseURL = "https://zhl-pictures.obs.cn-north-4.myhuaweicloud.com";
-      imageURL = imageURL.replace('/ZHL', baseURL);
+      var baseURL = "https://jkqdl-pictures.obs.cn-north-4.myhuaweicloud.com";
+      imageURL = imageURL.replace('/JKQDL', baseURL);
 
-      imageURL = imageURL.replace('SE-20/SE-20', 'SW205/SW205');    //替换为真实路径
-      imageURL = imageURL.replace('SW-20/SW-20', 'SE115/SE115');
+      imageURL = imageURL.replace('W+4/W+4', 'W%2B4/W%2B4');    //替换为真实路径
+      imageURL = imageURL.replace('N+4/N+4', 'N%2B4/N%2B4');
+      imageURL = imageURL.replace('JPG', 'jpg');
+      console.log(imageURL);
 
       that.url = imageURL;
       //that.srcList = [imageURL];
@@ -537,10 +534,10 @@ export default {
                 快捷选择：
                 <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
                   <el-button  @click="handleClick_quick('SE')" :loading="(this.is_rotating==='1')&&(this.rotating==='SE')">
-                    <el-icon><Place /></el-icon>&ensp;SE-20
+                    <el-icon><Place /></el-icon>&ensp;W+4
                   </el-button>
                   <el-button @click="handleClick_quick('SW')" :loading="(this.is_rotating==='1')&&(this.rotating==='SW')">
-                    <el-icon><Place /></el-icon>&ensp;SW-20
+                    <el-icon><Place /></el-icon>&ensp;N+4
                   </el-button>
                 </el-row>
               </a>

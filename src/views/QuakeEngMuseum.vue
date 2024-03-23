@@ -348,7 +348,6 @@ export default {
     add_points(image_url, x, y, z, path){       //对比的信息列表    添加新元素+显示在模型上
       var that = this;
       var points = that.setting_compare.points;
-
       while(points.length >= that.setting_compare.max_num){     //已满，删去第一个         //在模型上隐藏位点
         that.$refs.unityModel.hide_des(points[0].info[0].data + "," + points[0].info[1].data + "," + points[0].info[2].data);
         //alert("hide_des: " + points[0].info[0].data + "," + points[0].info[1].data + "," + points[0].info[2].data);
@@ -513,12 +512,17 @@ export default {
         //console.log('(来自vue)' + event.data.type);
 
     },
-    DoItYourself() {
-      // 获取路由路径
-      // const routePath = this.$router.resolve({ name: 'NewPage' }).href;
-      // 在新标签页中打开页面
-      // window.open(routePath, '_blank');
-      window.open('https://www.baidu.com', '_blank');
+    DoItYourself(path) {
+      path = path.replace(/\//g, "_");
+      const params="DZGCG"+path;
+      console.log(params);
+      // const params = "DZGCG_A_a_005.JPG";
+      const jsonParams = JSON.stringify(params);
+
+      // const url = `http://47.98.230.163:8080/?source_images_paths=[${encodeURIComponent(jsonParams)}]`;
+
+      // 打开新的标签页
+      // window.open(url, '_blank');
     },
   },
   mounted(){
@@ -783,42 +787,52 @@ export default {
         <template #error>
               <div class="image-slot">NULL</div>
             </template>
-      </el-image>
-    </div>
-    <div class="info">
-      <p v-for="data in info" :key="data">
-        <a>{{ data.name }}:</a>
-        <a>&emsp;{{ data.data }}</a>
-      </p>
-      <a v-if="url">
-        <el-button @click="handleClick_divide(url,info)" round>
-          <el-icon>
-            <Scissor />
-          </el-icon>进行分割
-        </el-button>
-        <el-button @click="DoItYourself">Do-It-Yourself!</el-button>
-      </a>
-    </div>
-  </div>
-  <div v-if="setting_compare.is_open" class="compare">
-    <el-divider />
-    <p class="text_1">最近查看：</p>
-    <el-scrollbar>
-      <div style="display: flex;">
-        <a v-for="(point, index) in setting_compare.points.slice().reverse()" :key="index">
-          <el-card v-if="point.state === '1'" :body-style="{ padding: '0px' }" class="compare_card">
-            <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
-              <a>NO. {{ setting_compare.points.length - index }}</a>
-              <a v-if="!index" style="position: absolute; right: 1%;">
-                <el-tag type="danger" class="mx-1" effect="plain" round>
-                  new
-                </el-tag>
-              </a>
-            </el-row>
-            <div class="compare_image">
-              <el-image style="width: 200px; height: 200px" :src="point.url" :zoom-rate="1.2"
-                :preview-src-list="[point.url]" :initial-index="4" fit="cover">
-                <template #error>
+          </el-image>
+        </div>
+        <div class="info">
+          <p v-for="data in info" :key="data">
+            <a>{{ data.name }}:</a>
+            <a>&emsp;{{ data.data }}</a>
+          </p>
+          <a v-if="url">
+            <el-button @click="handleClick_divide(url,info)" round>
+              <el-icon><Scissor /></el-icon>进行分割
+            </el-button>
+            <el-button @click="DoItYourself(info[3].data)">Do-It-Yourself!</el-button>
+          </a>
+        </div>
+      </div>
+      <div v-if="setting_compare.is_open" class="compare">
+        <el-divider />
+        <p class="text_1">最近查看：</p>
+        <el-scrollbar>
+          <div style="display: flex;">
+            <a
+              v-for="(point, index) in setting_compare.points.slice().reverse()"
+              :key="index"
+            >
+            <el-card
+              v-if="point.state === '1'"
+              :body-style="{ padding: '0px' }"
+              class="compare_card">
+              <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
+                <a>NO. {{ setting_compare.points.length - index }}</a>
+                <a v-if="!index" style="position: absolute; right: 1%;">
+                  <el-tag type="danger" class="mx-1" effect="plain" round>
+                    new
+                  </el-tag>
+                </a>
+              </el-row>
+              <div class="compare_image">
+                <el-image
+                  style="width: 200px; height: 200px"
+                  :src="point.url"
+                  :zoom-rate="1.2"
+                  :preview-src-list="[point.url]"
+                  :initial-index="4"
+                  fit="cover"
+                >
+                  <template #error>
                     <div class="image-slot">NULL</div>
                   </template>
               </el-image>

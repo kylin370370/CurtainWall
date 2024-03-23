@@ -348,6 +348,7 @@ export default {
     add_points(image_url, x, y, z, path){       //对比的信息列表    添加新元素+显示在模型上
       var that = this;
       var points = that.setting_compare.points;
+
       while(points.length >= that.setting_compare.max_num){     //已满，删去第一个         //在模型上隐藏位点
         that.$refs.unityModel.hide_des(points[0].info[0].data + "," + points[0].info[1].data + "," + points[0].info[2].data);
         //alert("hide_des: " + points[0].info[0].data + "," + points[0].info[1].data + "," + points[0].info[2].data);
@@ -372,7 +373,14 @@ export default {
             {name:'path', data: path} ],
           state: '1',
       });
-      that.$refs.unityModel.draw_des(x + "," + y + "," + z);    //在模型上显示
+
+      let ImageName = "";
+      let matchResult = path.match(/\/([^/]+)$/);
+      if (matchResult) {
+        ImageName = matchResult[1]; // 形如：a_005.JPG
+      }
+
+      that.$refs.unityModel.draw_des(x + "," + y + "," + z + "," + ImageName);    //在模型上显示
       //alert("draw_des" + x + "," + y + "," + z);
     },
     addSelections(index, datalist){     //更新选项
@@ -457,8 +465,7 @@ export default {
       that.info[1].data = mess.y;
       that.info[2].data = mess.z;
       that.info[3].data = "/" + that.select_1 +"/" + that.select_3.split(".")[1] + ".JPG";
-
-      that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
+      that.add_points(imageURL, parseFloat(mess.x), parseFloat(mess.y), parseFloat(mess.z), that.info[3].data);        ////加入对比列表并在模型上显示
     },
 
     updatePicture(){            //接收unity信息后更新显示
@@ -577,173 +584,163 @@ export default {
                 <span>相机</span>
               </span>
             </template>
-            <a>
-              <el-checkbox
-                v-model="is_keyboard"
-                label="启用键盘控制"
-                size="large"
-              />
-              <br>
-              <el-checkbox
-                v-model="is_mouse"
-                label="启用鼠标控制"
-                size="large"
-              />
-              <br>
-              <a class="text_2">
-                移动方式：
-                <el-row :span="24" style="margin-top: -5%;">
-                  <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode">
-                    <el-radio label="0" size="large">靠近</el-radio>
-                    <el-radio label="1" size="large">降落</el-radio>
-                  </el-radio-group>
-                </el-row>
-              </a>
-              <a class="text_2">
-                旋转：
-                <el-button @click="handleClick_rotating(0)">
-                  <el-icon><RefreshRight /></el-icon>&ensp;90°
-                </el-button>
-                <el-button @click="handleClick_rotating(1)">
-                  <el-icon><RefreshLeft /></el-icon>&ensp;90°
-                </el-button>
-                <br>
-              </a>
-              <a class="text_2">
-                调整：
-                <el-button @click="handleClick_size(1)">
-                  <el-icon><ZoomIn /></el-icon>放大
-                </el-button>
-                <el-button @click="handleClick_size(0)">
-                  <el-icon><ZoomOut /></el-icon>缩小
-                </el-button>
-                <br>
-              </a>
-              <a class="text_2">
-                快捷选择：
-                <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
-                <el-button  @click="handleClick_quick('A')" >
-                  <el-icon><Place /></el-icon>&ensp;A
-                </el-button>
-                <el-button @click="handleClick_quick('B')" >
-                  <el-icon><Place /></el-icon>&ensp;B
-                </el-button>
-                <el-button @click="handleClick_quick('C')" >
-                  <el-icon><Place /></el-icon>&ensp;C
-                </el-button>
-                </el-row>
-              </a>
-<!--              <a class="text_2">-->
-<!--                <a> 夜景模式：-->
-<!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
-<!--                </a>-->
-<!--              </a>-->
+<a>
+  <el-checkbox v-model="is_keyboard" label="启用键盘控制" size="large" />
+  <br>
+  <el-checkbox v-model="is_mouse" label="启用鼠标控制" size="large" />
+  <br>
+  <a class="text_2">
+    移动方式：
+    <el-row :span="24" style="margin-top: -5%;">
+      <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode">
+        <el-radio label="0" size="large">靠近</el-radio>
+        <el-radio label="1" size="large">降落</el-radio>
+      </el-radio-group>
+    </el-row>
+  </a>
+  <a class="text_2">
+    旋转：
+    <el-button @click="handleClick_rotating(0)">
+      <el-icon>
+        <RefreshRight />
+      </el-icon>&ensp;90°
+    </el-button>
+    <el-button @click="handleClick_rotating(1)">
+      <el-icon>
+        <RefreshLeft />
+      </el-icon>&ensp;90°
+    </el-button>
+    <br>
+  </a>
+  <a class="text_2">
+    调整：
+    <el-button @click="handleClick_size(1)">
+      <el-icon>
+        <ZoomIn />
+      </el-icon>放大
+    </el-button>
+    <el-button @click="handleClick_size(0)">
+      <el-icon>
+        <ZoomOut />
+      </el-icon>缩小
+    </el-button>
+    <br>
+  </a>
+  <a class="text_2">
+    快捷选择：
+    <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
+      <el-button @click="handleClick_quick('A')">
+        <el-icon>
+          <Place />
+        </el-icon>&ensp;A
+      </el-button>
+      <el-button @click="handleClick_quick('B')">
+        <el-icon>
+          <Place />
+        </el-icon>&ensp;B
+      </el-button>
+      <el-button @click="handleClick_quick('C')">
+        <el-icon>
+          <Place />
+        </el-icon>&ensp;C
+      </el-button>
+    </el-row>
+  </a>
+  <!--              <a class="text_2">-->
+  <!--                <a> 夜景模式：-->
+  <!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
+  <!--                </a>-->
+  <!--              </a>-->
 
-            </a>
-            <el-row style="margin-top: 5%; margin-bottom: 5%">
-            <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
-            <el-button @click="handleClick_info" size="small" round>
-                  <el-icon><InfoFilled /></el-icon>
-            </el-button>
-            </el-row>
-            <a v-if="setting_camera.is_info" class="text_info">
-              <el-scrollbar height="130px">
-                <li>键盘控制：</li>
-                <a class="text_3">
-                  <el-row>
-                    <el-col :span="12">
-                      <br>&emsp;启用键盘后，使用
-                    </el-col>
-                    <el-col :span="8.5">
-                      <el-row justify="center">
-                        <el-tag>W</el-tag>
-                      </el-row>
-                      <el-row>
-                        <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
-                      </el-row>
-                    </el-col>
-                    <br>&ensp;可移
-                  </el-row>
-                  <el-row>
-                    动镜头,使用&ensp;
-                    <el-tag>Q</el-tag><el-tag>E</el-tag>
-                    &ensp;可水平旋转镜头
-                  </el-row>
-                </a>
-                <li>鼠标控制：</li>
-                <a class="text_3">
-                  &emsp;启用鼠标后，按住鼠标左键拖动镜头，滚轮调整镜头距离，
-                  按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
-                </a>
-                <li>快捷选择：</li>
-                <a class="text_3">
-                  &emsp;快捷切换至所选立面
-                </a>
-                <li>重置：</li>
-                <a class="text_3">
-                  &emsp;可使模型位置回归初始状态
-                </a>
-              </el-scrollbar>
-            </a>
+</a>
+<el-row style="margin-top: 5%; margin-bottom: 5%">
+  <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
+  <el-button @click="handleClick_info" size="small" round>
+    <el-icon>
+      <InfoFilled />
+    </el-icon>
+  </el-button>
+</el-row>
+<a v-if="setting_camera.is_info" class="text_info">
+  <el-scrollbar height="130px">
+    <li>键盘控制：</li>
+    <a class="text_3">
+      <el-row>
+        <el-col :span="12">
+          <br>&emsp;启用键盘后，使用
+        </el-col>
+        <el-col :span="8.5">
+          <el-row justify="center">
+            <el-tag>W</el-tag>
+          </el-row>
+          <el-row>
+            <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
+          </el-row>
+        </el-col>
+        <br>&ensp;可移
+      </el-row>
+      <el-row>
+        动镜头,使用&ensp;
+        <el-tag>Q</el-tag><el-tag>E</el-tag>
+        &ensp;可水平旋转镜头
+      </el-row>
+    </a>
+    <li>鼠标控制：</li>
+    <a class="text_3">
+      &emsp;启用鼠标后，按住鼠标左键拖动镜头，滚轮调整镜头距离，
+      按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
+    </a>
+    <li>快捷选择：</li>
+    <a class="text_3">
+      &emsp;快捷切换至所选立面
+    </a>
+    <li>重置：</li>
+    <a class="text_3">
+      &emsp;可使模型位置回归初始状态
+    </a>
+  </el-scrollbar>
+</a>
 
-          </el-tab-pane>
+</el-tab-pane>
 
-          <el-tab-pane name="compare">
-            <template #label>
+<el-tab-pane name="compare">
+  <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>
                 <span>对比</span>
               </span>
             </template>
-            <a>
-              开启对比：
-              <el-switch
-              v-model="setting_compare.is_open"
-              @click="handleClick_compare" />
-            </a>
-            <br>
-            <a>
-              对比数：&emsp;
-              <el-input-number
-              v-model="setting_compare.max_num"
-              :min="1"
-              :max="10"
-              :step="1"
-              :disabled="!setting_compare.is_open" />
-            </a>
-            <br>
-            <a>
-              显示坐标：
-              <el-switch
-              v-model="setting_compare.is_show"
-              :disabled="!setting_compare.is_open" />
-            </a>
-            <br>
-            <a>
-              显示形式：
-              <el-switch
-                v-model="type_compare"
-                class="ml-2"
-                inline-prompt
-                style="--el-switch-on-color: #6A8BFF; --el-switch-off-color: #75D9D3"
-                active-text="显示全部"
-                inactive-text="逐个显示"
-                :disabled="!setting_compare.is_open"
-              />
-            </a>
-            <br>
-            <el-button
-              color="#626aef"
-              @click="handleClick_clear"
-              :dark="isDark"
-              :disabled="!setting_compare.is_open">
-              清空
-            </el-button>
+  <a>
+    开启对比：
+    <el-switch v-model="setting_compare.is_open" @click="handleClick_compare" />
+  </a>
+  <br>
+  <a>
+    对比数：&emsp;
+    <el-input-number v-model="setting_compare.max_num" :min="1" :max="10" :step="1"
+      :disabled="!setting_compare.is_open" />
+  </a>
+  <br>
+  <a>
+    显示坐标：
+    <el-switch v-model="setting_compare.is_show" :disabled="!setting_compare.is_open" />
+  </a>
+  <br>
+  <a>
+    显示形式：
+    <el-switch v-model="type_compare" class="ml-2" inline-prompt
+      style="--el-switch-on-color: #6A8BFF; --el-switch-off-color: #75D9D3" active-text="显示全部" inactive-text="逐个显示"
+      :disabled="!setting_compare.is_open" />
+  </a>
+  <br>
+  <el-button color="#626aef" @click="handleClick_clear" :dark="isDark" :disabled="!setting_compare.is_open">
+    清空
+  </el-button>
 
-          </el-tab-pane>
+</el-tab-pane>
 
-          <el-tab-pane name="measure">
-            <template #label>
+<el-tab-pane name="measure">
+  <template #label>
               <span class="custom-tabs-label">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path fill-rule="evenodd" clip-rule="evenodd" d="M16.2929 1.29289C16.6834 0.902369 17.3166 0.902369 17.7071 1.29289L22.7071 6.29289C23.0976 6.68342 23.0976 7.31658 22.7071 7.70711L7.70711 22.7071C7.31658 23.0976 6.68342 23.0976 6.29289 22.7071L1.29289 17.7071C0.902369 17.3166 0.902369 16.6834 1.29289 16.2929L3.79275 13.793L13.7928 3.79303L16.2929 1.29289ZM14.5 5.91421L13.4142 7L15.7071 9.29289C16.0976 9.68342 16.0976 10.3166 15.7071 10.7071C15.3166 11.0976 14.6834 11.0976 14.2929 10.7071L12 8.41421L10.9142 9.5L12.2071 10.7929C12.5976 11.1834 12.5976 11.8166 12.2071 12.2071C11.8166 12.5976 11.1834 12.5976 10.7929 12.2071L9.5 10.9142L8.41421 12L10.7071 14.2929C11.0976 14.6834 11.0976 15.3166 10.7071 15.7071C10.3166 16.0976 9.68342 16.0976 9.29289 15.7071L7 13.4142L5.91421 14.5L7.20711 15.7929C7.59763 16.1834 7.59763 16.8166 7.20711 17.2071C6.81658 17.5976 6.18342 17.5976 5.79289 17.2071L4.5 15.9142L3.41421 17L7 20.5858L20.5858 7L17 3.41421L15.9142 4.5L17.2071 5.79289C17.5976 6.18342 17.5976 6.81658 17.2071 7.20711C16.8166 7.59763 16.1834 7.59763 15.7929 7.20711L14.5 5.91421Z" fill="black" fill-opacity="0.85"/>
@@ -752,291 +749,239 @@ export default {
               </span>
             </template>
 
-            <a>
-              开启测距：
-              <el-switch
-              v-model="setting_measure.is_open"
-              @click="handleClick_measure" />
-            </a>
+  <a>
+    开启测距：
+    <el-switch v-model="setting_measure.is_open" @click="handleClick_measure" />
+  </a>
 
-            <div class="measure_steps">
-              <el-steps direction="vertical" :active="Number(setting_measure.step)" finish-status="success">
-                <el-step title="选择第一个点位" />
-                <el-step title="选择第二个点位" />
-              </el-steps>
-            </div>
-            <a v-if="setting_measure.has_data">
-              <a>水平距离：{{ setting_measure.distance[0] }}</a><br>
-              <a>垂直距离：{{ setting_measure.distance[1] }}</a><br>
-              <a>直线距离：{{ setting_measure.distance[2] }}</a><br>
-            </a>
-          </el-tab-pane>
+  <div class="measure_steps">
+    <el-steps direction="vertical" :active="Number(setting_measure.step)" finish-status="success">
+      <el-step title="选择第一个点位" />
+      <el-step title="选择第二个点位" />
+    </el-steps>
+  </div>
+  <a v-if="setting_measure.has_data">
+    <a>水平距离：{{ setting_measure.distance[0] }}</a><br>
+    <a>垂直距离：{{ setting_measure.distance[1] }}</a><br>
+    <a>直线距离：{{ setting_measure.distance[2] }}</a><br>
+  </a>
+</el-tab-pane>
 
-        </el-tabs>
-      </el-card>
-      <div class="model-from-unity">
-        <Model ref="unityModel"/>
-      </div>
-    </div>
+</el-tabs>
+</el-card>
+<div class="model-from-unity">
+  <Model ref="unityModel" />
+</div>
+</div>
 
-    <div class="details_and_compare">
-      <p class="text_1">当前查看：</p>
-      <div class="details">
-        <div class="image">
-          <el-image
-            style="width: 200px; height: 200px"
-            :src="url"
-            :zoom-rate="1.2"
-            :preview-src-list="[url]"
-            :initial-index="4"
-            fit="cover"
-          >
-            <template #error>
+<div class="details_and_compare">
+  <p class="text_1">当前查看：</p>
+  <div class="details">
+    <div class="image">
+      <el-image style="width: 200px; height: 200px" :src="url" :zoom-rate="1.2" :preview-src-list="[url]"
+        :initial-index="4" fit="cover">
+        <template #error>
               <div class="image-slot">NULL</div>
             </template>
-          </el-image>
-        </div>
-        <div class="info">
-          <p v-for="data in info" :key="data">
-            <a>{{ data.name }}:</a>
-            <a>&emsp;{{ data.data }}</a>
-          </p>
-          <a v-if="url">
-            <el-button @click="handleClick_divide(url,info)" round>
-              <el-icon><Scissor /></el-icon>进行分割
-            </el-button>
-            <el-button @click="DoItYourself">Do-It-Yourself!</el-button>
-          </a>
-        </div>
-      </div>
-      <div v-if="setting_compare.is_open" class="compare">
-        <el-divider />
-        <p class="text_1">最近查看：</p>
-        <el-scrollbar>
-          <div style="display: flex;">
-            <a
-              v-for="(point, index) in setting_compare.points.slice().reverse()"
-              :key="index"
-            >
-            <el-card
-              v-if="point.state === '1'"
-              :body-style="{ padding: '0px' }"
-              class="compare_card">
-              <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
-                <a>NO. {{ setting_compare.points.length - index }}</a>
-                <a v-if="!index" style="position: absolute; right: 1%;">
-                  <el-tag type="danger" class="mx-1" effect="plain" round>
-                    new
-                  </el-tag>
-                </a>
-              </el-row>
-              <div class="compare_image">
-                <el-image
-                  style="width: 200px; height: 200px"
-                  :src="point.url"
-                  :zoom-rate="1.2"
-                  :preview-src-list="[point.url]"
-                  :initial-index="4"
-                  fit="cover"
-                >
-                  <template #error>
+      </el-image>
+    </div>
+    <div class="info">
+      <p v-for="data in info" :key="data">
+        <a>{{ data.name }}:</a>
+        <a>&emsp;{{ data.data }}</a>
+      </p>
+      <a v-if="url">
+        <el-button @click="handleClick_divide(url,info)" round>
+          <el-icon>
+            <Scissor />
+          </el-icon>进行分割
+        </el-button>
+        <el-button @click="DoItYourself">Do-It-Yourself!</el-button>
+      </a>
+    </div>
+  </div>
+  <div v-if="setting_compare.is_open" class="compare">
+    <el-divider />
+    <p class="text_1">最近查看：</p>
+    <el-scrollbar>
+      <div style="display: flex;">
+        <a v-for="(point, index) in setting_compare.points.slice().reverse()" :key="index">
+          <el-card v-if="point.state === '1'" :body-style="{ padding: '0px' }" class="compare_card">
+            <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
+              <a>NO. {{ setting_compare.points.length - index }}</a>
+              <a v-if="!index" style="position: absolute; right: 1%;">
+                <el-tag type="danger" class="mx-1" effect="plain" round>
+                  new
+                </el-tag>
+              </a>
+            </el-row>
+            <div class="compare_image">
+              <el-image style="width: 200px; height: 200px" :src="point.url" :zoom-rate="1.2"
+                :preview-src-list="[point.url]" :initial-index="4" fit="cover">
+                <template #error>
                     <div class="image-slot">NULL</div>
                   </template>
-                </el-image>
-              </div>
-              <div v-if="setting_compare.is_show" class="compare_info">
-                <p v-for="data in point.info" :key="data">
+              </el-image>
+            </div>
+            <div v-if="setting_compare.is_show" class="compare_info">
+              <p v-for="data in point.info" :key="data">
                 <a>{{ data.name }}:</a>
                 <a>&emsp;{{ data.data }}</a>
-                </p>
-              </div>
-              <div class="compare_operation">
-                <el-button @click="handleClick_search(setting_compare.points.length - index - 1)">
-                  <el-icon><Search/></el-icon>
-                </el-button>
-                <a v-if="point.url">
-                  <el-button @click="handleClick_divide(point.url,point.info)">
-                    <el-icon><Scissor /></el-icon>
-                  </el-button>
-                </a>
-                <el-button @click="handleClick_delete(setting_compare.points.length - index - 1)">
-                  <el-icon><Delete/></el-icon>
-                </el-button>
-              </div>
-            </el-card>
-            <el-card
-              v-else-if="point.state === '2'"
-              :body-style="{ padding: '0px' }"
-              class="compare_card">
-              <a>
-                <el-icon color="#939393" :size="65" @click="handleClick_more">
-                  <More />
-                </el-icon>
-              </a>
-            </el-card>
-            </a>
-          </div>
-        </el-scrollbar>
-      </div>
-
-      <div v-if="StoneCrackDetect.is_show" class="divide">
-        <el-divider />
-        <p class="text_1">
-          图像分割与裂缝识别
-          <el-icon color="#409EFF" @click="handleClick_hideDivide">
-            <Hide />
-          </el-icon>
-        </p>
-
-        <el-card>
-          <el-row>
-            <el-col :span="8">
-              <p class="text_2">
-                当前图片&ensp;
-                <el-button @click="handleClick_search(-1)" size="small" circle>
-                  <el-icon><Search /></el-icon>
-                </el-button>
               </p>
-              <el-image
-                style="width: 200px; height: 200px"
-                :src="StoneCrackDetect.raw_path"
-                :zoom-rate="1.2"
-                :preview-src-list="[StoneCrackDetect.raw_path]"
-                :initial-index="4"
-                fit="cover"
-              >
-                <template #error>
+            </div>
+            <div class="compare_operation">
+              <el-button @click="handleClick_search(setting_compare.points.length - index - 1)">
+                <el-icon>
+                  <Search />
+                </el-icon>
+              </el-button>
+              <a v-if="point.url">
+                <el-button @click="handleClick_divide(point.url,point.info)">
+                  <el-icon>
+                    <Scissor />
+                  </el-icon>
+                </el-button>
+              </a>
+              <el-button @click="handleClick_delete(setting_compare.points.length - index - 1)">
+                <el-icon>
+                  <Delete />
+                </el-icon>
+              </el-button>
+            </div>
+          </el-card>
+          <el-card v-else-if="point.state === '2'" :body-style="{ padding: '0px' }" class="compare_card">
+            <a>
+              <el-icon color="#939393" :size="65" @click="handleClick_more">
+                <More />
+              </el-icon>
+            </a>
+          </el-card>
+        </a>
+      </div>
+    </el-scrollbar>
+  </div>
+
+  <div v-if="StoneCrackDetect.is_show" class="divide">
+    <el-divider />
+    <p class="text_1">
+      图像分割与裂缝识别
+      <el-icon color="#409EFF" @click="handleClick_hideDivide">
+        <Hide />
+      </el-icon>
+    </p>
+
+    <el-card>
+      <el-row>
+        <el-col :span="8">
+          <p class="text_2">
+            当前图片&ensp;
+            <el-button @click="handleClick_search(-1)" size="small" circle>
+              <el-icon>
+                <Search />
+              </el-icon>
+            </el-button>
+          </p>
+          <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
+            :preview-src-list="[StoneCrackDetect.raw_path]" :initial-index="4" fit="cover">
+            <template #error>
                   <div class="image-slot">NULL</div>
                 </template>
-              </el-image>
-              <el-row>
-                x: {{ StoneCrackDetect.des.x }}&emsp;
-                y: {{ StoneCrackDetect.des.y }}&emsp;
-                z: {{ StoneCrackDetect.des.z }}
-              </el-row>
-            </el-col>
-            <el-col :span="8">
-              <p class="text_2">检测图片</p>
-              <a v-if="StoneCrackDetect.success">
-                <el-row>
+          </el-image>
+          <el-row>
+            x: {{ StoneCrackDetect.des.x }}&emsp;
+            y: {{ StoneCrackDetect.des.y }}&emsp;
+            z: {{ StoneCrackDetect.des.z }}
+          </el-row>
+        </el-col>
+        <el-col :span="8">
+          <p class="text_2">检测图片</p>
+          <a v-if="StoneCrackDetect.success">
+            <el-row>
 
-                  <el-image
-                      style="width: 200px; height: 200px"
-                      :src="StoneCrackDetect.detect_path"
-                      :zoom-rate="1.2"
-                      :preview-src-list="[StoneCrackDetect.detect_path]"
-                      :initial-index="4"
-                      fit="cover"
-                  >
-                    <template #error>
+              <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
+                :preview-src-list="[StoneCrackDetect.detect_path]" :initial-index="4" fit="cover">
+                <template #error>
                       <div class="image-slot">NULL</div>
                     </template>
-                  </el-image>
-                </el-row>
-              </a>
-            </el-col>
-            <el-col :span="8">
-              <p class="text_2">分割情况</p>
-              <a v-if="StoneCrackDetect.success">
-                <el-image
-                  style="width: 200px; height: 200px"
-                  :src="StoneCrackDetect.seg_path"
-                  :zoom-rate="1.2"
-                  :preview-src-list="[StoneCrackDetect.seg_path]"
-                  :initial-index="4"
-                  fit="cover"
-                >
-                  <template #error>
+              </el-image>
+            </el-row>
+          </a>
+        </el-col>
+        <el-col :span="8">
+          <p class="text_2">分割情况</p>
+          <a v-if="StoneCrackDetect.success">
+            <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
+              :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
+              <template #error>
                     <div class="image-slot">NULL</div>
                   </template>
-                </el-image>
-                <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
-              </a>
-            </el-col>
+            </el-image>
+            <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
+          </a>
+        </el-col>
 
-          </el-row>
-        </el-card>
+      </el-row>
+    </el-card>
 
-        <p class="text_2">
-          查看分割块：
-          <el-select
-            v-model="StoneCrackDetect.onshow.no"
-            multiple
-            collapse-tags
-            collapse-tags-tooltip
-            :max-collapse-tags="3"
-            placeholder="Select"
-            style="width: 260px"
-          >
-            <el-option
-              v-for="item in StoneCrackDetect.onshow.options"
-              :key="item.value"
-              :label="item.label"
-              :value="item.value"
-            />
-          </el-select>
-        </p>
-        <div v-if="StoneCrackDetect.onshow.no[0]">
-          <el-scrollbar  height="500px">
-            <el-card v-for="block in StoneCrackDetect.onshow.no" :key="block">
-              <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
+    <p class="text_2">
+      查看分割块：
+      <el-select v-model="StoneCrackDetect.onshow.no" multiple collapse-tags collapse-tags-tooltip
+        :max-collapse-tags="3" placeholder="Select" style="width: 260px">
+        <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
+          :value="item.value" />
+      </el-select>
+    </p>
+    <div v-if="StoneCrackDetect.onshow.no[0]">
+      <el-scrollbar height="500px">
+        <el-card v-for="block in StoneCrackDetect.onshow.no" :key="block">
+          <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
+          <el-row>
+            <el-col :span="16">
               <el-row>
-                <el-col :span="16">
-                  <el-row>
-                    <el-image
-                      style="height: 100px"
-                      :src="StoneCrackDetect.block_data[block].block_seg_image_path"
-                      :zoom-rate="1.2"
-                      :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
-                      :initial-index="4"
-                      fit="cover"
-                    >
-                    <template #error>
+                <el-image style="height: 100px" :src="StoneCrackDetect.block_data[block].block_seg_image_path"
+                  :zoom-rate="1.2" :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
+                  :initial-index="4" fit="cover">
+                  <template #error>
                       <div class="image-slot">NULL</div>
                     </template>
-                    </el-image>
-                  </el-row>
-                  <el-row style="margin-top: 1%;">
-                    <el-image
-                      style="height: 100px"
-                      :src="StoneCrackDetect.block_data[block].block_detect_image_path"
-                      :zoom-rate="1.2"
-                      :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
-                      :initial-index="4"
-                      fit="cover"
-                    >
-                      <template #error>
+                </el-image>
+              </el-row>
+              <el-row style="margin-top: 1%;">
+                <el-image style="height: 100px" :src="StoneCrackDetect.block_data[block].block_detect_image_path"
+                  :zoom-rate="1.2" :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
+                  :initial-index="4" fit="cover">
+                  <template #error>
                         <div class="image-slot">NULL</div>
                       </template>
-                    </el-image>
-                  </el-row>
-                </el-col>
-                <el-col :span="7" style="margin-left: 1%;">
-                  <el-row>
-                    存在裂缝：
-                    <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
-                    <a v-else>否</a>
-                  </el-row>
-                  <a v-if="StoneCrackDetect.block_data[block].has_crack">
-                    <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
-                    <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
-                    <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth  }}</el-row>
-
-                    <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
-
-                  </a>
-                </el-col>
+                </el-image>
               </el-row>
-            </el-card>
-          </el-scrollbar>
-        </div>
-      </div>
+            </el-col>
+            <el-col :span="7" style="margin-left: 1%;">
+              <el-row>
+                存在裂缝：
+                <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
+                <a v-else>否</a>
+              </el-row>
+              <a v-if="StoneCrackDetect.block_data[block].has_crack">
+                <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
 
+                <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
 
+              </a>
+            </el-col>
+          </el-row>
+        </el-card>
+      </el-scrollbar>
     </div>
-
-  <br><br><br>
   </div>
+
+
+</div>
+
+<br><br><br>
+</div>
 </template>
 
 <style>

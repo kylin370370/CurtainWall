@@ -71,7 +71,7 @@ export default {
         is_open: false,         //是否开启对比
         is_show: true,          //是否显示坐标等信息
         max_num: 1,             //对比数量      1-10
-        points:[],              //url,info,state  state各点位card显示状态['1'显示, '0'不显示, '2'中间态(显示卡片不显示详细内容)]
+        points:[],              //url,info,colorinfo, state  state各点位card显示状态['1'显示, '0'不显示, '2'中间态(显示卡片不显示详细内容)]
         type: false,
       },//其他按钮： 清空
       type_compare: false,      //对比显示形式  false逐个/true全部
@@ -104,6 +104,11 @@ export default {
         {name:'z', data: 0},
         {name:'path', data:''},
       ],
+      //当前查看位置图片的颜色信息
+      infocolor: {
+        color: 0,
+        reason: ''  
+      },
       unityMessage: '',     //来自unity
 
       StoneCrackDetect:{
@@ -127,6 +132,9 @@ export default {
         },
         success:false,  //请求接口是否成功
       },
+
+      //一个字典用于存放所有位点的颜色信息，前面是id后面是颜色
+      pointColor: {},
     }
   },
   watch: {
@@ -261,6 +269,7 @@ export default {
         var  urlList=that. urlList;
         // alert(SCD.path);
         //alert(that.StoneCrackDetect.path);    //  A/a_004.JPG
+        //console.log('请求的URL:', `http://localhost:8443/api/image/${SCD.path}`);
           axios
               .get(`http://localhost:8443/api/image/${SCD.path}`)
               // .get(`http://120.46.136.85:8443/api/image/${SCD.path}`)
@@ -428,6 +437,19 @@ export default {
       else{     //index === 2   //A-a-a_004
       }
     },
+    searchColorData(infoid) {
+      console.log('请求颜色信息：', `http://localhost:8443/api/color/${infoid}`);
+      axios.get(`http://localhost:8443/api/color/${infoid}`)
+        .then(response => {
+          this.infocolor.color = response.data.color;
+          this.infocolor.reason = response.data.reason;
+          console.log('颜色信息：', response.data);
+        })
+        .catch(error => {
+          console.error(error);
+          console.log('颜色信息：', '请求失败');
+        });
+    },
     sendSelections(){       //  按钮“确定”    1.向unity发坐标   2. 更新图片
       var that = this;
       //alert(that.select_1+" "+that.select_2+" "+that.select_3);
@@ -449,7 +471,6 @@ export default {
       var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com";
       imageURL = imageURL.replace('Pictures', baseURL);
 
-
       //alert(imageURL);
       that.url = imageURL;
       //that.srcList = [imageURL];
@@ -457,10 +478,14 @@ export default {
       that.info[1].data = mess.y;
       that.info[2].data = mess.z;
       that.info[3].data = "/" + that.select_1 +"/" + that.select_3.split(".")[1] + ".JPG";
+      
 
+      var coloruId = that.select_1 + "_" + that.select_3.split(".")[1].replace('.JPG','').replace('/','_');
+      //console.log('请求的URL:', `${coloruId}`);
+
+      that.searchColorData(coloruId);
       that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
     },
-
     updatePicture(){            //接收unity信息后更新显示
       var that = this;                              //"52.12,13.28,85.74,/DZGCG/Pictures/A/a_004.JPG\r"
       var des_url = that.unityMessage.split(',');   //["52.12","13.28","85.74","/DZGCG/Pictures/A/a_004.JPG\r"]
@@ -797,7 +822,20 @@ export default {
           </el-image>
         </div>
         <div class="info">
+          
+          <!--红绿灯-->
+          <el-tag v-if="infocolor.color === 0" type="success" class="mx-1" effect="plain" round>
+            幕墙质量良好
+          </el-tag>
+          <el-tag v-if="infocolor.color === 1" type="warning" class="mx-1" effect="plain" round>
+            {{ infocolor.reason }}
+          </el-tag>
+          <el-tag v-if="infocolor.color === 2" type="danger" class="mx-1" effect="plain" round>
+            {{ infocolor.reason }}
+          </el-tag>
+          <!---->
           <p v-for="data in info" :key="data">
+            
             <a>{{ data.name }}:</a>
             <a>&emsp;{{ data.data }}</a>
           </p>
@@ -809,6 +847,8 @@ export default {
           </a>
         </div>
       </div>
+
+
       <div v-if="setting_compare.is_open" class="compare">
         <el-divider />
         <p class="text_1">最近查看：</p>
@@ -858,6 +898,8 @@ export default {
                   <el-button @click="handleClick_divide(point.url,point.info)">
                     <el-icon><Scissor /></el-icon>
                   </el-button>
+               
+
                 </a>
                 <el-button @click="handleClick_delete(setting_compare.points.length - index - 1)">
                   <el-icon><Delete/></el-icon>

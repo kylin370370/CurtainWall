@@ -355,14 +355,7 @@ export default {
       console.log("这里是"+imageURL);
       //这里是https://zhl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/SW205/SW205_01-06F_a_002.jpg
      
-      //alert(imageURL);
-      that.url = imageURL;
-      //that.srcList = [imageURL];
-      that.info[0].data = mess.x;
-      that.info[1].data = mess.y;
-      that.info[2].data = mess.z;
-      that.info[3].data = that.select_1 + "_" + that.select_2 + "_" + that.select_3[0].split(".")[0] + ".JPG";
-      //alert(that.info[3].data);
+      //alert(imageURL);\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\a);
       that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
     },
 

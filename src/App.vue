@@ -26,6 +26,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
       <el-menu-item index="2-4"><RouterLink to="/about/Office" disabled>政府大楼</RouterLink></el-menu-item>
       <el-menu-item index="2-5" disabled>敬请期待</el-menu-item>
     </el-sub-menu>
+    <el-menu-item index="3"><RouterLink to="/damage">Damage</RouterLink></el-menu-item>
   </el-menu>
   </header>
 

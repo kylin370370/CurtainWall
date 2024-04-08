@@ -556,9 +556,14 @@ export default {
 
 <template>
   <div class="about">
-    <div class="some-text">
-      <el-icon><Location /></el-icon>
-      同济大学地震工程馆
+    <div class="title-container">  
+      <div class="earth-background">  
+        <!-- 图片背景 -->  
+      </div>  
+      <div class="text-over-image">  
+        <el-icon><Location /></el-icon>  
+        同济大学地震工程馆  
+      </div>  
     </div>
 
     <div class="select-wrapper">
@@ -805,7 +810,7 @@ export default {
   <p class="text_1">当前查看：</p>
   <div class="details">
     <div class="image">
-      <el-image style="width: 200px; height: 200px" :src="url" :zoom-rate="1.2" :preview-src-list="[url]"
+      <el-image style="width: 266px; height: 200px" :src="url" :zoom-rate="1.2" :preview-src-list="[url]"
         :initial-index="4" fit="cover">
         <template #error>
               <div class="image-slot">NULL</div>
@@ -922,7 +927,7 @@ export default {
       </el-icon>
     </p>
 
-    <el-card>
+    <el-card style="border-radius: 20px;">
       <el-row>
         <el-col :span="8">
           <p class="text_2">
@@ -933,7 +938,7 @@ export default {
               </el-icon>
             </el-button>
           </p>
-          <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
+          <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
             :preview-src-list="[StoneCrackDetect.raw_path]" :initial-index="4" fit="cover">
             <template #error>
                   <div class="image-slot">NULL</div>
@@ -950,7 +955,7 @@ export default {
           <a v-if="StoneCrackDetect.success">
             <el-row>
 
-              <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
+              <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
                 :preview-src-list="[StoneCrackDetect.detect_path]" :initial-index="4" fit="cover">
                 <template #error>
                       <div class="image-slot">NULL</div>
@@ -962,7 +967,7 @@ export default {
         <el-col :span="8">
           <p class="text_2">分割情况</p>
           <a v-if="StoneCrackDetect.success">
-            <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
+            <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
               :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
               <template #error>
                     <div class="image-slot">NULL</div>
@@ -983,50 +988,78 @@ export default {
           :value="item.value" />
       </el-select>
     </p>
+
+
     <div v-if="StoneCrackDetect.onshow.no[0]">
-      <el-scrollbar height="500px">
-        <el-card v-for="block in StoneCrackDetect.onshow.no" :key="block">
-          <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
-          <el-row>
-            <el-col :span="16">
-              <el-row>
-                <el-image style="height: 100px" :src="StoneCrackDetect.block_data[block].block_seg_image_path"
-                  :zoom-rate="1.2" :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
-                  :initial-index="4" fit="cover">
-                  <template #error>
-                      <div class="image-slot">NULL</div>
-                    </template>
-                </el-image>
-              </el-row>
-              <el-row style="margin-top: 1%;">
-                <el-image style="height: 100px" :src="StoneCrackDetect.block_data[block].block_detect_image_path"
-                  :zoom-rate="1.2" :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
-                  :initial-index="4" fit="cover">
-                  <template #error>
-                        <div class="image-slot">NULL</div>
-                      </template>
-                </el-image>
-              </el-row>
-            </el-col>
-            <el-col :span="7" style="margin-left: 1%;">
-              <el-row>
-                存在裂缝：
-                <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
-                <a v-else>否</a>
-              </el-row>
-              <a v-if="StoneCrackDetect.block_data[block].has_crack">
-                <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
-                <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
-                <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
+          <el-scrollbar  height="500px">
+            <el-row :gutter="20"> <!-- 设置栅格间距 -->  
+              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->  
+                <el-card style="border-radius: 20px; width: 220px; height: 420px; overflow: auto;">  
+                  <!-- 卡片内容 -->  
+                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
 
-                <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
 
-              </a>
-            </el-col>
-          </el-row>
-        </el-card>
-      </el-scrollbar>
-    </div>
+
+                  <el-row>  
+  <el-col :span="16">  
+    <el-row>  
+      <el-image  
+        style="width: 180px; height: auto;"   
+        :src="StoneCrackDetect.block_data[block].block_seg_image_path"  
+        :zoom-rate="1.2"  
+        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"  
+        :initial-index="4"  
+        fit="contain"  
+      >  
+        <template #error>  
+          <div class="image-slot">NULL</div>  
+        </template>  
+      </el-image>  
+    </el-row>  
+    <el-row style="margin-top: 1%;">  
+      <el-image  
+        style="width: 180px; height: auto;"  
+        :src="StoneCrackDetect.block_data[block].block_detect_image_path"  
+        :zoom-rate="1.2"  
+        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"  
+        :initial-index="4"  
+        fit="contain"   
+      >  
+        <template #error>  
+          <div class="image-slot">NULL</div>  
+        </template>  
+      </el-image>  
+    </el-row>  
+  </el-col>  
+</el-row>
+
+
+
+                  <el-row style="width: 800px;">
+                    <el-col :span="7" style="margin-left: 1%;width: 800px;">
+                      <el-row>
+                        存在裂缝：
+                        <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
+                        <a v-else>否</a>
+                      </el-row>
+                      <a v-if="StoneCrackDetect.block_data[block].has_crack">
+                        <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                        <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                        <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
+                        <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
+                      </a>
+                    </el-col>
+                  </el-row>
+                </el-card>  
+              </el-col>  
+            </el-row>
+
+
+          </el-scrollbar>
+        </div>
+
+
+    
   </div>
 
 
@@ -1176,5 +1209,36 @@ export default {
       top: 50% !important;
       height: 4px;
     }
+
+    .title-container {  
+  position: relative; /* 确保子元素可以相对于这个容器定位 */  
+  width: 100%; /* 根据需要设置宽度 */  
+  height: 300px; /* 设置容器的高度，以适应背景图片 */  
+}  
+  
+.earth-background {  
+  position: absolute; /* 绝对定位使得背景图片可以覆盖整个容器 */  
+  top: -50; /* 顶部对齐 */  
+  left: 0; /* 左侧对齐 */  
+  width: 100%; /* 宽度覆盖整个容器 */  
+  height: 100%; /* 高度覆盖整个容器 */  
+  background-image: url('/src/assets/picture/earth.jpeg'); /* 背景图片路径 */  
+  background-size: cover; /* 背景图片覆盖整个容器 */  
+  background-position: center; /* 背景图片居中显示 */  
+  z-index: 1; /* 确保背景图片在文字下方 */  
+  opacity: 1; /* 设置图片的透明度 */  
+}  
+  
+.text-over-image {  
+  position: absolute; /* 绝对定位使得文字可以覆盖在背景图片上 */  
+  top: 50%; /* 垂直居中 */  
+  left: 50%; /* 水平居中 */  
+  transform: translate(-50%, -50%); /* 通过变换将文字居中 */  
+  color: white; /* 设置文字颜色，确保在背景图片上可见 */  
+  text-align: center; /* 文字居中显示 */  
+  z-index: 2; /* 确保文字在背景图片上方 */  
+  font-size: 24px;
+  font-weight: bold;  
+}
 
 </style>

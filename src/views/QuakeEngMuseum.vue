@@ -106,7 +106,7 @@ export default {
       ],
       //当前查看位置图片的颜色信息
       infocolor: {
-        color: 0,
+        color: -1,
         reason: ''  
       },
       unityMessage: '',     //来自unity
@@ -502,6 +502,11 @@ export default {
       //修改为OBS读取
       var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image";
       imageURL = imageURL.replace('/DZGCG/Pictures', baseURL);
+      console.log('请求的info:', `${that.info[3].data}`);
+      //上面输出/C/g_035.JPG
+      //修改格式
+      var coloruId = that.info[3].data.split("/")[1]+"_"+that.info[3].data.split("/")[2].replace('.JPG','').replace('/','_');
+      that.searchColorData(coloruId);
       // console.log("打印")
       // console.log(imageURL)
       that.url = imageURL;
@@ -734,16 +739,16 @@ export default {
   <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>
-                <span>对比</span>
+                <span>多选</span>
               </span>
             </template>
   <a>
-    开启对比：
+    开启多选：
     <el-switch v-model="setting_compare.is_open" @click="handleClick_compare" />
   </a>
   <br>
   <a>
-    对比数：&emsp;
+    多选数：&emsp;
     <el-input-number v-model="setting_compare.max_num" :min="1" :max="10" :step="1"
       :disabled="!setting_compare.is_open" />
   </a>

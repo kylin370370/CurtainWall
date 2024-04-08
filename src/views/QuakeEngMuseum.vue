@@ -498,11 +498,13 @@ export default {
       that.info[2].data = des_url[2] - 0;
 
       var imageURL = des_url[3].split('\r')[0];
+      //handleClick_divide(imageURL,that.info);
       that.info[3].data = imageURL.replace('/DZGCG/Pictures', '');
       //修改为OBS读取
       var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image";
+      
       imageURL = imageURL.replace('/DZGCG/Pictures', baseURL);
-      console.log('请求的info:', `${that.info[3].data}`);
+      //console.log('请求的info:', `${that.info[3].data}`);
       //上面输出/C/g_035.JPG
       //修改格式
       var coloruId = that.info[3].data.split("/")[1]+"_"+that.info[3].data.split("/")[2].replace('.JPG','').replace('/','_');
@@ -512,6 +514,7 @@ export default {
       that.url = imageURL;
       //that.srcList = [imageURL];
       that.add_points(imageURL, des_url[0] - 0, des_url[1] - 0, des_url[2] - 0, that.info[3].data);      //加入对比列表并在模型上显示
+    
     },
     updateDistance(){         //接收unity信息后更新测距步骤条与测距结果
       var that = this;
@@ -552,6 +555,11 @@ export default {
       // 打开新的标签页
       // window.open(url, '_blank');
     },
+    selectAllCracks(){
+      this.StoneCrackDetect.onshow.no = this.StoneCrackDetect.block_data
+      .map((block, index) => block.has_crack ? this.StoneCrackDetect.onshow.options[index].value : null)
+      .filter(value => value !== null);
+      }
   },
   mounted(){
     window.addEventListener("message",this.recieve);
@@ -992,6 +1000,7 @@ export default {
         <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
           :value="item.value" />
       </el-select>
+      <el-button @click="selectAllCracks">Select All Cracks</el-button>
     </p>
 
 

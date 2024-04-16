@@ -10,7 +10,7 @@ const handleSelect = (key: string, keyPath: string[]) => {
 </script>
 
 <template>
-  <header>
+  <header v-if="false">
     <el-menu
     :default-active="selected_item"
     class="el-menu-demo"

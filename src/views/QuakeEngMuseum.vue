@@ -1,5 +1,5 @@
 <script>
-import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,Histogram,
+import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,Histogram,Switch,
   RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place,Scissor,Hide,More } from '@element-plus/icons-vue';
 import axios  from "axios";
 //import Model from '@/components/model_1.vue';
@@ -54,9 +54,9 @@ export default {
   },
   data() {
     return {
-
+      pageoption:'0',
       setting_is_open: true,     //是否打开设置边栏
-      setting_type: 'compare',     //设置--相机/对比/测距
+      setting_type: 'camera',     //设置--相机/对比/测距
       setting_camera:{
         is_info: false,           //是否显示使用说明
         //is_keyboard: false,     //放此处watch不到所以挪出
@@ -107,7 +107,7 @@ export default {
       //当前查看位置图片的颜色信息
       infocolor: {
         color: -1,
-        reason: ''  
+        reason: ''
       },
       unityMessage: '',     //来自unity
 
@@ -322,10 +322,10 @@ export default {
     },
     handleClick_hideDivide(){         //隐藏分割栏
       var that = this;
-      that.StoneCrackDetect.is_show = false;
+      that.StoneCrackDetect.is_show = !that.StoneCrackDetect.is_show;
       that.StoneCrackDetect.onshow.no = [];
       that.StoneCrackDetect.onshow.options = [];
-      that.StoneCrackDetect.success = false;
+      that.StoneCrackDetect.success = !that.StoneCrackDetect.success;
     },
     handleClick_measure(){            //测距--开启测距
       var that = this;
@@ -482,7 +482,7 @@ export default {
       that.info[1].data = mess.y;
       that.info[2].data = mess.z;
       that.info[3].data = "/" + that.select_1 +"/" + that.select_3.split(".")[1] + ".JPG";
-      
+
 
       var coloruId = that.select_1 + "_" + that.select_3.split(".")[1].replace('.JPG','').replace('/','_');
       //console.log('请求的URL:', `${coloruId}`);
@@ -502,7 +502,7 @@ export default {
       that.info[3].data = imageURL.replace('/DZGCG/Pictures', '');
       //修改为OBS读取
       var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image";
-      
+
       imageURL = imageURL.replace('/DZGCG/Pictures', baseURL);
       //console.log('请求的info:', `${that.info[3].data}`);
       //上面输出/C/g_035.JPG
@@ -514,7 +514,7 @@ export default {
       that.url = imageURL;
       //that.srcList = [imageURL];
       that.add_points(imageURL, des_url[0] - 0, des_url[1] - 0, des_url[2] - 0, that.info[3].data);      //加入对比列表并在模型上显示
-    
+
     },
     updateDistance(){         //接收unity信息后更新测距步骤条与测距结果
       var that = this;
@@ -560,6 +560,16 @@ export default {
       .map((block, index) => block.has_crack ? this.StoneCrackDetect.onshow.options[index].value : null)
       .filter(value => value !== null);
       }
+      ,
+    changePage() {
+      this.pageoption = !this.pageoption;
+      if(this.pageoption === '0'){
+        this.$router.push('/about/QuakeEngMuseum')
+      }
+      else{
+        this.$router.push('/about/Office')
+      }
+    }
   },
   mounted(){
     window.addEventListener("message",this.recieve);
@@ -568,20 +578,17 @@ export default {
 </script>
 
 <template>
-  <div class="about">
-    <div class="title-container">  
-      <div class="earth-background">  
-        <!-- 图片背景 -->  
-      </div>  
-      <div class="text-over-image">  
-        <el-icon><Location /></el-icon>  
-        同济大学地震工程馆  
-      </div>  
+  <div class="about" style="background-color: #F5F5F5;">
+    <div class="some-text"  >
+      <el-icon><Location /></el-icon>
+      同济大学地震工程馆3D幕墙系统
+      <el-button color="#B29F82" style="color:white" @click="changePage()">
+      切换建筑
+      </el-button>
     </div>
-
-    <div class="select-wrapper">
-      <el-button color="#626aef"  @click="handleClick_setting" round>
-        <el-icon><Setting/></el-icon>
+    <div class="select-wrapper" style="background-color: #DBD4CC;">
+      <el-button color="#B29F82" @click="handleClick_setting" round>
+        <el-icon color="white"><Setting/></el-icon>
       </el-button>
       &emsp;
       <el-select-v2
@@ -612,8 +619,10 @@ export default {
       &ensp;
       <el-button
       @click="sendSelections"
-      color="#626aef"
+
       :disabled="!select_3"
+      color="#B29F82"
+      style="color:white"
       >
       确定
       </el-button>
@@ -625,19 +634,19 @@ export default {
           <el-tab-pane name="camera">
             <template #label>
               <span class="custom-tabs-label">
-                <el-icon><VideoCamera /></el-icon>
-                <span>相机</span>
+                <el-icon color="#463929"><VideoCamera /></el-icon>
+                <span style="color:#463929">相机</span>
               </span>
             </template>
 <a>
-  <el-checkbox v-model="is_keyboard" label="启用键盘控制" size="large" />
-  <br>
-  <el-checkbox v-model="is_mouse" label="启用鼠标控制" size="large" />
-  <br>
-  <a class="text_2">
+<!--  <el-checkbox v-model="is_keyboard" label="启用键盘控制" size="large"  />-->
+<!--  <br>-->
+<!--  <el-checkbox v-model="is_mouse" label="启用鼠标控制" size="large" />-->
+<!--  <br>-->
+  <a class="text_2" v-if="false">
     移动方式：
     <el-row :span="24" style="margin-top: -5%;">
-      <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode">
+      <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode" >
         <el-radio label="0" size="large">靠近</el-radio>
         <el-radio label="1" size="large">降落</el-radio>
       </el-radio-group>
@@ -699,15 +708,15 @@ export default {
 
 </a>
 <el-row style="margin-top: 5%; margin-bottom: 5%">
-  <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
+  <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
   <el-button @click="handleClick_info" size="small" round>
     <el-icon>
       <InfoFilled />
     </el-icon>
   </el-button>
 </el-row>
-<a v-if="setting_camera.is_info" class="text_info">
-  <el-scrollbar height="130px">
+<a v-if="!setting_camera.is_info" class="text_info">
+  <el-scrollbar height="300px">
     <li>键盘控制：</li>
     <a class="text_3">
       <el-row>
@@ -748,7 +757,7 @@ export default {
 
 </el-tab-pane>
 
-<el-tab-pane name="compare">
+<el-tab-pane name="compare" v-if="false">
   <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>
@@ -784,7 +793,7 @@ export default {
 
 </el-tab-pane>
 
-<el-tab-pane name="measure">
+<el-tab-pane name="measure" v-if="false">
   <template #label>
               <span class="custom-tabs-label">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
@@ -831,7 +840,7 @@ export default {
           </el-image>
         </div>
         <div class="info">
-          
+
           <!--红绿灯-->
           <el-tag v-if="infocolor.color === 0" type="success" class="mx-1" effect="plain" round>
             幕墙质量良好
@@ -844,15 +853,15 @@ export default {
           </el-tag>
           <!---->
           <p v-for="data in info" :key="data">
-            
+
             <a>{{ data.name }}:</a>
             <a>&emsp;{{ data.data }}</a>
           </p>
           <a v-if="url">
-            <el-button @click="handleClick_divide(url,info)" round>
-              <el-icon><Scissor /></el-icon>进行分割
+            <el-button  color="#B29F82" style="color:white" @click="handleClick_divide(url,info)" >
+              <el-icon color="white"><Scissor /></el-icon>显示分割结果
             </el-button>
-            <el-button @click="DoItYourself(info[3].data)">Do-It-Yourself!</el-button>
+            <el-button color="#B29F82" style="color:white" @click="DoItYourself(info[3].data)">跳转分割过程</el-button>
           </a>
         </div>
       </div>
@@ -931,14 +940,14 @@ export default {
     </el-scrollbar>
   </div>
 
-  <div v-if="StoneCrackDetect.is_show" class="divide">
     <el-divider />
-    <p class="text_1">
+    <p class="text_1" style="color:#463929">
       图像分割与裂缝识别
-      <el-icon color="#409EFF" @click="handleClick_hideDivide">
+      <el-icon color="#463929" @click="handleClick_hideDivide">
         <Hide />
       </el-icon>
     </p>
+  <div v-if="StoneCrackDetect.is_show" class="divide">
 
     <el-card style="border-radius: 20px;">
       <el-row>
@@ -1000,57 +1009,57 @@ export default {
         <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
           :value="item.value" />
       </el-select>
-      <el-button @click="selectAllCracks">Select All Cracks</el-button>
+      <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示所有有损伤的分割块</el-button>
     </p>
 
 
     <div v-if="StoneCrackDetect.onshow.no[0]">
           <el-scrollbar  height="500px">
-            <el-row :gutter="20"> <!-- 设置栅格间距 -->  
-              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->  
-                <el-card style="border-radius: 20px; width: 220px; height: 420px; overflow: auto;">  
-                  <!-- 卡片内容 -->  
+            <el-row :gutter="20"> <!-- 设置栅格间距 -->
+              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->
+                <el-card style="border-radius: 20px; width: auto; height: 420px; overflow: auto;">
+                  <!-- 卡片内容 -->
                   <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
 
 
 
-                  <el-row>  
-  <el-col :span="16">  
-    <el-row>  
-      <el-image  
-        style="width: 180px; height: auto;"   
-        :src="StoneCrackDetect.block_data[block].block_seg_image_path"  
-        :zoom-rate="1.2"  
-        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"  
-        :initial-index="4"  
-        fit="contain"  
-      >  
-        <template #error>  
-          <div class="image-slot">NULL</div>  
-        </template>  
-      </el-image>  
-    </el-row>  
-    <el-row style="margin-top: 1%;">  
-      <el-image  
-        style="width: 180px; height: auto;"  
-        :src="StoneCrackDetect.block_data[block].block_detect_image_path"  
-        :zoom-rate="1.2"  
-        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"  
-        :initial-index="4"  
-        fit="contain"   
-      >  
-        <template #error>  
-          <div class="image-slot">NULL</div>  
-        </template>  
-      </el-image>  
-    </el-row>  
-  </el-col>  
+                  <el-row>
+  <el-col :span="16">
+    <el-row>
+      <el-image
+        style="width: 180px; height: auto;"
+        :src="StoneCrackDetect.block_data[block].block_seg_image_path"
+        :zoom-rate="1.2"
+        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
+        :initial-index="4"
+        fit="contain"
+      >
+        <template #error>
+          <div class="image-slot">NULL</div>
+        </template>
+      </el-image>
+    </el-row>
+    <el-row style="margin-top: 1%;">
+      <el-image
+        style="width: 180px; height: auto;"
+        :src="StoneCrackDetect.block_data[block].block_detect_image_path"
+        :zoom-rate="1.2"
+        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
+        :initial-index="4"
+        fit="contain"
+      >
+        <template #error>
+          <div class="image-slot">NULL</div>
+        </template>
+      </el-image>
+    </el-row>
+  </el-col>
 </el-row>
 
 
 
                   <el-row style="width: 800px;">
-                    <el-col :span="7" style="margin-left: 1%;width: 800px;">
+                    <el-col :span="7" style="margin-left: 1%;width: auto;">
                       <el-row>
                         存在裂缝：
                         <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
@@ -1064,8 +1073,8 @@ export default {
                       </a>
                     </el-col>
                   </el-row>
-                </el-card>  
-              </el-col>  
+                </el-card>
+              </el-col>
             </el-row>
 
 
@@ -1073,7 +1082,7 @@ export default {
         </div>
 
 
-    
+
   </div>
 
 
@@ -1088,11 +1097,12 @@ export default {
   background-color: white;
 }
 .some-text{
+  background-color: #ADA08C;
   height: 80px;
   font-size: 40px;
   font-weight: bold;
   line-height: 80px;
-  margin-left: 30px;
+
   letter-spacing:1px;
   width: 100%;
 }
@@ -1224,35 +1234,48 @@ export default {
       height: 4px;
     }
 
-    .title-container {  
-  position: relative; /* 确保子元素可以相对于这个容器定位 */  
-  width: 100%; /* 根据需要设置宽度 */  
-  height: 300px; /* 设置容器的高度，以适应背景图片 */  
-}  
-  
-.earth-background {  
-  position: absolute; /* 绝对定位使得背景图片可以覆盖整个容器 */  
-  top: -50; /* 顶部对齐 */  
-  left: 0; /* 左侧对齐 */  
-  width: 100%; /* 宽度覆盖整个容器 */  
-  height: 100%; /* 高度覆盖整个容器 */  
-  background-image: url('/src/assets/picture/earth.jpeg'); /* 背景图片路径 */  
-  background-size: cover; /* 背景图片覆盖整个容器 */  
-  background-position: center; /* 背景图片居中显示 */  
-  z-index: 1; /* 确保背景图片在文字下方 */  
-  opacity: 1; /* 设置图片的透明度 */  
-}  
-  
-.text-over-image {  
-  position: absolute; /* 绝对定位使得文字可以覆盖在背景图片上 */  
-  top: 50%; /* 垂直居中 */  
-  left: 50%; /* 水平居中 */  
-  transform: translate(-50%, -50%); /* 通过变换将文字居中 */  
-  color: white; /* 设置文字颜色，确保在背景图片上可见 */  
-  text-align: center; /* 文字居中显示 */  
-  z-index: 2; /* 确保文字在背景图片上方 */  
-  font-size: 24px;
-  font-weight: bold;  
+    .title-container {
+  position: relative; /* 确保子元素可以相对于这个容器定位 */
+  width: 100%; /* 根据需要设置宽度 */
+  height: 0px; /* 设置容器的高度，以适应背景图片 */
 }
 
+.earth-background {
+  position: absolute; /* 绝对定位使得背景图片可以覆盖整个容器 */
+  top: -50; /* 顶部对齐 */
+  left: 0; /* 左侧对齐 */
+  width: 100%; /* 宽度覆盖整个容器 */
+  height: 100%; /* 高度覆盖整个容器 */
+  background-image: url('/src/assets/picture/earth.jpeg'); /* 背景图片路径 */
+  background-size: cover; /* 背景图片覆盖整个容器 */
+  background-position: center; /* 背景图片居中显示 */
+  z-index: 1; /* 确保背景图片在文字下方 */
+  opacity: 1; /* 设置图片的透明度 */
+}
+
+.text-over-image {
+  position: absolute; /* 绝对定位使得文字可以覆盖在背景图片上 */
+  top: 50%; /* 垂直居中 */
+  left: 50%; /* 水平居中 */
+  transform: translate(-50%, -50%); /* 通过变换将文字居中 */
+  color: white; /* 设置文字颜色，确保在背景图片上可见 */
+  text-align: center; /* 文字居中显示 */
+  z-index: 2; /* 确保文字在背景图片上方 */
+  font-size: 24px;
+  font-weight: bold;
+}
+:deep(.el-tabs__item.is-active) {
+  color: #a6733a;
+}
+:deep(.el-tabs__active-bar) {
+  background-color: #a6733a;
+}
+
+:deep(.el-tabs__item:hover) {
+  color: #a6733a;
+  cursor:pointer; /* 鼠标指针的样式 */
+}
+.option_wrapper{
+  height:30px;
+}
 </style>

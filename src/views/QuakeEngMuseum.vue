@@ -477,6 +477,7 @@ export default {
 
       //alert(imageURL);
       that.url = imageURL;
+      console.log(imageURL)
       //that.srcList = [imageURL];
       that.info[0].data = mess.x;
       that.info[1].data = mess.y;

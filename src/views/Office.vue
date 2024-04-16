@@ -51,9 +51,9 @@ export default {
   },
   data() {
     return {
-
+      pageoption:'1',
       setting_is_open: true,     //是否打开设置边栏
-      setting_type: 'compare',     //设置--相机/对比/测距
+      setting_type: 'camera',     //设置--相机/对比/测距
       setting_camera:{
         is_info: false,           //是否显示使用说明
         //is_keyboard: false,     //放此处watch不到所以挪出
@@ -419,6 +419,13 @@ export default {
       else{     //index === 2   //A-a-a_004
       }
     },
+    handleClick_hideDivide(){         //隐藏分割栏
+      var that = this;
+      that.StoneCrackDetect.is_show = !that.StoneCrackDetect.is_show;
+      that.StoneCrackDetect.onshow.no = [];
+      that.StoneCrackDetect.onshow.options = [];
+      that.StoneCrackDetect.success = !that.StoneCrackDetect.success;
+    },
     searchColorData(infoid) {
       console.log('请求颜色信息：', `http://localhost:8443/api/color/${infoid}`);
       axios.get(`http://localhost:8443/api/color/${infoid}`)
@@ -458,9 +465,9 @@ export default {
       // console.log(that.select_1);
       // console.log(that.select_3);
       that.info[3].data = that.select_1 +"_"+ that.select_2 + "_" + that.select_3[0].split(".")[0] + ".png";
-      
-      
-    
+
+
+
 
       that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
     },
@@ -488,7 +495,7 @@ export default {
       imageURL = imageURL.replace('/N+4/N+4_', '/D/');
       imageURL = imageURL.replace('JPG', 'png');
 
-      
+
       console.log(imageURL);
 
       that.url = imageURL;
@@ -525,25 +532,43 @@ export default {
       console.log('(来自vue)' + that.unityMessage);
       //console.log('(来自vue)' + event.data.type);
 
+    }
+  ,
+    DoItYourself(path) {
+      path = path.replace(/\//g, "_");
+      const params="JKQDL"+path;
+      console.log(params);
+      // const params = "DZGCG_A_a_005.JPG";
+      const jsonParams = JSON.stringify(params);
+
+      // const url = `http://47.98.230.163:8080/?source_images_paths=[${encodeURIComponent(jsonParams)}]`;
+
+      // 打开新的标签页
+      // window.open(url, '_blank');
     },
+  changePage() {
+      this.$router.push('/about/QuakeEngMuseum')
+  }
   },
   mounted(){
     window.addEventListener("message",this.recieve);
-  },
+  }
 }
 </script>
 
 <template>
-  <div class="about">
+  <div class="about" style="background-color: #F5F5F5;">
     <div class="some-text">
       <el-icon><Location /></el-icon>
       经开区政府大楼
-
+      <el-button color="#B29F82" style="color:white" @click="changePage()">
+        切换建筑
+      </el-button>
     </div>
 
-    <div class="select-wrapper">
-      <el-button color="#626aef"  @click="handleClick_setting" round>
-        <el-icon><Setting/></el-icon>
+    <div class="select-wrapper" style="background-color: #DBD4CC;">
+      <el-button color="#B29F82"  @click="handleClick_setting" round>
+        <el-icon color="white"><Setting/></el-icon>
       </el-button>
       &emsp;
       <el-select-v2
@@ -575,9 +600,10 @@ export default {
       &ensp;
       <el-button
           @click="sendSelections"
-          color="#626aef"
           :disabled="!select_3"
-      >
+          color="#B29F82"
+          style="color:white"
+     >
         确定
       </el-button>
     </div>
@@ -588,32 +614,32 @@ export default {
           <el-tab-pane name="camera">
             <template #label>
               <span class="custom-tabs-label">
-                <el-icon><VideoCamera /></el-icon>
-                <span>相机</span>
+                <el-icon color="#463929"><VideoCamera /></el-icon>
+                <span style="color:#463929">相机</span>
               </span>
             </template>
             <a>
-              <el-checkbox
-                  v-model="is_keyboard"
-                  label="启用键盘控制"
-                  size="large"
-              />
-              <br>
-              <el-checkbox
-                  v-model="is_mouse"
-                  label="启用鼠标控制"
-                  size="large"
-              />
-              <br>
-              <a class="text_2">
-                移动方式：
-                <el-row :span="24" style="margin-top: -5%;">
-                  <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode">
-                    <el-radio label="0" size="large">靠近</el-radio>
-                    <el-radio label="1" size="large">降落</el-radio>
-                  </el-radio-group>
-                </el-row>
-              </a>
+<!--              <el-checkbox-->
+<!--                  v-model="is_keyboard"-->
+<!--                  label="启用键盘控制"-->
+<!--                  size="large"-->
+<!--              />-->
+<!--              <br>-->
+<!--              <el-checkbox-->
+<!--                  v-model="is_mouse"-->
+<!--                  label="启用鼠标控制"-->
+<!--                  size="large"-->
+<!--              />-->
+<!--              <br>-->
+<!--              <a class="text_2">-->
+<!--                移动方式：-->
+<!--                <el-row :span="24" style="margin-top: -5%;">-->
+<!--                  <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode">-->
+<!--                    <el-radio label="0" size="large">靠近</el-radio>-->
+<!--                    <el-radio label="1" size="large">降落</el-radio>-->
+<!--                  </el-radio-group>-->
+<!--                </el-row>-->
+<!--              </a>-->
               <a class="text_2">
                 旋转：
                 <el-button @click="handleClick_rotating(0)">
@@ -645,21 +671,21 @@ export default {
                   </el-button>
                 </el-row>
               </a>
-              <a class="text_2">
-                <a> 夜景模式：
-                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />
-                </a>
-              </a>
+<!--              <a class="text_2" >-->
+<!--                <a> 夜景模式：-->
+<!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
+<!--                </a>-->
+<!--              </a>-->
 
             </a>
             <el-row style="margin-top: 5%; margin-bottom: 5%">
-              <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
+              <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
               <el-button @click="handleClick_info" size="small" round>
                 <el-icon><InfoFilled /></el-icon>
               </el-button>
             </el-row>
-            <a v-if="setting_camera.is_info" class="text_info">
-              <el-scrollbar height="130px">
+            <a v-if="!setting_camera.is_info" class="text_info">
+              <el-scrollbar height="300px">
                 <li>键盘控制：</li>
                 <a class="text_3">
                   <el-row>
@@ -700,7 +726,7 @@ export default {
 
           </el-tab-pane>
 
-          <el-tab-pane name="compare">
+          <el-tab-pane name="compare" v-if="false">
             <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>
@@ -813,6 +839,12 @@ export default {
             <a>{{ data.name }}:</a>
             <a>&emsp;{{ data.data }}</a>
           </p>
+          <a v-if="url">
+            <el-button  color="#B29F82" style="color:white" @click="handleClick_divide(url,info)" >
+              <el-icon color="white"><Scissor /></el-icon>显示分割结果
+            </el-button>
+            <el-button color="#B29F82" style="color:white" @click="DoItYourself(info[3].data)">跳转分割过程</el-button>
+          </a>
         </div>
       </div>
       <div v-if="setting_compare.is_open" class="compare">
@@ -888,15 +920,15 @@ export default {
       </div>
 
     </div>
-
-    <div v-if="StoneCrackDetect.is_show" class="divide">
     <el-divider />
-    <p class="text_1">
+    <p class="text_1" style="color:#463929">
       图像分割与裂缝识别
-      <el-icon color="#409EFF" @click="handleClick_hideDivide">
+      <el-icon color="#463929" @click="handleClick_hideDivide">
         <Hide />
       </el-icon>
     </p>
+    <div v-if="StoneCrackDetect.is_show" class="divide">
+
 
     <el-card style="border-radius: 20px;">
       <el-row>
@@ -958,48 +990,48 @@ export default {
         <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
           :value="item.value" />
       </el-select>
-      <el-button @click="selectAllCracks">Select All Cracks</el-button>
+      <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示所有有损伤的分割块</el-button>
     </p>
 
 
     <div v-if="StoneCrackDetect.onshow.no[0]">
           <el-scrollbar  height="500px">
-            <el-row :gutter="20"> <!-- 设置栅格间距 -->  
-              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->  
-                <el-card style="border-radius: 20px; width: 220px; height: 420px; overflow: auto;">  
-                  <!-- 卡片内容 -->  
+            <el-row :gutter="20"> <!-- 设置栅格间距 -->
+              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->
+                <el-card style="border-radius: 20px; width: 220px; height: 420px; overflow: auto;">
+                  <!-- 卡片内容 -->
                   <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
-                  <el-row>  
-                  <el-col :span="16">  
-                    <el-row>  
-                      <el-image  
-                        style="width: 180px; height: auto;"   
-                        :src="StoneCrackDetect.block_data[block].block_seg_image_path"  
-                        :zoom-rate="1.2"  
-                        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"  
-                        :initial-index="4"  
-                        fit="contain"  
-                      >  
-                        <template #error>  
-                          <div class="image-slot">NULL</div>  
-                        </template>  
-                      </el-image>  
-                    </el-row>  
-                    <el-row style="margin-top: 1%;">  
-                      <el-image  
-                        style="width: 180px; height: auto;"  
-                        :src="StoneCrackDetect.block_data[block].block_detect_image_path"  
-                        :zoom-rate="1.2"  
-                        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"  
-                        :initial-index="4"  
-                        fit="contain"   
-                      >  
-                        <template #error>  
-                          <div class="image-slot">NULL</div>  
-                        </template>  
-                      </el-image>  
-                    </el-row>  
-                  </el-col>  
+                  <el-row>
+                  <el-col :span="16">
+                    <el-row>
+                      <el-image
+                        style="width: 180px; height: auto;"
+                        :src="StoneCrackDetect.block_data[block].block_seg_image_path"
+                        :zoom-rate="1.2"
+                        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
+                        :initial-index="4"
+                        fit="contain"
+                      >
+                        <template #error>
+                          <div class="image-slot">NULL</div>
+                        </template>
+                      </el-image>
+                    </el-row>
+                    <el-row style="margin-top: 1%;">
+                      <el-image
+                        style="width: 180px; height: auto;"
+                        :src="StoneCrackDetect.block_data[block].block_detect_image_path"
+                        :zoom-rate="1.2"
+                        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
+                        :initial-index="4"
+                        fit="contain"
+                      >
+                        <template #error>
+                          <div class="image-slot">NULL</div>
+                        </template>
+                      </el-image>
+                    </el-row>
+                  </el-col>
                 </el-row>
                   <el-row style="width: 800px;">
                     <el-col :span="7" style="margin-left: 1%;width: 800px;">
@@ -1016,8 +1048,8 @@ export default {
                       </a>
                     </el-col>
                   </el-row>
-                </el-card>  
-              </el-col>  
+                </el-card>
+              </el-col>
             </el-row>
 
 
@@ -1025,11 +1057,11 @@ export default {
         </div>
 
 
-    
+
   </div>
 
 
-    
+
 
     <br><br><br>
   </div>

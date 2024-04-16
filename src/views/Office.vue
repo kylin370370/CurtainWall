@@ -104,6 +104,27 @@ export default {
         {name:'path', data:''},
       ],
       unityMessage: '',     //来自unity
+      StoneCrackDetect:{
+        is_show: false,      //是否开启图像分割栏
+        raw_path: '',       //原图路径
+        path: '',           //原图路径(请求接口时使用)
+        des:{               //原图坐标
+          x:0,
+          y:0,
+          z:0
+        },
+        has_crack: false,   //有无裂痕
+        crack_data: {},     //裂痕数据
+        seg_path: '',       //图像分割中间结果图片
+        detect_path:'',
+        seg_count: 0,       //分割块数
+        block_data: [{}],   //每块数据
+        onshow:{
+          no:[],        //要显示的块block_data中位置
+          options:[],   //选项
+        },
+        success:false,  //请求接口是否成功
+      },
 
     }
   },
@@ -220,6 +241,67 @@ export default {
 
       that.$refs.unityModel.setQuick(type.toString());
     },
+    handleClick_divide(path, info){
+      var that = this;
+      var SCD = that.StoneCrackDetect;
+      SCD.is_show = true;           //显示分隔栏
+      SCD.des.x = info[0].data;     //保存坐标
+      SCD.des.y = info[1].data;
+      SCD.des.z = info[2].data;
+      SCD.onshow.no = [];
+      SCD.onshow.options = [];
+      SCD.success = false;
+      if(path){         // /DZGCG/Pictures/A/a_004.JPG
+        // console.error("this is path", path)
+        SCD.path = path.split("/JKQDL/source_image/")[1];
+
+        SCD.raw_path = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/JKQDL/source_image/"+SCD.path;
+
+        SCD.seg_path =  SCD.raw_path.replace('.png',"/segment_whole.png");
+        SCD.seg_path =  SCD.seg_path.replace('source_image',"segment_image");
+        SCD.detect_path="https://stone-wall.obs.cn-east-3.myhuaweicloud.com/JKQDL/detect_image/"+SCD.path;
+        // SCD.detect_path=SCD.detect_path.replace('JPG','png');
+        SCD.path= SCD.path.replace('/','_')
+        SCD.path= SCD.path.replace('.png','')
+        var  urlList=that. urlList;
+        // alert(SCD.path);
+        //alert(that.StoneCrackDetect.path);    //  A/a_004.JPG
+        //console.log('请求的URL:', `http://localhost:8443/api/image/${SCD.path}`);
+          axios
+              .get(`http://localhost:8443/api/image/${SCD.path}`)
+              // .get(`http://120.46.136.85:8443/api/image/${SCD.path}`)
+              .then((response) => {
+                SCD.seg_count = response.data.length;
+                SCD.block_data = response.data.map((item, index) => {
+                  const block = {
+                    has_crack: item.hasCrack,
+                    block_num:index,
+                    block_seg_image_path:item.imagePath,
+                    block_detect_image_path: item.binaryImagePath,
+                    crack_data: {
+                      crackArea: item.crackArea,
+                      crackLength: item.crackLength,
+                      crackAverageWidth: item.crackAverageWidth,
+                      crackMaxWidth: item.crackMaxWidth
+                    }
+                  };
+
+                  // 打印每个block块
+                  console.log('Block 数据:', block);
+                  SCD.onshow.options.push({
+                    value: index.toString(),
+                    label: 'Block ' + index.toString() // 如果有具体的block_num，请使用 item.block_num
+                  });
+                  return block;
+
+                });
+              })
+              .catch((error) => {
+                console.error('获取URL列表失败：', error);
+              });
+        SCD.success = true;
+      }
+    },
     handleClick_measure(){            //测距--开启测距
       var that = this;
       that.$refs.unityModel.isMeasuring(that.setting_measure.is_open.toString());
@@ -270,6 +352,8 @@ export default {
           {name:'path',data: path}  ],
         state: '1',
       });
+
+
       that.$refs.unityModel.draw_des(x + "," + y + "," + z);    //在模型上显示
       //alert("draw_des" + x + "," + y + "," + z);
     },
@@ -335,6 +419,19 @@ export default {
       else{     //index === 2   //A-a-a_004
       }
     },
+    searchColorData(infoid) {
+      console.log('请求颜色信息：', `http://localhost:8443/api/color/${infoid}`);
+      axios.get(`http://localhost:8443/api/color/${infoid}`)
+        .then(response => {
+          this.infocolor.color = response.data.color;
+          this.infocolor.reason = response.data.reason;
+          console.log('颜色信息：', response.data);
+        })
+        .catch(error => {
+          console.error(error);
+          console.log('颜色信息：', '请求失败');
+        });
+    },
     sendSelections(){       //  按钮“确定”    1.向unity发坐标   2. 更新图片
       var that = this;
       //alert(that.select_1+" "+that.select_2+" "+that.select_3[1]);
@@ -347,19 +444,31 @@ export default {
       //alert(mess.x + "," + mess.y + "," + mess.z);
       //this.$refs.unityModel.sendOrders(mess.x + "," + mess.y + "," + mess.z);
       //https://jkqdl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/N%2B4/N%2B4_a_001.jpg
-      var baseURL = "https://jkqdl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/";
-      var imageURL = baseURL + that.select_1 + "/" + that.select_1 + "_" + that.select_2 + "_" + that.select_3[0].split(".")[0] + ".jpg";
+      var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/JKQDL/source_image";
+      var imageURL = baseURL + that.select_1 + "/" + that.select_1 + "_" + that.select_2 + "_" + that.select_3[0].split(".")[0] + ".png";
 
-      imageURL = imageURL.replace('W+4/W+4', 'W%2B4/W%2B4');    //替换为真实路径
-      imageURL = imageURL.replace('N+4/N+4', 'N%2B4/N%2B4');
+      imageURL = imageURL.replace('W+4/W+4_', '/E/');    //替换为真实路径
+      imageURL = imageURL.replace('N+4/N+4_', '/D/');
       console.log("这里是"+imageURL);
-      //这里是https://zhl-pictures.obs.cn-north-4.myhuaweicloud.com/Pictures/SW205/SW205_01-06F_a_002.jpg
-     
-      //alert(imageURL);\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\\a);
+      that.url = imageURL;
+      console.log(mess)
+      that.info[0].data = mess.x;
+      that.info[1].data = mess.y;
+      that.info[2].data = mess.z;
+      // console.log(that.select_1);
+      // console.log(that.select_3);
+      that.info[3].data = that.select_1 +"_"+ that.select_2 + "_" + that.select_3[0].split(".")[0] + ".png";
+      
+      
+    
+
       that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
     },
 
     updatePicture(){            //接收unity信息后更新显示
+
+
+      console.error("update picture!!!!!\n\n\n\n\n")
       var that = this;                              //"50.48,29.23,0.88,/ZHL/Pictures/W+4/SE-20_01-06F_a_001.jpg\r"
       var des_url = that.unityMessage.split(',');   //["50.48","29.23","0.88","/ZHL/Pictures/W+4/SE-20_01-06F_a_001.jpg\r"]
 
@@ -372,12 +481,14 @@ export default {
       that.info[3].data = imageURL.split('/')[4];         //SE-20_01-06F_a_001.jpg
 
       //修改为OBS读取
-      var baseURL = "https://jkqdl-pictures.obs.cn-north-4.myhuaweicloud.com";
-      imageURL = imageURL.replace('/JKQDL', baseURL);
+      var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/JKQDL/source_image";
+      imageURL = imageURL.replace('/JKQDL/Pictures', baseURL);
 
-      imageURL = imageURL.replace('W+4/W+4', 'W%2B4/W%2B4');    //替换为真实路径
-      imageURL = imageURL.replace('N+4/N+4', 'N%2B4/N%2B4');
-      imageURL = imageURL.replace('JPG', 'jpg');
+      imageURL = imageURL.replace('/W+4/W+4_', '/E/');    //替换为真实路径
+      imageURL = imageURL.replace('/N+4/N+4_', '/D/');
+      imageURL = imageURL.replace('JPG', 'png');
+
+      
       console.log(imageURL);
 
       that.url = imageURL;
@@ -749,6 +860,13 @@ export default {
                   <el-button @click="handleClick_search(setting_compare.points.length - index - 1)">
                     <el-icon><Search/></el-icon>
                   </el-button>
+                  <a v-if="point.url">
+                    <el-button @click="handleClick_divide(point.url,point.info)">
+                      <el-icon>
+                        <Scissor />
+                      </el-icon>
+                    </el-button>
+                  </a>
                   <el-button @click="handleClick_delete(setting_compare.points.length - index - 1)">
                     <el-icon><Delete/></el-icon>
                   </el-button>
@@ -770,6 +888,148 @@ export default {
       </div>
 
     </div>
+
+    <div v-if="StoneCrackDetect.is_show" class="divide">
+    <el-divider />
+    <p class="text_1">
+      图像分割与裂缝识别
+      <el-icon color="#409EFF" @click="handleClick_hideDivide">
+        <Hide />
+      </el-icon>
+    </p>
+
+    <el-card style="border-radius: 20px;">
+      <el-row>
+        <el-col :span="8">
+          <p class="text_2">
+            当前图片&ensp;
+            <el-button @click="handleClick_search(-1)" size="small" circle>
+              <el-icon>
+                <Search />
+              </el-icon>
+            </el-button>
+          </p>
+          <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
+            :preview-src-list="[StoneCrackDetect.raw_path]" :initial-index="4" fit="cover">
+            <template #error>
+                  <div class="image-slot">NULL</div>
+                </template>
+          </el-image>
+          <el-row>
+            x: {{ StoneCrackDetect.des.x }}&emsp;
+            y: {{ StoneCrackDetect.des.y }}&emsp;
+            z: {{ StoneCrackDetect.des.z }}
+          </el-row>
+        </el-col>
+        <el-col :span="8">
+          <p class="text_2">检测图片</p>
+          <a v-if="StoneCrackDetect.success">
+            <el-row>
+
+              <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
+                :preview-src-list="[StoneCrackDetect.detect_path]" :initial-index="4" fit="cover">
+                <template #error>
+                      <div class="image-slot">NULL</div>
+                    </template>
+              </el-image>
+            </el-row>
+          </a>
+        </el-col>
+        <el-col :span="8">
+          <p class="text_2">分割情况</p>
+          <a v-if="StoneCrackDetect.success">
+            <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
+              :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
+              <template #error>
+                    <div class="image-slot">NULL</div>
+                  </template>
+            </el-image>
+            <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
+          </a>
+        </el-col>
+
+      </el-row>
+    </el-card>
+
+    <p class="text_2">
+      查看分割块：
+      <el-select v-model="StoneCrackDetect.onshow.no" multiple collapse-tags collapse-tags-tooltip
+        :max-collapse-tags="3" placeholder="Select" style="width: 260px">
+        <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
+          :value="item.value" />
+      </el-select>
+      <el-button @click="selectAllCracks">Select All Cracks</el-button>
+    </p>
+
+
+    <div v-if="StoneCrackDetect.onshow.no[0]">
+          <el-scrollbar  height="500px">
+            <el-row :gutter="20"> <!-- 设置栅格间距 -->  
+              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->  
+                <el-card style="border-radius: 20px; width: 220px; height: 420px; overflow: auto;">  
+                  <!-- 卡片内容 -->  
+                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
+                  <el-row>  
+                  <el-col :span="16">  
+                    <el-row>  
+                      <el-image  
+                        style="width: 180px; height: auto;"   
+                        :src="StoneCrackDetect.block_data[block].block_seg_image_path"  
+                        :zoom-rate="1.2"  
+                        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"  
+                        :initial-index="4"  
+                        fit="contain"  
+                      >  
+                        <template #error>  
+                          <div class="image-slot">NULL</div>  
+                        </template>  
+                      </el-image>  
+                    </el-row>  
+                    <el-row style="margin-top: 1%;">  
+                      <el-image  
+                        style="width: 180px; height: auto;"  
+                        :src="StoneCrackDetect.block_data[block].block_detect_image_path"  
+                        :zoom-rate="1.2"  
+                        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"  
+                        :initial-index="4"  
+                        fit="contain"   
+                      >  
+                        <template #error>  
+                          <div class="image-slot">NULL</div>  
+                        </template>  
+                      </el-image>  
+                    </el-row>  
+                  </el-col>  
+                </el-row>
+                  <el-row style="width: 800px;">
+                    <el-col :span="7" style="margin-left: 1%;width: 800px;">
+                      <el-row>
+                        存在裂缝：
+                        <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
+                        <a v-else>否</a>
+                      </el-row>
+                      <a v-if="StoneCrackDetect.block_data[block].has_crack">
+                        <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                        <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                        <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
+                        <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
+                      </a>
+                    </el-col>
+                  </el-row>
+                </el-card>  
+              </el-col>  
+            </el-row>
+
+
+          </el-scrollbar>
+        </div>
+
+
+    
+  </div>
+
+
+    
 
     <br><br><br>
   </div>

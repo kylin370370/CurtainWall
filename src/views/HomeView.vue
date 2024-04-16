@@ -37,8 +37,11 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
       if(this.option === '0'){
         this.$router.push('/about/QuakeEngMuseum')
       }
-      else{
+      else if(this.option === '1'){
         this.$router.push('/about/Composite')
+      }
+      else if(this.option === '2'){
+        this.$router.push('/about/Office')
       }
     }
   },
@@ -54,6 +57,7 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
         <el-radio-group v-model="option" class="ml-4" @change="handleClick_change">
           <el-radio label="0" size="large">地震工程馆</el-radio>
           <el-radio label="1" size="large">衷和楼</el-radio>
+          <el-radio label="2" size="large">政府大楼</el-radio>
         </el-radio-group>
       </div>  
     </div>
@@ -96,7 +100,7 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
         </el-button>
       </div>
     </div>
-    <div v-else class="quake_info">   
+    <div v-if="option==='1'" class="quake_info">   
       <div class="text_1_1">
         <el-row style="margin-bottom: 2%">衷和楼</el-row>
       </div>
@@ -107,17 +111,67 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
       
       <el-divider />
       <el-row class="text_fun">
-        <el-col :span="7">
+        <el-col :span="4">
           <el-icon><Search /></el-icon><br>
           查看幕墙
         </el-col>
         <el-divider direction="vertical" />
-        <el-col :span="7">
+        <el-col :span="4">
+          <el-icon><Position /></el-icon><br>
+          两点测距
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
           <el-icon><Histogram /></el-icon><br>
           图片对比
         </el-col>
         <el-divider direction="vertical" />
-        <el-col :span="7">
+        <el-col :span="4">
+          <el-icon><Scissor /></el-icon><br>
+          图像分割
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
+          <el-icon><Moon /></el-icon><br>
+          夜景模式
+        </el-col>
+      </el-row> 
+      <div class="router_button">
+        <el-button @click="changePage" size="large" color="#EEFFFF" round>
+          <el-icon><Pointer /></el-icon>前往体验
+        </el-button>
+      </div>
+    </div>
+    <div v-if="option==='2'" class="quake_info">   
+      <div class="text_1_1">
+        <el-row style="margin-bottom: 2%">政府大楼</el-row>
+      </div>
+      <div class="text_1_2">
+        <!-- 坐落于上海虹桥经济开发区，由常年展贸中心、上海世贸展馆、上海世贸大厦三大主体建筑构成，是一个集展示、交易、办公、资讯于一体的超级交易市场，为国内外商家及专业买主提供国际级的设施和服务。 -->
+      </div>
+      <el-divider />
+      <el-row class="text_fun">
+        <el-col :span="4">
+          <el-icon><Search /></el-icon><br>
+          查看幕墙
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
+          <el-icon><Position /></el-icon><br>
+          两点测距
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
+          <el-icon><Histogram /></el-icon><br>
+          图片对比
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
+          <el-icon><Scissor /></el-icon><br>
+          图像分割
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
           <el-icon><Moon /></el-icon><br>
           夜景模式
         </el-col>

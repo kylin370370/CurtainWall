@@ -71,7 +71,7 @@ export default {
         is_open: false,         //是否开启对比
         is_show: true,          //是否显示坐标等信息
         max_num: 1,             //对比数量      1-10
-        points:[],              //url,info,colorinfo, state  state各点位card显示状态['1'显示, '0'不显示, '2'中间态(显示卡片不显示详细内容)]
+        points:[],              //url,info,state  state各点位card显示状态['1'显示, '0'不显示, '2'中间态(显示卡片不显示详细内容)]
         type: false,
       },//其他按钮： 清空
       type_compare: false,      //对比显示形式  false逐个/true全部
@@ -104,11 +104,6 @@ export default {
         {name:'z', data: 0},
         {name:'path', data:''},
       ],
-      //当前查看位置图片的颜色信息
-      infocolor: {
-        color: -1,
-        reason: ''  
-      },
       unityMessage: '',     //来自unity
 
       StoneCrackDetect:{
@@ -266,7 +261,6 @@ export default {
         var  urlList=that. urlList;
         // alert(SCD.path);
         //alert(that.StoneCrackDetect.path);    //  A/a_004.JPG
-        //console.log('请求的URL:', `http://localhost:8443/api/image/${SCD.path}`);
           axios
               .get(`http://localhost:8443/api/image/${SCD.path}`)
               // .get(`http://120.46.136.85:8443/api/image/${SCD.path}`)
@@ -354,6 +348,7 @@ export default {
     add_points(image_url, x, y, z, path){       //对比的信息列表    添加新元素+显示在模型上
       var that = this;
       var points = that.setting_compare.points;
+
       while(points.length >= that.setting_compare.max_num){     //已满，删去第一个         //在模型上隐藏位点
         that.$refs.unityModel.hide_des(points[0].info[0].data + "," + points[0].info[1].data + "," + points[0].info[2].data);
         //alert("hide_des: " + points[0].info[0].data + "," + points[0].info[1].data + "," + points[0].info[2].data);
@@ -441,19 +436,6 @@ export default {
       else{     //index === 2   //A-a-a_004
       }
     },
-    searchColorData(infoid) {
-      console.log('请求颜色信息：', `http://localhost:8443/api/color/${infoid}`);
-      axios.get(`http://localhost:8443/api/color/${infoid}`)
-        .then(response => {
-          this.infocolor.color = response.data.color;
-          this.infocolor.reason = response.data.reason;
-          console.log('颜色信息：', response.data);
-        })
-        .catch(error => {
-          console.error(error);
-          console.log('颜色信息：', '请求失败');
-        });
-    },
     sendSelections(){       //  按钮“确定”    1.向unity发坐标   2. 更新图片
       var that = this;
       //alert(that.select_1+" "+that.select_2+" "+that.select_3);
@@ -475,22 +457,17 @@ export default {
       var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com";
       imageURL = imageURL.replace('Pictures', baseURL);
 
+
       //alert(imageURL);
       that.url = imageURL;
-      console.log(imageURL)
       //that.srcList = [imageURL];
       that.info[0].data = mess.x;
       that.info[1].data = mess.y;
       that.info[2].data = mess.z;
       that.info[3].data = "/" + that.select_1 +"/" + that.select_3.split(".")[1] + ".JPG";
-      
-
-      var coloruId = that.select_1 + "_" + that.select_3.split(".")[1].replace('.JPG','').replace('/','_');
-      //console.log('请求的URL:', `${coloruId}`);
-
-      that.searchColorData(coloruId);
-      that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
+      that.add_points(imageURL, parseFloat(mess.x), parseFloat(mess.y), parseFloat(mess.z), that.info[3].data);        ////加入对比列表并在模型上显示
     },
+
     updatePicture(){            //接收unity信息后更新显示
       var that = this;                              //"52.12,13.28,85.74,/DZGCG/Pictures/A/a_004.JPG\r"
       var des_url = that.unityMessage.split(',');   //["52.12","13.28","85.74","/DZGCG/Pictures/A/a_004.JPG\r"]
@@ -499,23 +476,15 @@ export default {
       that.info[2].data = des_url[2] - 0;
 
       var imageURL = des_url[3].split('\r')[0];
-      //handleClick_divide(imageURL,that.info);
       that.info[3].data = imageURL.replace('/DZGCG/Pictures', '');
       //修改为OBS读取
       var baseURL = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image";
-      
       imageURL = imageURL.replace('/DZGCG/Pictures', baseURL);
-      //console.log('请求的info:', `${that.info[3].data}`);
-      //上面输出/C/g_035.JPG
-      //修改格式
-      var coloruId = that.info[3].data.split("/")[1]+"_"+that.info[3].data.split("/")[2].replace('.JPG','').replace('/','_');
-      that.searchColorData(coloruId);
       // console.log("打印")
       // console.log(imageURL)
       that.url = imageURL;
       //that.srcList = [imageURL];
       that.add_points(imageURL, des_url[0] - 0, des_url[1] - 0, des_url[2] - 0, that.info[3].data);      //加入对比列表并在模型上显示
-    
     },
     updateDistance(){         //接收unity信息后更新测距步骤条与测距结果
       var that = this;
@@ -544,23 +513,13 @@ export default {
         //console.log('(来自vue)' + event.data.type);
 
     },
-    DoItYourself(path) {
-      path = path.replace(/\//g, "_");
-      const params="DZGCG"+path;
-      console.log(params);
-      // const params = "DZGCG_A_a_005.JPG";
-      const jsonParams = JSON.stringify(params);
-
-      // const url = `http://47.98.230.163:8080/?source_images_paths=[${encodeURIComponent(jsonParams)}]`;
-
-      // 打开新的标签页
-      // window.open(url, '_blank');
+    DoItYourself() {
+      // 获取路由路径
+      // const routePath = this.$router.resolve({ name: 'NewPage' }).href;
+      // 在新标签页中打开页面
+      // window.open(routePath, '_blank');
+      window.open('https://www.baidu.com', '_blank');
     },
-    selectAllCracks(){
-      this.StoneCrackDetect.onshow.no = this.StoneCrackDetect.block_data
-      .map((block, index) => block.has_crack ? this.StoneCrackDetect.onshow.options[index].value : null)
-      .filter(value => value !== null);
-      }
   },
   mounted(){
     window.addEventListener("message",this.recieve);
@@ -570,14 +529,9 @@ export default {
 
 <template>
   <div class="about">
-    <div class="title-container">  
-      <div class="earth-background">  
-        <!-- 图片背景 -->  
-      </div>  
-      <div class="text-over-image">  
-        <el-icon><Location /></el-icon>  
-        同济大学地震工程馆  
-      </div>  
+    <div class="some-text">
+      <el-icon><Location /></el-icon>
+      同济大学地震工程馆
     </div>
 
     <div class="select-wrapper">
@@ -753,16 +707,16 @@ export default {
   <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>
-                <span>多选</span>
+                <span>对比</span>
               </span>
             </template>
   <a>
-    开启多选：
+    开启对比：
     <el-switch v-model="setting_compare.is_open" @click="handleClick_compare" />
   </a>
   <br>
   <a>
-    多选数：&emsp;
+    对比数：&emsp;
     <el-input-number v-model="setting_compare.max_num" :min="1" :max="10" :step="1"
       :disabled="!setting_compare.is_open" />
   </a>
@@ -824,72 +778,47 @@ export default {
   <p class="text_1">当前查看：</p>
   <div class="details">
     <div class="image">
-      <el-image style="width: 266px; height: 200px" :src="url" :zoom-rate="1.2" :preview-src-list="[url]"
+      <el-image style="width: 200px; height: 200px" :src="url" :zoom-rate="1.2" :preview-src-list="[url]"
         :initial-index="4" fit="cover">
         <template #error>
               <div class="image-slot">NULL</div>
             </template>
-          </el-image>
-        </div>
-        <div class="info">
-          
-          <!--红绿灯-->
-          <el-tag v-if="infocolor.color === 0" type="success" class="mx-1" effect="plain" round>
-            幕墙质量良好
-          </el-tag>
-          <el-tag v-if="infocolor.color === 1" type="warning" class="mx-1" effect="plain" round>
-            {{ infocolor.reason }}
-          </el-tag>
-          <el-tag v-if="infocolor.color === 2" type="danger" class="mx-1" effect="plain" round>
-            {{ infocolor.reason }}
-          </el-tag>
-          <!---->
-          <p v-for="data in info" :key="data">
-            
-            <a>{{ data.name }}:</a>
-            <a>&emsp;{{ data.data }}</a>
-          </p>
-          <a v-if="url">
-            <el-button @click="handleClick_divide(url,info)" round>
-              <el-icon><Scissor /></el-icon>进行分割
-            </el-button>
-            <el-button @click="DoItYourself(info[3].data)">Do-It-Yourself!</el-button>
-          </a>
-        </div>
-      </div>
-
-
-      <div v-if="setting_compare.is_open" class="compare">
-        <el-divider />
-        <p class="text_1">最近查看：</p>
-        <el-scrollbar>
-          <div style="display: flex;">
-            <a
-              v-for="(point, index) in setting_compare.points.slice().reverse()"
-              :key="index"
-            >
-            <el-card
-              v-if="point.state === '1'"
-              :body-style="{ padding: '0px' }"
-              class="compare_card">
-              <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
-                <a>NO. {{ setting_compare.points.length - index }}</a>
-                <a v-if="!index" style="position: absolute; right: 1%;">
-                  <el-tag type="danger" class="mx-1" effect="plain" round>
-                    new
-                  </el-tag>
-                </a>
-              </el-row>
-              <div class="compare_image">
-                <el-image
-                  style="width: 200px; height: 200px"
-                  :src="point.url"
-                  :zoom-rate="1.2"
-                  :preview-src-list="[point.url]"
-                  :initial-index="4"
-                  fit="cover"
-                >
-                  <template #error>
+      </el-image>
+    </div>
+    <div class="info">
+      <p v-for="data in info" :key="data">
+        <a>{{ data.name }}:</a>
+        <a>&emsp;{{ data.data }}</a>
+      </p>
+      <a v-if="url">
+        <el-button @click="handleClick_divide(url,info)" round>
+          <el-icon>
+            <Scissor />
+          </el-icon>进行分割
+        </el-button>
+        <el-button @click="DoItYourself">Do-It-Yourself!</el-button>
+      </a>
+    </div>
+  </div>
+  <div v-if="setting_compare.is_open" class="compare">
+    <el-divider />
+    <p class="text_1">最近查看：</p>
+    <el-scrollbar>
+      <div style="display: flex;">
+        <a v-for="(point, index) in setting_compare.points.slice().reverse()" :key="index">
+          <el-card v-if="point.state === '1'" :body-style="{ padding: '0px' }" class="compare_card">
+            <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
+              <a>NO. {{ setting_compare.points.length - index }}</a>
+              <a v-if="!index" style="position: absolute; right: 1%;">
+                <el-tag type="danger" class="mx-1" effect="plain" round>
+                  new
+                </el-tag>
+              </a>
+            </el-row>
+            <div class="compare_image">
+              <el-image style="width: 200px; height: 200px" :src="point.url" :zoom-rate="1.2"
+                :preview-src-list="[point.url]" :initial-index="4" fit="cover">
+                <template #error>
                     <div class="image-slot">NULL</div>
                   </template>
               </el-image>
@@ -941,7 +870,7 @@ export default {
       </el-icon>
     </p>
 
-    <el-card style="border-radius: 20px;">
+    <el-card>
       <el-row>
         <el-col :span="8">
           <p class="text_2">
@@ -952,7 +881,7 @@ export default {
               </el-icon>
             </el-button>
           </p>
-          <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
+          <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
             :preview-src-list="[StoneCrackDetect.raw_path]" :initial-index="4" fit="cover">
             <template #error>
                   <div class="image-slot">NULL</div>
@@ -969,7 +898,7 @@ export default {
           <a v-if="StoneCrackDetect.success">
             <el-row>
 
-              <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
+              <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
                 :preview-src-list="[StoneCrackDetect.detect_path]" :initial-index="4" fit="cover">
                 <template #error>
                       <div class="image-slot">NULL</div>
@@ -981,7 +910,7 @@ export default {
         <el-col :span="8">
           <p class="text_2">分割情况</p>
           <a v-if="StoneCrackDetect.success">
-            <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
+            <el-image style="width: 200px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
               :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
               <template #error>
                     <div class="image-slot">NULL</div>
@@ -1001,80 +930,51 @@ export default {
         <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
           :value="item.value" />
       </el-select>
-      <el-button @click="selectAllCracks">Select All Cracks</el-button>
     </p>
-
-
     <div v-if="StoneCrackDetect.onshow.no[0]">
-          <el-scrollbar  height="500px">
-            <el-row :gutter="20"> <!-- 设置栅格间距 -->  
-              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->  
-                <el-card style="border-radius: 20px; width: 220px; height: 420px; overflow: auto;">  
-                  <!-- 卡片内容 -->  
-                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
+      <el-scrollbar height="500px">
+        <el-card v-for="block in StoneCrackDetect.onshow.no" :key="block">
+          <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
+          <el-row>
+            <el-col :span="16">
+              <el-row>
+                <el-image style="height: 100px" :src="StoneCrackDetect.block_data[block].block_seg_image_path"
+                  :zoom-rate="1.2" :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
+                  :initial-index="4" fit="cover">
+                  <template #error>
+                      <div class="image-slot">NULL</div>
+                    </template>
+                </el-image>
+              </el-row>
+              <el-row style="margin-top: 1%;">
+                <el-image style="height: 100px" :src="StoneCrackDetect.block_data[block].block_detect_image_path"
+                  :zoom-rate="1.2" :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
+                  :initial-index="4" fit="cover">
+                  <template #error>
+                        <div class="image-slot">NULL</div>
+                      </template>
+                </el-image>
+              </el-row>
+            </el-col>
+            <el-col :span="7" style="margin-left: 1%;">
+              <el-row>
+                存在裂缝：
+                <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
+                <a v-else>否</a>
+              </el-row>
+              <a v-if="StoneCrackDetect.block_data[block].has_crack">
+                <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
 
+                <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
 
-
-                  <el-row>  
-  <el-col :span="16">  
-    <el-row>  
-      <el-image  
-        style="width: 180px; height: auto;"   
-        :src="StoneCrackDetect.block_data[block].block_seg_image_path"  
-        :zoom-rate="1.2"  
-        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"  
-        :initial-index="4"  
-        fit="contain"  
-      >  
-        <template #error>  
-          <div class="image-slot">NULL</div>  
-        </template>  
-      </el-image>  
-    </el-row>  
-    <el-row style="margin-top: 1%;">  
-      <el-image  
-        style="width: 180px; height: auto;"  
-        :src="StoneCrackDetect.block_data[block].block_detect_image_path"  
-        :zoom-rate="1.2"  
-        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"  
-        :initial-index="4"  
-        fit="contain"   
-      >  
-        <template #error>  
-          <div class="image-slot">NULL</div>  
-        </template>  
-      </el-image>  
-    </el-row>  
-  </el-col>  
-</el-row>
-
-
-
-                  <el-row style="width: 800px;">
-                    <el-col :span="7" style="margin-left: 1%;width: 800px;">
-                      <el-row>
-                        存在裂缝：
-                        <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
-                        <a v-else>否</a>
-                      </el-row>
-                      <a v-if="StoneCrackDetect.block_data[block].has_crack">
-                        <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
-                        <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
-                        <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
-                        <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
-                      </a>
-                    </el-col>
-                  </el-row>
-                </el-card>  
-              </el-col>  
-            </el-row>
-
-
-          </el-scrollbar>
-        </div>
-
-
-    
+              </a>
+            </el-col>
+          </el-row>
+        </el-card>
+      </el-scrollbar>
+    </div>
   </div>
 
 
@@ -1224,36 +1124,5 @@ export default {
       top: 50% !important;
       height: 4px;
     }
-
-    .title-container {  
-  position: relative; /* 确保子元素可以相对于这个容器定位 */  
-  width: 100%; /* 根据需要设置宽度 */  
-  height: 300px; /* 设置容器的高度，以适应背景图片 */  
-}  
-  
-.earth-background {  
-  position: absolute; /* 绝对定位使得背景图片可以覆盖整个容器 */  
-  top: -50; /* 顶部对齐 */  
-  left: 0; /* 左侧对齐 */  
-  width: 100%; /* 宽度覆盖整个容器 */  
-  height: 100%; /* 高度覆盖整个容器 */  
-  background-image: url('/src/assets/picture/earth.jpeg'); /* 背景图片路径 */  
-  background-size: cover; /* 背景图片覆盖整个容器 */  
-  background-position: center; /* 背景图片居中显示 */  
-  z-index: 1; /* 确保背景图片在文字下方 */  
-  opacity: 1; /* 设置图片的透明度 */  
-}  
-  
-.text-over-image {  
-  position: absolute; /* 绝对定位使得文字可以覆盖在背景图片上 */  
-  top: 50%; /* 垂直居中 */  
-  left: 50%; /* 水平居中 */  
-  transform: translate(-50%, -50%); /* 通过变换将文字居中 */  
-  color: white; /* 设置文字颜色，确保在背景图片上可见 */  
-  text-align: center; /* 文字居中显示 */  
-  z-index: 2; /* 确保文字在背景图片上方 */  
-  font-size: 24px;
-  font-weight: bold;  
-}
 
 </style>

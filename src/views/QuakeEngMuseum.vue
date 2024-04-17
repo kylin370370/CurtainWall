@@ -96,7 +96,7 @@ export default {
         []
       ],
       urlList:[],
-      url: '',        //图片url
+      url: 'https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image/C/f_052.JPG',       //图片url
       //srcList: [],    //打开图片预览，可以放入多张图片
       info: [
         {name:'x', data: 0},
@@ -570,6 +570,9 @@ export default {
       else{
         this.$router.push('/about/Office')
       }
+    },
+    openVideo() {
+      window.open('http://www.html5videoplayer.net/videos/madagascar3.mp4', '_blank');
     }
   },
   mounted(){
@@ -586,6 +589,7 @@ export default {
       <el-button color="#B29F82" style="color:white" @click="changePage()">
       切换建筑
       </el-button>
+      <el-button color="#B29F82" style="color:black"  @click="openVideo">观看教程</el-button>
     </div>
     <div class="select-wrapper" style="background-color: #DBD4CC;">
       <el-button color="#B29F82" @click="handleClick_setting" round>
@@ -860,9 +864,9 @@ export default {
           </p>
           <a v-if="url">
             <el-button  color="#B29F82" style="color:white" @click="handleClick_divide(url,info)" >
-              <el-icon color="white"><Scissor /></el-icon>显示分割结果
+              <el-icon color="white"><Scissor /></el-icon>显示检测情况
             </el-button>
-            <el-button color="#B29F82" style="color:white" @click="DoItYourself(info[3].data)">跳转分割过程</el-button>
+            <el-button color="#B29F82" style="color:white" @click="DoItYourself(info[3].data)">送往检测系统</el-button>
           </a>
         </div>
       </div>
@@ -1010,7 +1014,7 @@ export default {
         <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
           :value="item.value" />
       </el-select>
-      <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示所有有损伤的分割块</el-button>
+      <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示损伤幕墙块</el-button>
     </p>
 
 

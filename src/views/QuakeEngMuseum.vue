@@ -73,8 +73,15 @@ export default {
         max_num: 1,             //对比数量      1-10
         points:[],              //url,info,colorinfo, state  state各点位card显示状态['1'显示, '0'不显示, '2'中间态(显示卡片不显示详细内容)]
         type: false,
+        is_open: false,
       },//其他按钮： 清空
       type_compare: false,      //对比显示形式  false逐个/true全部
+
+      risk_setting:{
+        risk_data:[],             //风险图片id，只在color分支中被下拉栏使用
+        risk_select: '0',       //风险等级选择
+        risk_selected:null,     //风险图片id
+      },
 
       setting_measure:{
         is_open: false,
@@ -95,6 +102,7 @@ export default {
         [],
         []
       ],
+      
       urlList:[],
       url: 'https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image/C/f_052.JPG',       //图片url
       //srcList: [],    //打开图片预览，可以放入多张图片
@@ -560,8 +568,7 @@ export default {
       this.StoneCrackDetect.onshow.no = this.StoneCrackDetect.block_data
       .map((block, index) => block.has_crack ? this.StoneCrackDetect.onshow.options[index].value : null)
       .filter(value => value !== null);
-      }
-      ,
+    },
     changePage() {
       this.pageoption = !this.pageoption;
       if(this.pageoption === '0'){
@@ -573,7 +580,60 @@ export default {
     },
     openVideo() {
       window.open('http://www.html5videoplayer.net/videos/madagascar3.mp4', '_blank');
-    }
+    },
+    selectAllRisk(risk_rank){
+    //console.log(risk_rank);
+      
+      this.risk_setting.risk_select=risk_rank;
+      var datalist = this.risk_setting.risk_data;
+    //console.log(risk_select,typeof(risk_select));  -> 0 string
+    //查询全部风险图片id
+    axios.get(`http://localhost:8443/api/risk/${risk_rank}`)
+    .then(res=>{
+      //存储全部风险图片id
+      this.risk_setting.risk_data = res.data.map(item => ({ value: item, label: item }));
+    })  
+    .catch(error => {   
+        console.log('风险信息：', '请求失败');   
+        console.log(risk_rank);
+        console.error(error);
+      });
+    },
+    selectRisk(){
+      var select_1,select_2,select_3,imageURL,path,baseURL,coloruId;
+      var that = this;
+      path = this.risk_setting.risk_selected;
+      select_1 = path.split("_")[0];
+      select_2 = path.split("_")[1];
+      select_3 = path.split("_")[1]+'_'+path.split("_")[2]+".JPG";
+
+      let csvData;
+      if(select_1=='B')
+        csvData = data_B;
+      else if(select_1=='C')
+        csvData = data_C;
+      else
+        csvData = data_A;
+
+      let row = csvData.find(item => item.name === select_3);
+      if (row) {
+          console.log(row);
+          that.url = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image/"+select_1+"/"+select_3;
+          //that.srcList = [imageURL];
+          console.log(that.url);
+          that.info[0].data = row.x;
+          that.info[1].data = row.y;
+          that.info[2].data = row.z;
+          that.info[3].data = "/" + select_1 +"/" + select_3.split(".")[1] + ".JPG";
+          
+
+          coloruId = select_1 + "_" + select_3;
+          console.log('请求的URL:', `${coloruId}`);
+
+          that.searchColorData(coloruId);
+          that.add_points(imageURL, row.x, row.y, row.z, that.info[3].data);        ////加入对比列表并在模型上显示
+        }
+      }
   },
   mounted(){
     window.addEventListener("message",this.recieve);
@@ -705,6 +765,16 @@ export default {
       </el-button>
     </el-row>
   </a>
+  <!--下面两个按钮横向填充满-->
+  <el-row style="margin-top: 3%; margin-bottom: 5%">
+    <!--按钮宽度为自适应-->
+    <el-button  @click="selectAllRisk(2)" >
+        &ensp;高危幕墙&ensp;
+      </el-button>
+      <el-button @click="selectAllRisk(1)">
+        &ensp;中危幕墙&ensp;
+      </el-button>
+  </el-row>
   <!--              <a class="text_2">-->
   <!--                <a> 夜景模式：-->
   <!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
@@ -753,7 +823,8 @@ export default {
     <a class="text_3">
       &emsp;快捷切换至所选立面
     </a>
-    <li>重置：</li>
+    <!--当该按键被按下执行this.setting_compare.isopen=false-->
+    <li @click="this.risk_setting.risk_select=0">重置：</li>
     <a class="text_3">
       &emsp;可使模型位置回归初始状态
     </a>
@@ -834,7 +905,19 @@ export default {
 </div>
 
 <div class="details_and_compare">
-  <p class="text_1">当前查看：</p>
+  <p class="text_1">当前查看：
+  <!--当快捷选择中的高危/中危被按下，显示一个下拉栏，栏内内容为this.risk_data数据-->
+
+  <a v-if="this.risk_setting.risk_select">
+    <el-select-v2
+      v-model="this.risk_setting.risk_selected"
+      :options="this.risk_setting.risk_data"
+      placeholder="Please select"
+      size="large"
+      @change="selectRisk()"
+    />
+  </a>
+</p>
   <div class="details">
     <div class="image">
       <el-image style="width: 266px; height: 200px" :src="url" :zoom-rate="1.2" :preview-src-list="[url]"
@@ -844,6 +927,8 @@ export default {
             </template>
           </el-image>
         </div>
+
+
         <div class="info">
 
           <!--红绿灯-->
@@ -858,7 +943,6 @@ export default {
           </el-tag>
           <!---->
           <p v-for="data in info" :key="data">
-
             <a>{{ data.name }}:</a>
             <a>&emsp;{{ data.data }}</a>
           </p>
@@ -870,6 +954,8 @@ export default {
           </a>
         </div>
       </div>
+
+
 
 
       <div v-if="setting_compare.is_open" class="compare">

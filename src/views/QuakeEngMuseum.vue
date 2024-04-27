@@ -79,7 +79,7 @@ export default {
 
       risk_setting:{
         risk_data:[],             //风险图片id，只在color分支中被下拉栏使用
-        risk_select: '0',       //风险等级选择
+        risk_select: 0,       //风险等级选择
         risk_selected:null,     //风险图片id
       },
 
@@ -198,6 +198,8 @@ export default {
     },
     handleClick_reset(){              //相机--重置按钮
       var that = this;
+      that.risk_setting.risk_data = [];
+      that.risk_setting.risk_select = 0;
       that.setting_camera.is_info = false;
       that.$refs.unityModel.reset();
     },
@@ -625,13 +627,12 @@ export default {
           that.info[1].data = row.y;
           that.info[2].data = row.z;
           that.info[3].data = "/" + select_1 +"/" + select_3.split(".")[1] + ".JPG";
-          
+          coloruId = select_1 + "_" + select_3.split(".")[0];
 
-          coloruId = select_1 + "_" + select_3;
           console.log('请求的URL:', `${coloruId}`);
 
           that.searchColorData(coloruId);
-          that.add_points(imageURL, row.x, row.y, row.z, that.info[3].data);        ////加入对比列表并在模型上显示
+          that.add_points(imageURL, row.x, row.y, row.z, that.info[3].data);        //加入对比列表并在模型上显示
         }
       }
   },
@@ -775,6 +776,18 @@ export default {
         &ensp;中危幕墙&ensp;
       </el-button>
   </el-row>
+
+  <!--当快捷选择中的高危/中危被按下，显示一个下拉栏，栏内内容为this.risk_data数据-->
+
+  <a v-if="this.risk_setting.risk_select">
+    <el-select-v2
+      v-model="this.risk_setting.risk_selected"
+      :options="this.risk_setting.risk_data"
+      placeholder="Please select"
+      size="large"
+      @change="selectRisk()"
+    />
+  </a>
   <!--              <a class="text_2">-->
   <!--                <a> 夜景模式：-->
   <!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
@@ -906,17 +919,7 @@ export default {
 
 <div class="details_and_compare">
   <p class="text_1">当前查看：
-  <!--当快捷选择中的高危/中危被按下，显示一个下拉栏，栏内内容为this.risk_data数据-->
-
-  <a v-if="this.risk_setting.risk_select">
-    <el-select-v2
-      v-model="this.risk_setting.risk_selected"
-      :options="this.risk_setting.risk_data"
-      placeholder="Please select"
-      size="large"
-      @change="selectRisk()"
-    />
-  </a>
+  
 </p>
   <div class="details">
     <div class="image">

@@ -7,6 +7,7 @@ import Model from '@/components/model.vue';
 import data_A from '@/assets/imageCSV_1/new_A.csv';
 import data_B from '@/assets/imageCSV_1/new_B.csv';
 import data_C from '@/assets/imageCSV_1/new_C.csv';
+import { el } from 'element-plus/es/locales.mjs';
 
 /* 处理数据，获得选项2 */
 var uniqueSet = new Set();    // 创建一个空Set对象
@@ -292,7 +293,11 @@ export default {
                       crackArea: item.crackArea,
                       crackLength: item.crackLength,
                       crackAverageWidth: item.crackAverageWidth,
-                      crackMaxWidth: item.crackMaxWidth
+                      crackMaxWidth: item.crackMaxWidth,
+                      actualArea: item.actualArea,
+                      actualLength: item.actualLength,
+                      actualAverageWidth: item.actualAverageWidth,
+                      actualMaxWidth: item.actualMaxWidth
                     }
                   };
 
@@ -602,7 +607,7 @@ export default {
       });
     },
     selectRisk(){
-      var select_1,select_2,select_3,imageURL,path,baseURL,coloruId;
+      var select_1,select_2,select_3,imageURL,path,coloruId;
       var that = this;
       path = this.risk_setting.risk_selected;
       select_1 = path.split("_")[0];
@@ -626,7 +631,7 @@ export default {
           that.info[0].data = row.x;
           that.info[1].data = row.y;
           that.info[2].data = row.z;
-          that.info[3].data = "/" + select_1 +"/" + select_3.split(".")[1] + ".JPG";
+          that.info[3].data = "/" + select_1 +"/" + select_3.split(".")[0] + ".JPG";
           coloruId = select_1 + "_" + select_3.split(".")[0];
 
           console.log('请求的URL:', `${coloruId}`);
@@ -935,6 +940,7 @@ export default {
         <div class="info">
 
           <!--红绿灯-->
+          <p>
           <el-tag v-if="infocolor.color === 0" type="success" class="mx-1" effect="plain" round>
             幕墙质量良好
           </el-tag>
@@ -944,6 +950,7 @@ export default {
           <el-tag v-if="infocolor.color === 2" type="danger" class="mx-1" effect="plain" round>
             {{ infocolor.reason }}
           </el-tag>
+        </p>
           <!---->
           <p v-for="data in info" :key="data">
             <a>{{ data.name }}:</a>
@@ -1161,9 +1168,14 @@ export default {
                       </el-row>
                       <a v-if="StoneCrackDetect.block_data[block].has_crack">
                         <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                        <el-row>裂痕实际面积：{{ StoneCrackDetect.block_data[block].crack_data.actualArea}}</el-row>
                         <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                        <el-row>裂痕实际长度：{{ StoneCrackDetect.block_data[block].crack_data.actualLength }}</el-row>
                         <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
+                        <el-row>裂痕实际平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualAverageWidth }}</el-row>
                         <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
+                        <el-row>裂痕实际最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualMaxWidth }}</el-row>
+
                       </a>
                     </el-col>
                   </el-row>

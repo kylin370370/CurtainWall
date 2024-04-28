@@ -55,6 +55,7 @@ export default {
   },
   data() {
     return {
+
       pageoption:'0',
       setting_is_open: true,     //是否打开设置边栏
       setting_type: 'camera',     //设置--相机/对比/测距
@@ -301,11 +302,11 @@ export default {
                     }
                   };
 
-                  // 打印每个block块
+                  // 打印每个block块FNO
                   console.log('Block 数据:', block);
                   SCD.onshow.options.push({
                     value: index.toString(),
-                    label: 'Block ' + index.toString() // 如果有具体的block_num，请使用 item.block_num
+                    label: 'Block ' + (index+1).toString() // 如果有具体的block_num，请使用 item.block_num
                   });
                   return block;
 
@@ -651,17 +652,15 @@ export default {
   <div class="about" style="background-color: #F5F5F5;">
     <div class="some-text"  >
       <el-icon><Location /></el-icon>
-      同济大学地震工程馆3D幕墙系统
+      地震⼯程馆三维幕墙裂缝检测展⽰系统
       <el-button color="#B29F82" style="color:white" @click="changePage()">
-      切换建筑
+      切换政府大楼
       </el-button>
       <el-button color="#B29F82" style="color:black"  @click="openVideo">观看教程</el-button>
     </div>
     <div class="select-wrapper" style="background-color: #DBD4CC;">
-      <el-button color="#B29F82" @click="handleClick_setting" round>
-        <el-icon color="white"><Setting/></el-icon>
-      </el-button>
-      &emsp;
+      
+&ensp;
       <el-select-v2
         v-model="select_1"
         :options="selections[0]"
@@ -699,14 +698,27 @@ export default {
       </el-button>
     </div>
 
+
     <div class="setting_and_model">
       <el-card v-if="setting_is_open" class="setting_wrapper">
+
+          
+
         <el-tabs v-model="setting_type" @tab-click="handleClick_type">
-          <el-tab-pane name="camera">
+          <el-tab-pane name="easycontroller">
+            <template #label>
+              <span class="custom-tabs-label">
+                <el-icon color="#463929"><Setting/></el-icon>
+                <span style="color:#463929" @click="handleClick_setting" >展示便捷控制台</span>
+              </span>
+            </template>
+          </el-tab-pane>
+
+          <el-tab-pane name="camera" >
             <template #label>
               <span class="custom-tabs-label">
                 <el-icon color="#463929"><VideoCamera /></el-icon>
-                <span style="color:#463929">相机</span>
+                <span style="color:#463929">便捷控制台</span>
               </span>
             </template>
 <a>
@@ -771,15 +783,13 @@ export default {
       </el-button>
     </el-row>
   </a>
-  <!--下面两个按钮横向填充满-->
   <el-row style="margin-top: 3%; margin-bottom: 5%">
-    <!--按钮宽度为自适应-->
-    <el-button  @click="selectAllRisk(2)" >
-        &ensp;高危幕墙&ensp;
-      </el-button>
-      <el-button @click="selectAllRisk(1)">
-        &ensp;中危幕墙&ensp;
-      </el-button>
+    <el-button type="danger" @click="selectAllRisk(2)">
+      &ensp;高危幕墙&ensp;
+    </el-button>
+    <el-button type="warning" @click="selectAllRisk(1)">
+      &ensp;中危幕墙&ensp;
+    </el-button>
   </el-row>
 
   <!--当快捷选择中的高危/中危被按下，显示一个下拉栏，栏内内容为this.risk_data数据-->
@@ -808,8 +818,11 @@ export default {
     </el-icon>
   </el-button>
 </el-row>
-<a v-if="!setting_camera.is_info" class="text_info">
-  <el-scrollbar height="300px">
+  <a v-if="!setting_camera.is_info" class="text_info" >
+    <el-card class="box-card" header="使用说明" style="font-weight: bold;">
+  
+  <el-scrollbar height="400px">
+    <div style="background-color: #f5f5f5; padding: 10px;width:120%;">
     <li>键盘控制：</li>
     <a class="text_3">
       <el-row>
@@ -846,10 +859,18 @@ export default {
     <a class="text_3">
       &emsp;可使模型位置回归初始状态
     </a>
+  </div>
   </el-scrollbar>
+  
+</el-card>
 </a>
-
 </el-tab-pane>
+
+
+
+
+
+
 
 <el-tab-pane name="compare" v-if="false">
   <template #label>
@@ -921,7 +942,6 @@ export default {
   <Model ref="unityModel" />
 </div>
 </div>
-
 <div class="details_and_compare">
   <p class="text_1">当前查看：
   
@@ -982,7 +1002,7 @@ export default {
               :body-style="{ padding: '0px' }"
               class="compare_card">
               <el-row style="margin-top: 3%; margin-bottom: 3%; position: relative;">
-                <a>NO. {{ setting_compare.points.length - index }}</a>
+                <a>NO. {{ setting_compare.points.length - index+1 }}</a>
                 <a v-if="!index" style="position: absolute; right: 1%;">
                   <el-tag type="danger" class="mx-1" effect="plain" round>
                     new
@@ -1043,7 +1063,7 @@ export default {
 
     <el-divider />
     <p class="text_1" style="color:#463929">
-      图像分割与裂缝识别
+      图像处理和裂缝检测结果
       <el-icon color="#463929" @click="handleClick_hideDivide">
         <Hide />
       </el-icon>
@@ -1074,7 +1094,7 @@ export default {
           </el-row>
         </el-col>
         <el-col :span="8">
-          <p class="text_2">检测图片</p>
+          <p class="text_2">旋转锚框⽬标检测结果</p>
           <a v-if="StoneCrackDetect.success">
             <el-row>
 
@@ -1088,7 +1108,7 @@ export default {
           </a>
         </el-col>
         <el-col :span="8">
-          <p class="text_2">分割情况</p>
+          <p class="text_2">幕墙块语义分割结果</p>
           <a v-if="StoneCrackDetect.success">
             <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
               :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
@@ -1104,13 +1124,15 @@ export default {
     </el-card>
 
     <p class="text_2">
-      查看分割块：
+      查看幕墙块裂缝检测和测量结果（编号与分割结果⼀⼀对应）
       <el-select v-model="StoneCrackDetect.onshow.no" multiple collapse-tags collapse-tags-tooltip
         :max-collapse-tags="3" placeholder="Select" style="width: 260px">
         <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
           :value="item.value" />
       </el-select>
-      <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示损伤幕墙块</el-button>
+      <el-tooltip content="⽆⼈机采集图像的过程中，⽆⼈机与幕墙的物理距离保持⼀致。因此，以像素点作为裂缝测量的单位，数值具有可⽐性">
+  <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示损伤幕墙块</el-button>
+</el-tooltip>
     </p>
 
 
@@ -1120,13 +1142,11 @@ export default {
               <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->
                 <el-card style="border-radius: 20px; width: auto; height: 420px; overflow: auto;">
                   <!-- 卡片内容 -->
-                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
-
-
-
+                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num+1}}</el-row>
                   <el-row>
   <el-col :span="16">
     <el-row>
+      <el-tooltip content="幕墙块图像">
       <el-image
         style="width: 180px; height: auto;"
         :src="StoneCrackDetect.block_data[block].block_seg_image_path"
@@ -1139,8 +1159,10 @@ export default {
           <div class="image-slot">NULL</div>
         </template>
       </el-image>
+    </el-tooltip>
     </el-row>
     <el-row style="margin-top: 1%;">
+      <el-tooltip content="裂缝检测结果">
       <el-image
         style="width: 180px; height: auto;"
         :src="StoneCrackDetect.block_data[block].block_detect_image_path"
@@ -1153,6 +1175,7 @@ export default {
           <div class="image-slot">NULL</div>
         </template>
       </el-image>
+    </el-tooltip>
     </el-row>
   </el-col>
 </el-row>
@@ -1167,13 +1190,13 @@ export default {
                         <a v-else>否</a>
                       </el-row>
                       <a v-if="StoneCrackDetect.block_data[block].has_crack">
-                        <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                        <el-row>所有裂缝像素⾯积和：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
                         <el-row>裂痕实际面积：{{ StoneCrackDetect.block_data[block].crack_data.actualArea}}</el-row>
-                        <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                        <el-row>所有裂缝像素⻓度和：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
                         <el-row>裂痕实际长度：{{ StoneCrackDetect.block_data[block].crack_data.actualLength }}</el-row>
                         <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
                         <el-row>裂痕实际平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualAverageWidth }}</el-row>
-                        <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
+                        <el-row>裂缝（可能多条）像素最⼤宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
                         <el-row>裂痕实际最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualMaxWidth }}</el-row>
 
                       </a>

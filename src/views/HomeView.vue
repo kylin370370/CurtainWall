@@ -37,8 +37,11 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
       if(this.option === '0'){
         this.$router.push('/about/QuakeEngMuseum')
       }
-      else{
+      else if(this.option === '1'){
         this.$router.push('/about/Composite')
+      }
+      else if(this.option === '2'){
+        this.$router.push('/about/Office')
       }
     }
   },
@@ -46,23 +49,24 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
 </script>
 
 <template>
-  <div class="home" >
+  <div class="home">
     <img class="bk_image" src="../assets/home/bk.png">
 
     <div class="option_wrapper">
       <div class="mb-2 flex items-center text-sm">
         <el-radio-group v-model="option" class="ml-4" @change="handleClick_change">
           <el-radio label="0" size="large">地震工程馆</el-radio>
-          <el-radio label="1" size="large">衷和楼</el-radio>
+          <el-radio label="1" size="large">井开区政府⼤楼</el-radio>
+          <el-radio label="2" size="large">政府大楼</el-radio>
         </el-radio-group>
-      </div>
+      </div>  
     </div>
 
-    <div v-if="option==='0'" class="quake_info">
+    <div v-if="option==='0'" class="quake_info">   
       <div class="text_1_1">
-        <el-row style="margin-bottom: 2%">地震工程馆</el-row>
+        <el-row style="margin-bottom: 2%">地震工程馆三维幕墙裂缝检测展示系统</el-row>
       </div>
-      <div class="text_1_2">同济大学多功能振动实验中心是当前世界规模最大、由四座振动台组合而成的大型综合试验室，为我国广泛领域内的振动和抗震试验研究、土木工程领域防灾提供了一个开放的试验平台。这一领先国际的振动台组系统不仅能对大型桥梁工程、生命管线、水坝、隧道等线状结构进行振动试验研究，还能以矩形振动台组形式对高层建筑、超高层建筑、体育场馆等大型建筑结构进行抗震试验研究。四座振动台总承载能力为200吨，为目前国内振动台承载能力之最。投入使用以来，已先后为泰州长江大桥、广东榕江桥、港珠澳隧道等大型建筑和工程进行抗震实验，有效促进了学校学科发展和人才培养，并为国家建设提供了很好的技术支撑。</div>
+      <div class="text_1_2">同济大学地震⼯程馆是当前世界规模最大、由四座振动台组合而成的大型综合试验室，通体由石材幕墙作为外维护结构。使用年限十余年，表面出现不少裂缝损伤。我们通过无人机对地震馆进行三维模型数据采集和局部图像矩阵拍摄，并将局部图像进行批量裂缝检测，将检测结果映射到三维模型上，供用户查看。系统提供如下功能：<br>▪ 将局部图像中心点映射到三维模型上，并以红⻩绿三种颜色标识其损伤程度<br>▪ 查看局部图像的处理过程和检测结果<br>▪ 批量查看严重损伤幕墙块的具体情况</div>
       <el-divider />
       <el-row class="text_fun">
         <el-col :span="4">
@@ -89,39 +93,78 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
           <el-icon><Moon /></el-icon><br>
           夜景模式
         </el-col>
-      </el-row>
+      </el-row> 
       <div class="router_button">
         <el-button @click="changePage" size="large" color="#EEFFFF" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
       </div>
     </div>
-    <div v-else class="quake_info">
+    <div v-if="option==='1'" class="quake_info">   
       <div class="text_1_1">
-        <el-row style="margin-bottom: 2%">衷和楼</el-row>
+        <el-row style="margin-bottom: 2%">井开区政府大楼三维幕墙裂缝检测展示系统</el-row>
       </div>
       <div class="text_1_2">
-        衷和楼原为综合楼，取同济当发展为综合型科研型大学之义，为教学科研综合楼。现改为衷和楼，又与原音接近，取自《尚书·皋陶谟》：“同寅协恭和衷哉”，寓意和衷共济，契合同济精神。于2007年百年校庆前建成并投入使用, 是百年校庆的标志性建筑。
-        综合楼的大投资以及建立在大投资基础上的体量都是有史以来之最,其高度创造了同济校本部的新地标,无论空间的塑造方式还是立面用材分割都具时代感,但立面的分割方式、色彩又与五、六十年代建成的南北教学楼、图书馆以及八十年代末期的行政楼相协调,又从老建筑的立面中获得自身的设计依据。
+        井冈山国家级经济技术开发区政府新大楼的外围护结构，由石材幕墙加玻璃幕墙混合组成。建筑整体较新，石材幕墙⽆明显裂缝损伤。为保护隐私，与井开区城市建设管理局协商，在本系统中仅展⽰政府⼤楼背面和中间的石材幕墙部分区域，可作为系统功能和泛化性的验证。
       </div>
-
+      
       <el-divider />
       <el-row class="text_fun">
         <el-col :span="7">
           <el-icon><Search /></el-icon><br>
-          查看幕墙
+          浏览建筑模型
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="7">
+          <el-icon><Position /></el-icon><br>
+          图像处理结果
         </el-col>
         <el-divider direction="vertical" />
         <el-col :span="7">
           <el-icon><Histogram /></el-icon><br>
+          损伤等级预警
+        </el-col>
+      </el-row> 
+      <div class="router_button">
+        <el-button @click="changePage" size="large" color="#EEFFFF" round>
+          <el-icon><Pointer /></el-icon>前往体验
+        </el-button>
+      </div>
+    </div>
+    <div v-if="option==='2'" class="quake_info">   
+      <div class="text_1_1">
+        <el-row style="margin-bottom: 2%">政府大楼</el-row>
+      </div>
+      <div class="text_1_2">
+        <!-- 坐落于上海虹桥经济开发区，由常年展贸中心、上海世贸展馆、上海世贸大厦三大主体建筑构成，是一个集展示、交易、办公、资讯于一体的超级交易市场，为国内外商家及专业买主提供国际级的设施和服务。 -->
+      </div>
+      <el-divider />
+      <el-row class="text_fun">
+        <el-col :span="4">
+          <el-icon><Search /></el-icon><br>
+          查看幕墙
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
+          <el-icon><Position /></el-icon><br>
+          两点测距
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
+          <el-icon><Histogram /></el-icon><br>
           图片对比
         </el-col>
         <el-divider direction="vertical" />
-        <el-col :span="7">
+        <el-col :span="4">
+          <el-icon><Scissor /></el-icon><br>
+          图像分割
+        </el-col>
+        <el-divider direction="vertical" />
+        <el-col :span="4">
           <el-icon><Moon /></el-icon><br>
           夜景模式
         </el-col>
-      </el-row>
+      </el-row> 
       <div class="router_button">
         <el-button @click="changePage" size="large" color="#EEFFFF" round>
           <el-icon><Pointer /></el-icon>前往体验
@@ -129,7 +172,7 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
       </div>
     </div>
 
-
+    
     <div class="carousel">
       <el-carousel :interval="3000" type="card" height="65vh"  direction="vertical">
         <el-carousel-item v-for="(item, index) in imageBox" :key="index">
@@ -150,8 +193,8 @@ body{
 }
 .bk_image{
   width: 50vw;
-  position: absolute;
-  bottom: 0;
+  position: absolute; 
+  bottom: 0; 
   left: 0;
 }
 .option_wrapper{
@@ -180,7 +223,7 @@ body{
   font-size: 1.8lvh;
 }
 .router_button{
-  display: flex;
+  display: flex; 
   justify-content: center;
   margin-top: 4%;
 }

@@ -560,7 +560,7 @@ export default {
   <div class="about" style="background-color: #F5F5F5;">
     <div class="some-text">
       <el-icon><Location /></el-icon>
-      经开区政府大楼
+      井开区政府大楼三维幕墙裂缝检测展示系统
       <el-button color="#B29F82" style="color:white" @click="changePage()">
         切换建筑
       </el-button>

@@ -787,6 +787,7 @@ export default {
     <el-button type="warning" @click="selectAllRisk(1)">
       &ensp;中危幕墙&ensp;
     </el-button>
+  <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
   </el-row>
 
   <!--当快捷选择中的高危/中危被按下，显示一个下拉栏，栏内内容为this.risk_data数据-->
@@ -807,23 +808,22 @@ export default {
   <!--              </a>-->
 
 </a>
-<el-row style="margin-top: 5%; margin-bottom: 5%">
-  <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
+<!--<el-row style="margin-top: 5%; margin-bottom: 5%">
   <el-button @click="handleClick_info" size="small" round>
     <el-icon>
       <InfoFilled />
     </el-icon>
   </el-button>
-</el-row>
+</el-row>-->
   <a v-if="!setting_camera.is_info" class="text_info" >
-    <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: large;">
+    <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;">
   
   <el-scrollbar height="400px">
-    <div style="background-color: #f5f5f5; padding: 10px;width:120%;">
+    <div style="background-color: #f5f5f5; padding: 10px;width:100%">
     <li>键盘控制：</li>
     <a class="text_3">
       <el-row>
-        <el-col :span="12">
+        <el-col :span="9">
           <br>&emsp;启用键盘后，使用
         </el-col>
         <el-col :span="8.5">
@@ -844,8 +844,8 @@ export default {
     </a>
     <li>鼠标控制：</li>
     <a class="text_3">
-      &emsp;启用鼠标后，按住鼠标左键拖动镜头，滚轮调整镜头距离，
-      按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
+      &emsp;按住鼠标左键拖动镜头，滚轮调整镜头距离，
+      <br>按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
     </a>
     <li>快捷选择：</li>
     <a class="text_3">
@@ -1257,7 +1257,7 @@ export default {
   align-items: center;
 }
 .setting_wrapper{
-  width:300px;
+  width:400px;
   margin-top: -35px;
   height: 660px;
   line-height: 45px;

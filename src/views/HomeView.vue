@@ -1,5 +1,6 @@
 <script>
-import{ Search,Position,Histogram,Scissor,Moon,Pointer } from '@element-plus/icons-vue';
+import{ Search,Position,Histogram,Scissor,Moon,Pointer,Warning } from '@element-plus/icons-vue';
+import { useDisabled } from 'element-plus';
 import { RouterLink, RouterView } from 'vue-router'
 
 var imageURL = ["/home/carousel_1.png","/home/carousel_2.png","/home/carousel_3.png",
@@ -57,7 +58,7 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
         <el-radio-group v-model="option" class="ml-4" @change="handleClick_change">
           <el-radio label="0" size="large">地震工程馆</el-radio>
           <el-radio label="1" size="large">井开区政府⼤楼</el-radio>
-          <el-radio label="2" size="large">政府大楼</el-radio>
+          <!--<el-radio label="2" size="large">政府大楼</el-radio>-->
         </el-radio-group>
       </div>  
     </div>
@@ -69,29 +70,19 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
       <div class="text_1_2">同济大学地震⼯程馆是当前世界规模最大、由四座振动台组合而成的大型综合试验室，通体由石材幕墙作为外维护结构。使用年限十余年，表面出现不少裂缝损伤。我们通过无人机对地震馆进行三维模型数据采集和局部图像矩阵拍摄，并将局部图像进行批量裂缝检测，将检测结果映射到三维模型上，供用户查看。系统提供如下功能：<br>▪ 将局部图像中心点映射到三维模型上，并以红⻩绿三种颜色标识其损伤程度<br>▪ 查看局部图像的处理过程和检测结果<br>▪ 批量查看严重损伤幕墙块的具体情况</div>
       <el-divider />
       <el-row class="text_fun">
-        <el-col :span="4">
+        <el-col :span="7">
           <el-icon><Search /></el-icon><br>
-          查看幕墙
+          浏览建筑模型
         </el-col>
         <el-divider direction="vertical" />
-        <el-col :span="4">
+        <el-col :span="7">
           <el-icon><Position /></el-icon><br>
-          两点测距
+          图像处理结果
         </el-col>
         <el-divider direction="vertical" />
-        <el-col :span="4">
+        <el-col :span="7">
           <el-icon><Histogram /></el-icon><br>
-          图片对比
-        </el-col>
-        <el-divider direction="vertical" />
-        <el-col :span="4">
-          <el-icon><Scissor /></el-icon><br>
-          图像分割
-        </el-col>
-        <el-divider direction="vertical" />
-        <el-col :span="4">
-          <el-icon><Moon /></el-icon><br>
-          夜景模式
+          损伤等级预警
         </el-col>
       </el-row> 
       <div class="router_button">

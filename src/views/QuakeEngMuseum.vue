@@ -659,8 +659,14 @@ export default {
       <el-button color="#B29F82" style="color:black"  @click="openVideo">观看教程</el-button>
     </div>
     <div class="select-wrapper" style="background-color: #DBD4CC;">
-      
-&ensp;
+      <el-button color="#B29F82"  style="color:white" @click="handleClick_setting"  round>
+        <el-icon><Setting/></el-icon>
+        <p v-if="this.setting_is_open">隐藏便捷控制台</p>
+        <p v-else>显示便捷控制台</p>
+      </el-button>&ensp;
+      &ensp;&ensp;&ensp;
+      <p style="color:black; background-color:#A29B82; border: 3px; padding: 1px;">方位-图片名选择框:</p>&ensp;
+
       <el-select-v2
         v-model="select_1"
         :options="selections[0]"
@@ -705,16 +711,7 @@ export default {
           
 
         <el-tabs v-model="setting_type" @tab-click="handleClick_type">
-          <el-tab-pane name="easycontroller">
-            <template #label>
-              <span class="custom-tabs-label">
-                <el-icon color="#463929"><Setting/></el-icon>
-                <span style="color:#463929" @click="handleClick_setting" >展示便捷控制台</span>
-              </span>
-            </template>
-          </el-tab-pane>
-
-          <el-tab-pane name="camera" >
+                 <el-tab-pane name="camera" >
             <template #label>
               <span class="custom-tabs-label">
                 <el-icon color="#463929"><VideoCamera /></el-icon>
@@ -819,7 +816,7 @@ export default {
   </el-button>
 </el-row>
   <a v-if="!setting_camera.is_info" class="text_info" >
-    <el-card class="box-card" header="使用说明" style="font-weight: bold;">
+    <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: large;">
   
   <el-scrollbar height="400px">
     <div style="background-color: #f5f5f5; padding: 10px;width:120%;">
@@ -1142,7 +1139,7 @@ export default {
               <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->
                 <el-card style="border-radius: 20px; width: auto; height: 420px; overflow: auto;">
                   <!-- 卡片内容 -->
-                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num+1}}</el-row>
+                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num+1}} 原图和检测结果</el-row>
                   <el-row>
   <el-col :span="16">
     <el-row>

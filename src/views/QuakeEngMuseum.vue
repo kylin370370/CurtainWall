@@ -706,10 +706,7 @@ export default {
 
 
     <div class="setting_and_model">
-      <el-card v-if="setting_is_open" class="setting_wrapper">
-
-          
-
+      <el-card v-if="setting_is_open" class="setting_wrapper">      
         <el-tabs v-model="setting_type" @tab-click="handleClick_type">
                  <el-tab-pane name="camera" >
             <template #label>
@@ -780,6 +777,7 @@ export default {
       </el-button>
     </el-row>
   </a>
+  
   <el-row style="margin-top: 3%; margin-bottom: 5%">
     <el-button type="danger" @click="selectAllRisk(2)">
       &ensp;高危幕墙&ensp;

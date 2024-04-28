@@ -282,7 +282,11 @@ export default {
                       crackArea: item.crackArea,
                       crackLength: item.crackLength,
                       crackAverageWidth: item.crackAverageWidth,
-                      crackMaxWidth: item.crackMaxWidth
+                      crackMaxWidth: item.crackMaxWidth,
+                      actualArea: item.actualArea,
+                      actualLength: item.actualLength,
+                      actualAverageWidth: item.actualAverageWidth,
+                      actualMaxWidth: item.actualMaxWidth
                     }
                   };
 
@@ -564,13 +568,17 @@ export default {
       <el-button color="#B29F82" style="color:white" @click="changePage()">
         切换地震工程馆
       </el-button>
+      <el-button color="#B29F82" style="color:black"  @click="openVideo">观看教程</el-button>
     </div>
-
     <div class="select-wrapper" style="background-color: #DBD4CC;">
-      <el-button color="#B29F82"  @click="handleClick_setting" round>
-        <el-icon color="white"><Setting/></el-icon>
-      </el-button>
-      &emsp;
+      <el-button color="#B29F82"  style="color:white" @click="handleClick_setting"  round>
+        <el-icon><Setting/></el-icon>
+        <p v-if="this.setting_is_open">隐藏便捷控制台</p>
+        <p v-else>显示便捷控制台</p>
+      </el-button>&ensp;
+      &ensp;&ensp;&ensp;
+      <p style="color:black; background-color:#A29B82; border: 3px; padding: 1px;">方位-图片名选择框:</p>&ensp;
+
       <el-select-v2
           v-model="select_1"
           :options="selections[0]"
@@ -615,7 +623,7 @@ export default {
             <template #label>
               <span class="custom-tabs-label">
                 <el-icon color="#463929"><VideoCamera /></el-icon>
-                <span style="color:#463929">相机</span>
+                <span style="color:#463929">便捷控制台</span>
               </span>
             </template>
             <a>
@@ -671,6 +679,7 @@ export default {
                   </el-button>
                 </el-row>
               </a>
+            
 <!--              <a class="text_2" >-->
 <!--                <a> 夜景模式：-->
 <!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
@@ -680,48 +689,56 @@ export default {
             </a>
             <el-row style="margin-top: 5%; margin-bottom: 5%">
               <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
+  
               <el-button @click="handleClick_info" size="small" round>
                 <el-icon><InfoFilled /></el-icon>
               </el-button>
             </el-row>
             <a v-if="!setting_camera.is_info" class="text_info">
-              <el-scrollbar height="300px">
-                <li>键盘控制：</li>
-                <a class="text_3">
-                  <el-row>
-                    <el-col :span="12">
-                      <br>&emsp;启用键盘后，使用
-                    </el-col>
-                    <el-col :span="8.5">
-                      <el-row justify="center">
-                        <el-tag>W</el-tag>
-                      </el-row>
-                      <el-row>
-                        <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
-                      </el-row>
-                    </el-col>
-                    <br>&ensp;可移
-                  </el-row>
-                  <el-row>
-                    动镜头,使用&ensp;
-                    <el-tag>Q</el-tag><el-tag>E</el-tag>
-                    &ensp;可水平旋转镜头
-                  </el-row>
-                </a>
-                <li>鼠标控制：</li>
-                <a class="text_3">
-                  &emsp;启用鼠标后，按住鼠标左键拖动镜头，滚轮调整镜头距离，
-                  按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
-                </a>
-                <li>快捷选择：</li>
-                <a class="text_3">
-                  &emsp;快捷切换至所选立面
-                </a>
-                <li>重置：</li>
-                <a class="text_3">
-                  &emsp;可使模型位置回归初始状态
-                </a>
-              </el-scrollbar>
+              <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;">
+  
+  <el-scrollbar height="400px">
+    <div style="background-color: #f5f5f5; padding: 10px;width:100%">
+    <li>键盘控制：</li>
+    <a class="text_3">
+      <el-row>
+        <el-col :span="9">
+          <br>&emsp;启用键盘后，使用
+        </el-col>
+        <el-col :span="8.5">
+          <el-row justify="center">
+            <el-tag>W</el-tag>
+          </el-row>
+          <el-row>
+            <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
+          </el-row>
+        </el-col>
+        <br>&ensp;可移
+      </el-row>
+      <el-row>
+        动镜头,使用&ensp;
+        <el-tag>Q</el-tag><el-tag>E</el-tag>
+        &ensp;可水平旋转镜头
+      </el-row>
+    </a>
+    <li>鼠标控制：</li>
+    <a class="text_3">
+      &emsp;按住鼠标左键拖动镜头，滚轮调整镜头距离，
+      <br>按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
+    </a>
+    <li>快捷选择：</li>
+    <a class="text_3">
+      &emsp;快捷切换至所选立面
+    </a>
+    <!--当该按键被按下执行this.setting_compare.isopen=false-->
+    <li @click="this.risk_setting.risk_select=0">重置：</li>
+    <a class="text_3">
+      &emsp;可使模型位置回归初始状态
+    </a>
+  </div>
+  </el-scrollbar>
+  
+</el-card>
             </a>
 
           </el-tab-pane>
@@ -922,7 +939,7 @@ export default {
     </div>
     <el-divider />
     <p class="text_1" style="color:#463929">
-      图像分割与裂缝识别
+      图像处理和裂缝检测结果
       <el-icon color="#463929" @click="handleClick_hideDivide">
         <Hide />
       </el-icon>
@@ -954,7 +971,7 @@ export default {
           </el-row>
         </el-col>
         <el-col :span="8">
-          <p class="text_2">检测图片</p>
+          <p class="text_2">旋转锚框⽬标检测结果</p>
           <a v-if="StoneCrackDetect.success">
             <el-row>
 
@@ -968,7 +985,7 @@ export default {
           </a>
         </el-col>
         <el-col :span="8">
-          <p class="text_2">分割情况</p>
+          <p class="text_2">幕墙块语义分割结果</p>
           <a v-if="StoneCrackDetect.success">
             <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
               :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
@@ -984,7 +1001,7 @@ export default {
     </el-card>
 
     <p class="text_2">
-      查看分割块：
+      查看幕墙块裂缝检测和测量结果（编号与分割结果⼀⼀对应）
       <el-select v-model="StoneCrackDetect.onshow.no" multiple collapse-tags collapse-tags-tooltip
         :max-collapse-tags="3" placeholder="Select" style="width: 260px">
         <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
@@ -1041,10 +1058,14 @@ export default {
                         <a v-else>否</a>
                       </el-row>
                       <a v-if="StoneCrackDetect.block_data[block].has_crack">
-                        <el-row>裂痕像素面积：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
-                        <el-row>裂痕像素长度：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                        <el-row>所有裂缝像素⾯积和：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                        <el-row>裂痕实际面积：{{ StoneCrackDetect.block_data[block].crack_data.actualArea}}</el-row>
+                        <el-row>所有裂缝像素⻓度和：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                        <el-row>裂痕实际长度：{{ StoneCrackDetect.block_data[block].crack_data.actualLength }}</el-row>
                         <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
-                        <el-row>裂痕像素最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
+                        <el-row>裂痕实际平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualAverageWidth }}</el-row>
+                        <el-row>裂缝（可能多条）像素最⼤宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
+                        <el-row>裂痕实际最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualMaxWidth }}</el-row>
                       </a>
                     </el-col>
                   </el-row>
@@ -1106,7 +1127,7 @@ export default {
   align-items: center;
 }
 .setting_wrapper{
-  width:300px;
+  width:400px;
   margin-top: -35px;
   height: 660px;
   line-height: 45px;

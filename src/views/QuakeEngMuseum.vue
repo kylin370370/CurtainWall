@@ -104,7 +104,7 @@ export default {
         [],
         []
       ],
-      
+
       urlList:[],
       url: 'https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image/C/f_052.JPG',       //图片url
       //srcList: [],    //打开图片预览，可以放入多张图片
@@ -112,7 +112,7 @@ export default {
         {name:'x', data: 36.9},
         {name:'y', data:9.88},
         {name:'z', data: 54.73},
-        {name:'path', data:'C/f_052.JPG'},
+        {name:'path', data:'/C/f_052.JPG'},
       ],
       //当前查看位置图片的颜色信息
       infocolor: {
@@ -591,7 +591,7 @@ export default {
     },
     selectAllRisk(risk_rank){
     //console.log(risk_rank);
-      
+
       this.risk_setting.risk_select=risk_rank;
       var datalist = this.risk_setting.risk_data;
     //console.log(risk_select,typeof(risk_select));  -> 0 string
@@ -600,9 +600,9 @@ export default {
     .then(res=>{
       //存储全部风险图片id
       this.risk_setting.risk_data = res.data.map(item => ({ value: item, label: item }));
-    })  
-    .catch(error => {   
-        console.log('风险信息：', '请求失败');   
+    })
+    .catch(error => {
+        console.log('风险信息：', '请求失败');
         console.log(risk_rank);
         console.error(error);
       });
@@ -706,7 +706,7 @@ export default {
 
 
     <div class="setting_and_model">
-      <el-card v-if="setting_is_open" class="setting_wrapper">      
+      <el-card v-if="setting_is_open" class="setting_wrapper">
         <el-tabs v-model="setting_type" @tab-click="handleClick_type">
                  <el-tab-pane name="camera" >
             <template #label>
@@ -777,7 +777,7 @@ export default {
       </el-button>
     </el-row>
   </a>
-  
+
   <el-row style="margin-top: 3%; margin-bottom: 5%">
     <el-button type="danger" @click="selectAllRisk(2)">
       &ensp;高危幕墙&ensp;
@@ -815,7 +815,7 @@ export default {
 </el-row>-->
   <a v-if="!setting_camera.is_info" class="text_info" >
     <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;">
-  
+
   <el-scrollbar height="400px">
     <div style="background-color: #f5f5f5; padding: 10px;width:100%">
     <li>键盘控制：</li>
@@ -856,7 +856,7 @@ export default {
     </a>
   </div>
   </el-scrollbar>
-  
+
 </el-card>
 </a>
 </el-tab-pane>
@@ -939,7 +939,7 @@ export default {
 </div>
 <div class="details_and_compare">
   <p class="text_1">当前查看：
-  
+
 </p>
   <div class="details">
     <div class="image">

@@ -471,6 +471,7 @@ export default {
       that.info[3].data = that.select_1 +"_"+ that.select_2 + "_" + that.select_3[0].split(".")[0] + ".png";
       that.info[3].data=that.info[3].data.replace('W+4_', '');
       that.info[3].data=that.info[3].data.replace('N+4_', '');
+      that.info[3].data=that.info[3].data.replace('png', 'JPG');
       console.log("0428这里选中的是"+that.info[3].data);
 
 

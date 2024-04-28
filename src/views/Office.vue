@@ -460,7 +460,7 @@ export default {
 
       imageURL = imageURL.replace('W+4/W+4_', '/E/');    //替换为真实路径
       imageURL = imageURL.replace('N+4/N+4_', '/D/');
-      console.log("这里是"+imageURL);
+      // console.log("0428这里选中的是"+imageURL);
       that.url = imageURL;
       console.log(mess)
       that.info[0].data = mess.x;
@@ -469,8 +469,9 @@ export default {
       // console.log(that.select_1);
       // console.log(that.select_3);
       that.info[3].data = that.select_1 +"_"+ that.select_2 + "_" + that.select_3[0].split(".")[0] + ".png";
-
-
+      that.info[3].data=that.info[3].data.replace('W+4_', '');
+      that.info[3].data=that.info[3].data.replace('N+4_', '');
+      console.log("0428这里选中的是"+that.info[3].data);
 
 
       that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
@@ -679,7 +680,7 @@ export default {
                   </el-button>
                 </el-row>
               </a>
-            
+
 <!--              <a class="text_2" >-->
 <!--                <a> 夜景模式：-->
 <!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
@@ -689,14 +690,14 @@ export default {
             </a>
             <el-row style="margin-top: 5%; margin-bottom: 5%">
               <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
-  
+
               <el-button @click="handleClick_info" size="small" round>
                 <el-icon><InfoFilled /></el-icon>
               </el-button>
             </el-row>
             <a v-if="!setting_camera.is_info" class="text_info">
               <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;">
-  
+
   <el-scrollbar height="400px">
     <div style="background-color: #f5f5f5; padding: 10px;width:100%">
     <li>键盘控制：</li>
@@ -737,7 +738,7 @@ export default {
     </a>
   </div>
   </el-scrollbar>
-  
+
 </el-card>
             </a>
 
@@ -858,9 +859,9 @@ export default {
           </p>
           <a v-if="url">
             <el-button  color="#B29F82" style="color:white" @click="handleClick_divide(url,info)" >
-              <el-icon color="white"><Scissor /></el-icon>显示分割结果
+              <el-icon color="white"><Scissor /></el-icon>显示检测情况
             </el-button>
-            <el-button color="#B29F82" style="color:white" @click="DoItYourself(info[3].data)">跳转分割过程</el-button>
+            <el-button color="#B29F82" style="color:white" @click="DoItYourself(info[3].data)">送往检测系统</el-button>
           </a>
         </div>
       </div>

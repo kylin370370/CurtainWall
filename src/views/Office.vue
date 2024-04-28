@@ -562,7 +562,7 @@ export default {
       <el-icon><Location /></el-icon>
       井开区政府大楼三维幕墙裂缝检测展示系统
       <el-button color="#B29F82" style="color:white" @click="changePage()">
-        切换建筑
+        切换地震工程馆
       </el-button>
     </div>
 

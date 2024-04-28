@@ -109,10 +109,10 @@ export default {
       url: 'https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image/C/f_052.JPG',       //图片url
       //srcList: [],    //打开图片预览，可以放入多张图片
       info: [
-        {name:'x', data: 0},
-        {name:'y', data: 0},
-        {name:'z', data: 0},
-        {name:'path', data:''},
+        {name:'x', data: 36.9},
+        {name:'y', data:9.88},
+        {name:'z', data: 54.73},
+        {name:'path', data:'C/f_052.JPG'},
       ],
       //当前查看位置图片的颜色信息
       infocolor: {

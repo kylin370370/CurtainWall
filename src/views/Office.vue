@@ -63,8 +63,7 @@ export default {
       is_keyboard: true,         //是否允许使用键盘
       is_mouse: true,            //是否允许使用鼠标
 
-      is_rotating:'0',         //是否正在旋转
-      rotating:null,           //记录一下旋转面
+      
       skyType: true ,         //false白天，true为晚间
 
       setting_compare:{
@@ -233,12 +232,6 @@ export default {
     },
     handleClick_quick(type){          //相机--快捷选择    'SE' 'SW'
       var that = this;
-
-      if(type==='SE')//记录旋转的面
-        this.rotating='SE';
-      else if(type==='SW')
-        this.rotating='SW';
-
       that.$refs.unityModel.setQuick(type.toString());
     },
     handleClick_divide(path, info){
@@ -532,9 +525,6 @@ export default {
       else if(event.data.type === '1')   //测距相关      '1/r'   '2,6,8,10/r'
         that.updateDistance();
 
-      else if(event.data.type === '2')   //提示当前是否正在旋转
-        that.is_rotating=that.unityMessage ;
-
       console.log('(来自vue)' + that.unityMessage);
       //console.log('(来自vue)' + event.data.type);
 
@@ -673,11 +663,11 @@ export default {
               <a class="text_2">
                 快捷选择：
                 <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
-                  <el-button  @click="handleClick_quick('SE')" :loading="(this.is_rotating==='1')&&(this.rotating==='SE')">
-                    <el-icon><Place /></el-icon>&ensp;W+4
+                  <el-button  @click="handleClick_quick('D')">
+                    <el-icon><Place /></el-icon>&ensp;D
                   </el-button>
-                  <el-button @click="handleClick_quick('SW')" :loading="(this.is_rotating==='1')&&(this.rotating==='SW')">
-                    <el-icon><Place /></el-icon>&ensp;N+4
+                  <el-button @click="handleClick_quick('E')" >
+                    <el-icon><Place /></el-icon>&ensp;E
                   </el-button>
                 </el-row>
               </a>

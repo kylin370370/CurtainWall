@@ -55,10 +55,10 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
 
     <div class="option_wrapper">
       <div class="mb-2 flex items-center text-sm">
-        <el-radio-group v-model="option" class="ml-4" @change="handleClick_change">
-          <el-radio label="0" size="large">地震工程馆</el-radio>
-          <el-radio label="1" size="large">井开区政府⼤楼</el-radio>
-          <!--<el-radio label="2" size="large">政府大楼</el-radio>-->
+        <el-radio-group v-model="option" class="ml-4" @change="handleClick_change" fill="#B29F82">
+          <el-radio-button label="0" size="middle">地震工程馆</el-radio-button>
+          <el-radio-button label="1" size="middle">井开区政府⼤楼</el-radio-button>
+          <!--<el-radio label="2" size="middle">政府大楼</el-radio>-->
         </el-radio-group>
       </div>  
     </div>
@@ -86,7 +86,7 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
         </el-col>
       </el-row> 
       <div class="router_button">
-        <el-button @click="changePage" size="large" color="#EEFFFF" round>
+        <el-button @click="changePage" size="large" color="#B29F82" style="color:white" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
       </div>
@@ -117,7 +117,7 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
         </el-col>
       </el-row> 
       <div class="router_button">
-        <el-button @click="changePage" size="large" color="#EEFFFF" round>
+        <el-button @click="changePage" size="large" color="#B29F82" style="color:white" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
       </div>
@@ -163,9 +163,8 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
       </div>
     </div>
 
-    
     <div class="carousel">
-      <el-carousel :interval="3000" type="card" height="65vh"  direction="vertical">
+      <el-carousel :interval="3000" type="card" height="65vh" direction="vertical">
         <el-carousel-item v-for="(item, index) in imageBox" :key="index">
           <el-image :src="item" style="height: 100%;"/>
         </el-carousel-item>
@@ -173,14 +172,14 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
     </div>
   </div>
 </template>
-<style>
+<style scope>
 body{
   height: 98vh;
 }
 .home {
   position: relative;
   height: 92vh;
-  background: linear-gradient(180deg, #FFF 0%, #FFF 0.01%, #EFF 100%);
+  /* background: linear-gradient(180deg, #FFF 0%, #FFF 0.01%, #EFF 100%); */
 }
 .bk_image{
   width: 50vw;
@@ -202,11 +201,14 @@ body{
 }
 .text_1_1{
   font-size:5lvh;
-  color: rgb(73, 65, 56);
+  /* color: rgb(73, 65, 56); */
+  color: #6f685f;
   font-weight: 600;
 }
 .text_1_2{
-  font-size:1.7lvh;
+  font-size:1.9lvh;
+  line-height: 30px;
+  height: 25vh;
 }
 .text_fun{
   text-align: center;

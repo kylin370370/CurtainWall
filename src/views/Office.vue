@@ -557,26 +557,29 @@ export default {
     <div class="some-text">
       <el-icon><Location /></el-icon>
       井开区政府大楼三维幕墙裂缝检测展示系统
-      <el-button color="#B29F82" style="color:white" @click="changePage()">
+      <el-button color="#DBD4CC" style="color:black" @click="changePage()" round>
         切换地震工程馆
       </el-button>
-      <el-button color="#B29F82" style="color:black"  @click="openVideo">观看教程</el-button>
+      <el-button color="#DBD4CC" style="color:black"  @click="openVideo" round>
+        观看教程
+      </el-button>
     </div>
     <div class="select-wrapper" style="background-color: #DBD4CC;">
-      <el-button color="#B29F82"  style="color:white" @click="handleClick_setting"  round>
+      <el-button color="#B29F82"  style="color:white" @click="handleClick_setting" round>
         <el-icon><Setting/></el-icon>
         <p v-if="this.setting_is_open">隐藏便捷控制台</p>
         <p v-else>显示便捷控制台</p>
-      </el-button>&ensp;
-      &ensp;&ensp;&ensp;
-      <p style="color:black; background-color:#A29B82; border: 3px; padding: 1px;">方位-图片名选择框:</p>&ensp;
+      </el-button>
+      &ensp;&ensp;&ensp;&ensp;
+      <p style="color:black; font-weight: bold;">方位-图片名选择框:</p>
+      &ensp;
 
       <el-select-v2
           v-model="select_1"
           :options="selections[0]"
           placeholder="Please select"
           @change="updateSelections(0)"
-          size="large"
+          size="middle"
       />
       &ensp;
       <el-select-v2
@@ -584,7 +587,7 @@ export default {
           :options="selections[1]"
           placeholder="Please select"
           @change="updateSelections(1)"
-          size="large"
+          size="middle"
           :disabled="!select_1"
       />
       &ensp;
@@ -593,7 +596,7 @@ export default {
           :options="selections[2]"
           placeholder="Please select"
           @change="updateSelections(2)"
-          size="large"
+          size="middle"
           :show-all-levels="false"
           :disabled="!select_2"
       />
@@ -679,63 +682,62 @@ export default {
 <!--              </a>-->
 
             </a>
-            <el-row style="margin-top: 5%; margin-bottom: 5%">
+            <el-row style="margin-top: 3%; margin-bottom: 3%">
               <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
 
               <el-button @click="handleClick_info" size="small" round>
                 <el-icon><InfoFilled /></el-icon>
               </el-button>
             </el-row>
+
             <a v-if="!setting_camera.is_info" class="text_info">
-              <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;">
-
-  <el-scrollbar height="400px">
-    <div style="background-color: #f5f5f5; padding: 10px;width:100%">
-    <li>键盘控制：</li>
-    <a class="text_3">
-      <el-row>
-        <el-col :span="9">
-          <br>&emsp;启用键盘后，使用
-        </el-col>
-        <el-col :span="8.5">
-          <el-row justify="center">
-            <el-tag>W</el-tag>
-          </el-row>
-          <el-row>
-            <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
-          </el-row>
-        </el-col>
-        <br>&ensp;可移
-      </el-row>
-      <el-row>
-        动镜头,使用&ensp;
-        <el-tag>Q</el-tag><el-tag>E</el-tag>
-        &ensp;可水平旋转镜头
-      </el-row>
-    </a>
-    <li>鼠标控制：</li>
-    <a class="text_3">
-      &emsp;按住鼠标左键拖动镜头，滚轮调整镜头距离，
-      <br>按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
-    </a>
-    <li>快捷选择：</li>
-    <a class="text_3">
-      &emsp;快捷切换至所选立面
-    </a>
-    <!--当该按键被按下执行this.setting_compare.isopen=false-->
-    <li @click="this.risk_setting.risk_select=0">重置：</li>
-    <a class="text_3">
-      &emsp;可使模型位置回归初始状态
-    </a>
-  </div>
-  </el-scrollbar>
-
-</el-card>
+              <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;" body-style="padding:1px;">
+                <el-scrollbar height="300px">
+                  <div style="padding:5px 10px;width:100%">
+                    <li>键盘控制：</li>
+                    <a class="text_3">
+                      <el-row>
+                        <el-col :span="9">
+                          <br>&emsp;启用键盘后，使用
+                        </el-col>
+                        <el-col :span="8.5">
+                          <el-row justify="center">
+                            <el-tag>W</el-tag>
+                          </el-row>
+                          <el-row>
+                            <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
+                          </el-row>
+                        </el-col>
+                        <br>&ensp;可移
+                      </el-row>
+                      <el-row>
+                        动镜头,使用&ensp;
+                        <el-tag>Q</el-tag><el-tag>E</el-tag>
+                        &ensp;可水平旋转镜头
+                      </el-row>
+                    </a>
+                    <li>鼠标控制：</li>
+                    <a class="text_3">
+                      &emsp;按住鼠标左键拖动镜头，滚轮调整镜头距离，
+                      <br>按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
+                    </a>
+                    <li>快捷选择：</li>
+                    <a class="text_3">
+                      &emsp;快捷切换至所选立面
+                    </a>
+                    <!--当该按键被按下执行this.setting_compare.isopen=false-->
+                    <li @click="this.risk_setting.risk_select=0">重置：</li>
+                    <a class="text_3">
+                      &emsp;可使模型位置回归初始状态
+                    </a>
+                  </div>
+                </el-scrollbar>
+              </el-card>
             </a>
 
           </el-tab-pane>
 
-          <el-tab-pane name="compare" v-if="false">
+          <el-tab-pane name="compare">
             <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>
@@ -780,7 +782,8 @@ export default {
             </a>
             <br>
             <el-button
-                color="#626aef"
+                color="#B29F82"
+                style="color:white"
                 @click="handleClick_clear"
                 :dark="isDark"
                 :disabled="!setting_compare.is_open">
@@ -1081,16 +1084,16 @@ export default {
 
 </template>
 
-<style>
+<style scope>
 .about{
   background-color: white;
 }
 .some-text{
+  background-color: #ADA08C;
   height: 80px;
   font-size: 40px;
   font-weight: bold;
   line-height: 80px;
-  margin-left: 30px;
   letter-spacing:1px;
   width: 100%;
 }
@@ -1114,6 +1117,7 @@ export default {
 }
 
 .setting_and_model{
+  margin-top: 2vh;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -1168,7 +1172,7 @@ export default {
 
 
 .model-from-unity{
-  margin-left: 10px;
+  margin-left: 15px;
 }
 
 .details_and_compare{

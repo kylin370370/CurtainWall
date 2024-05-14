@@ -53,8 +53,9 @@ export default {
   data() {
     return {
 
+      pageoption:'2',
       setting_is_open: true,     //是否打开设置边栏
-      setting_type: 'compare',     //设置--相机/对比/测距
+      setting_type: 'camera',     //设置--相机/对比/测距
       setting_camera:{
         is_info: false,           //是否显示使用说明
         //is_keyboard: false,     //放此处watch不到所以挪出
@@ -151,6 +152,15 @@ export default {
     },
   },
   methods:{
+    changePage(newOption) {
+      if (newOption === 0) {
+        this.$router.push('/about/QuakeEngMuseum')
+      } else if (newOption === 1) {
+        this.$router.push('/about/Office')
+      } else if (newOption === 2) {
+        this.$router.push('/about/Composite')
+      }
+    },
     handleClick_setting(){            //设置按钮
       this.setting_is_open = !this.setting_is_open;
     },
@@ -436,23 +446,37 @@ export default {
 </script>
 
 <template>
-  <div class="about">
+  <div class="about" style="background-color: #F5F5F5;">
     <div class="some-text">
       <el-icon><Location /></el-icon>
-      衷和楼（综合楼）
+      衷和楼（综合楼）三维幕墙裂缝检测展示系统
+      <el-button color="#DBD4CC" style="color:black" @click="changePage(0)" round>
+        切换地震工程馆
+      </el-button>
+      <el-button color="#DBD4CC" style="color:black" @click="changePage(1)" round>
+        切换政府大楼
+      </el-button>
+      <el-button color="#DBD4CC" style="color:black"  @click="openVideo" round>
+        观看教程
+      </el-button>
     </div>
 
-    <div class="select-wrapper">
-      <el-button color="#626aef"  @click="handleClick_setting" round>
+    <div class="select-wrapper" style="background-color: #DBD4CC;">
+      <el-button color="#B29F82" style="color:white" @click="handleClick_setting" round>
         <el-icon><Setting/></el-icon>
+        <p v-if="this.setting_is_open">隐藏便捷控制台</p>
+        <p v-else>显示便捷控制台</p>
       </el-button>
-      &emsp;
+      &ensp;&ensp;&ensp;&ensp;
+      <p style="color:black; font-weight: bold;">方位-图片名选择框:</p>
+      &ensp;
+
       <el-select-v2
         v-model="select_1"
         :options="selections[0]"
         placeholder="Please select"
         @change="updateSelections(0)"
-        size="large"
+        size="middle"
       />
       &ensp;
       <el-select-v2
@@ -460,7 +484,7 @@ export default {
         :options="selections[1]"
         placeholder="Please select"
         @change="updateSelections(1)"
-        size="large"
+        size="middle"
         :disabled="!select_1"
       />
       &ensp;
@@ -469,15 +493,16 @@ export default {
         :options="selections[2]"
         placeholder="Please select"
         @change="updateSelections(2)"
-        size="large"
+        size="middle"
         :show-all-levels="false"
         :disabled="!select_2"
       />
       &ensp;
       <el-button
       @click="sendSelections"
-      color="#626aef"
       :disabled="!select_3"
+      color="#B29F82"
+      style="color:white"
       > 
       确定
       </el-button>
@@ -485,16 +510,16 @@ export default {
 
     <div class="setting_and_model">
       <el-card v-if="setting_is_open" class="setting_wrapper">
-        <el-tabs v-model="setting_type" @tab-click="handleClick_type">
+        <el-tabs fill="black" v-model="setting_type" @tab-click="handleClick_type">
           <el-tab-pane name="camera">
             <template #label>
               <span class="custom-tabs-label">
-                <el-icon><VideoCamera /></el-icon>
-                <span>相机</span>
+                <el-icon color="#463929"><VideoCamera /></el-icon>
+                <span style="color:#463929">便捷控制台</span>
               </span>
             </template>          
             <a>
-              <el-checkbox 
+              <!-- <el-checkbox 
                 v-model="is_keyboard" 
                 label="启用键盘控制" 
                 size="large"
@@ -505,8 +530,8 @@ export default {
                 label="启用鼠标控制" 
                 size="large" 
               /> 
-              <br>
-              <a class="text_2">
+              <br> -->
+              <a class="text_2" v-if="false">
                 移动方式：
                 <el-row :span="24" style="margin-top: -5%;">
                   <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode">
@@ -546,57 +571,63 @@ export default {
                 </el-button>
                 </el-row>
               </a>
-              <a class="text_2">
+              <!-- <a class="text_2">
                 <a> 夜景模式： 
                   <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />
                 </a>
-              </a>
-
+              </a> -->
             </a>
-            <el-row style="margin-top: 5%; margin-bottom: 5%">
-            <el-button color="#626aef" @click="handleClick_reset" :dark="isDark">重置</el-button>
-            <el-button @click="handleClick_info" size="small" round>
-                  <el-icon><InfoFilled /></el-icon>
-            </el-button>
+
+            <el-row style="margin-top: 3%; margin-bottom: 3%">
+              <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
+              <el-button @click="handleClick_info" size="small" round>
+                <el-icon><InfoFilled /></el-icon>
+              </el-button>
             </el-row>
-            <a v-if="setting_camera.is_info" class="text_info">
-              <el-scrollbar height="130px">
-                <li>键盘控制：</li>
-                <a class="text_3">
-                  <el-row>
-                    <el-col :span="12">
-                      <br>&emsp;启用键盘后，使用
-                    </el-col>
-                    <el-col :span="8.5">
-                      <el-row justify="center">
-                        <el-tag>W</el-tag>
+
+            <a v-if="!setting_camera.is_info" class="text_info">
+              <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;" body-style="padding:1px;">
+                <el-scrollbar height="300px">
+                  <div style="padding:5px 10px;width:100%">
+                    <li>键盘控制：</li>
+                    <a class="text_3">
+                      <el-row>
+                        <el-col :span="9">
+                          <br>&emsp;启用键盘后，使用
+                        </el-col>
+                        <el-col :span="8.5">
+                          <el-row justify="center">
+                            <el-tag>W</el-tag>
+                          </el-row>
+                          <el-row>
+                            <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
+                          </el-row>
+                        </el-col>
+                        <br>&ensp;可移
                       </el-row>
                       <el-row>
-                        <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
+                        动镜头,使用&ensp;
+                        <el-tag>Q</el-tag><el-tag>E</el-tag>
+                        &ensp;可水平旋转镜头
                       </el-row>
-                    </el-col>
-                    <br>&ensp;可移
-                  </el-row>
-                  <el-row>
-                    动镜头,使用&ensp;
-                    <el-tag>Q</el-tag><el-tag>E</el-tag>
-                    &ensp;可水平旋转镜头
-                  </el-row>
-                </a>
-                <li>鼠标控制：</li>
-                <a class="text_3">
-                  &emsp;启用鼠标后，按住鼠标左键拖动镜头，滚轮调整镜头距离，
-                  按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
-                </a>
-                <li>快捷选择：</li>
-                <a class="text_3">
-                  &emsp;快捷切换至所选立面
-                </a>
-                <li>重置：</li>
-                <a class="text_3">
-                  &emsp;可使模型位置回归初始状态
-                </a>
-              </el-scrollbar>
+                    </a>
+                    <li>鼠标控制：</li>
+                    <a class="text_3">
+                      &emsp;按住鼠标左键拖动镜头，滚轮调整镜头距离，
+                      <br>按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
+                    </a>
+                    <li>快捷选择：</li>
+                    <a class="text_3">
+                      &emsp;快捷切换至所选立面
+                    </a>
+                    <!--当该按键被按下执行this.setting_compare.isopen=false-->
+                    <li @click="this.risk_setting.risk_select=0">重置：</li>
+                    <a class="text_3">
+                      &emsp;可使模型位置回归初始状态
+                    </a>
+                  </div>
+                </el-scrollbar>
+              </el-card>
             </a>
 
           </el-tab-pane>
@@ -608,37 +639,42 @@ export default {
                 <span>对比</span>
               </span>
             </template> 
-            <a> 
+            <a class="text_2"> 
               开启对比： 
               <el-switch 
-              v-model="setting_compare.is_open" 
-              @click="handleClick_compare" />
+                v-model="setting_compare.is_open" 
+                style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC;"
+                @click="handleClick_compare"
+              />
             </a>
             <br>
-            <a>
+            <a class="text_2">
               对比数：&emsp;
-              <el-input-number 
-              v-model="setting_compare.max_num" 
-              :min="1" 
-              :max="10"
-              :step="1"
-              :disabled="!setting_compare.is_open" />
+              <el-input-number
+                v-model="setting_compare.max_num" 
+                :min="1" 
+                :max="10"
+                :step="1"
+                :disabled="!setting_compare.is_open"
+              />
             </a>
             <br>
-            <a>
+            <a class="text_2">
               显示坐标：
               <el-switch 
-              v-model="setting_compare.is_show" 
-              :disabled="!setting_compare.is_open" />
+                v-model="setting_compare.is_show" 
+                style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC;"
+                :disabled="!setting_compare.is_open"
+              />
             </a>
             <br>
-            <a>
+            <a class="text_2">
               显示形式：
               <el-switch
                 v-model="type_compare"
                 class="ml-2"
                 inline-prompt
-                style="--el-switch-on-color: #6A8BFF; --el-switch-off-color: #75D9D3"
+                style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC; font-weight: normal;"
                 active-text="显示全部"
                 inactive-text="逐个显示"
                 :disabled="!setting_compare.is_open" 
@@ -646,7 +682,8 @@ export default {
             </a>
             <br>
             <el-button 
-              color="#626aef" 
+              color="#B29F82"
+              style="color:white"
               @click="handleClick_clear" 
               :dark="isDark" 
               :disabled="!setting_compare.is_open">
@@ -668,8 +705,8 @@ export default {
             <a> 
               开启测距： 
               <el-switch 
-              v-model="setting_measure.is_open" 
-              @click="handleClick_measure" />
+                v-model="setting_measure.is_open" 
+                @click="handleClick_measure" />
             </a>
 
             <div class="measure_steps">  
@@ -678,6 +715,7 @@ export default {
                 <el-step title="选择第二个点位" />
               </el-steps>
             </div>
+
             <a v-if="setting_measure.has_data">
               <a>水平距离：{{ setting_measure.distance[0] }}</a><br>
               <a>垂直距离：{{ setting_measure.distance[1] }}</a><br>
@@ -687,6 +725,7 @@ export default {
 
         </el-tabs>
       </el-card>
+
       <div class="model-from-unity">
         <Model ref="unityModel"/>
       </div>
@@ -714,6 +753,13 @@ export default {
             <a>{{ data.name }}:</a>
             <a>&emsp;{{ data.data }}</a>
           </p>
+          <!-- <a v-if="url">
+            to be continue
+            <el-button  color="#B29F82" style="color:white" @click="handleClick_divide(url,info)" >
+              <el-icon color="white"><Scissor /></el-icon>显示检测情况
+            </el-button>
+            <el-button color="#B29F82" style="color:white" @click="DoItYourself(info[3].data)">送往检测系统</el-button>
+          </a> -->
         </div>
       </div>
       <div v-if="setting_compare.is_open" class="compare">
@@ -781,6 +827,15 @@ export default {
         </el-scrollbar>
       </div>
 
+      <el-divider />
+
+      <p class="text_1" style="color:#463929">
+        图像处理和裂缝检测结果
+        <!-- to be continue
+        <el-icon color="#463929" @click="handleClick_hideDivide">
+          <Hide />
+        </el-icon> -->
+      </p>
     </div>
 
   <br><br><br>
@@ -788,16 +843,16 @@ export default {
 
 </template>
 
-<style>
+<style scope>
 .about{
   background-color: white;
 }
 .some-text{
+  background-color: #ADA08C;
   height: 80px;
   font-size: 40px;
   font-weight: bold;
   line-height: 80px;
-  margin-left: 30px;
   letter-spacing:1px;
   width: 100%;
 }
@@ -821,12 +876,13 @@ export default {
 }
 
 .setting_and_model{
+  margin-top: 2vh;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 .setting_wrapper{
-  width:300px;
+  width:400px;
   margin-top: -35px;
   height: 660px;
   line-height: 45px;
@@ -875,7 +931,7 @@ export default {
 
 
 .model-from-unity{
-  margin-left: 10px;
+  margin-left: 15px;
 }
 
 .details_and_compare{

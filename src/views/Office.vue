@@ -542,9 +542,15 @@ export default {
       // 打开新的标签页
       // window.open(url, '_blank');
     },
-  changePage() {
-      this.$router.push('/about/QuakeEngMuseum')
-  }
+    changePage(newOption) {
+      if (newOption === 0) {
+        this.$router.push('/about/QuakeEngMuseum')
+      } else if (newOption === 1) {
+        this.$router.push('/about/Office')
+      } else if (newOption === 2) {
+        this.$router.push('/about/Composite')
+      }
+    },
   },
   mounted(){
     window.addEventListener("message",this.recieve);
@@ -557,13 +563,17 @@ export default {
     <div class="some-text">
       <el-icon><Location /></el-icon>
       井开区政府大楼三维幕墙裂缝检测展示系统
-      <el-button color="#DBD4CC" style="color:black" @click="changePage()" round>
+      <el-button color="#DBD4CC" style="color:black" @click="changePage(0)" round>
         切换地震工程馆
+      </el-button>
+      <el-button color="#DBD4CC" style="color:black" @click="changePage(2)" round>
+        切换衷和楼
       </el-button>
       <el-button color="#DBD4CC" style="color:black"  @click="openVideo" round>
         观看教程
       </el-button>
     </div>
+
     <div class="select-wrapper" style="background-color: #DBD4CC;">
       <el-button color="#B29F82"  style="color:white" @click="handleClick_setting" round>
         <el-icon><Setting/></el-icon>
@@ -744,14 +754,15 @@ export default {
                 <span>对比</span>
               </span>
             </template>
-            <a>
+            <a class="text_2">
               开启对比：
               <el-switch
                   v-model="setting_compare.is_open"
+                  style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC;"
                   @click="handleClick_compare" />
             </a>
             <br>
-            <a>
+            <a class="text_2">
               对比数：&emsp;
               <el-input-number
                   v-model="setting_compare.max_num"
@@ -761,23 +772,24 @@ export default {
                   :disabled="!setting_compare.is_open" />
             </a>
             <br>
-            <a>
+            <a class="text_2">
               显示坐标：
               <el-switch
                   v-model="setting_compare.is_show"
+                  style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC;"
                   :disabled="!setting_compare.is_open" />
             </a>
             <br>
-            <a>
+            <a class="text_2">
               显示形式：
               <el-switch
-                  v-model="type_compare"
-                  class="ml-2"
-                  inline-prompt
-                  style="--el-switch-on-color: #6A8BFF; --el-switch-off-color: #75D9D3"
-                  active-text="显示全部"
-                  inactive-text="逐个显示"
-                  :disabled="!setting_compare.is_open"
+                v-model="type_compare"
+                class="ml-2"
+                inline-prompt
+                style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC; font-weight: normal;"
+                active-text="显示全部"
+                inactive-text="逐个显示"
+                :disabled="!setting_compare.is_open"
               />
             </a>
             <br>
@@ -865,8 +877,8 @@ export default {
         <el-scrollbar>
           <div style="display: flex;">
             <a
-                v-for="(point, index) in setting_compare.points.slice().reverse()"
-                :key="index"
+              v-for="(point, index) in setting_compare.points.slice().reverse()"
+              :key="index"
             >
               <el-card
                   v-if="point.state === '1'"
@@ -930,154 +942,142 @@ export default {
           </div>
         </el-scrollbar>
       </div>
-
-    </div>
-    <el-divider />
-    <p class="text_1" style="color:#463929">
-      图像处理和裂缝检测结果
-      <el-icon color="#463929" @click="handleClick_hideDivide">
-        <Hide />
-      </el-icon>
-    </p>
-    <div v-if="StoneCrackDetect.is_show" class="divide">
-
-
-    <el-card style="border-radius: 20px;">
-      <el-row>
-        <el-col :span="8">
-          <p class="text_2">
-            当前图片&ensp;
-            <el-button @click="handleClick_search(-1)" size="small" circle>
-              <el-icon>
-                <Search />
-              </el-icon>
-            </el-button>
-          </p>
-          <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
-            :preview-src-list="[StoneCrackDetect.raw_path]" :initial-index="4" fit="cover">
-            <template #error>
-                  <div class="image-slot">NULL</div>
-                </template>
-          </el-image>
+      <el-divider />
+      <p class="text_1" style="color:#463929">
+        图像处理和裂缝检测结果
+        <el-icon color="#463929" @click="handleClick_hideDivide">
+          <Hide />
+        </el-icon>
+      </p>
+      <div v-if="StoneCrackDetect.is_show" class="divide">
+        <el-card style="border-radius: 20px;">
           <el-row>
-            x: {{ StoneCrackDetect.des.x }}&emsp;
-            y: {{ StoneCrackDetect.des.y }}&emsp;
-            z: {{ StoneCrackDetect.des.z }}
-          </el-row>
-        </el-col>
-        <el-col :span="8">
-          <p class="text_2">旋转锚框⽬标检测结果</p>
-          <a v-if="StoneCrackDetect.success">
-            <el-row>
-
-              <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
-                :preview-src-list="[StoneCrackDetect.detect_path]" :initial-index="4" fit="cover">
+            <el-col :span="8">
+              <p class="text_2">
+                当前图片&ensp;
+                <el-button @click="handleClick_search(-1)" size="small" circle>
+                  <el-icon>
+                    <Search />
+                  </el-icon>
+                </el-button>
+              </p>
+              <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
+                :preview-src-list="[StoneCrackDetect.raw_path]" :initial-index="4" fit="cover">
                 <template #error>
                       <div class="image-slot">NULL</div>
                     </template>
               </el-image>
-            </el-row>
-          </a>
-        </el-col>
-        <el-col :span="8">
-          <p class="text_2">幕墙块语义分割结果</p>
-          <a v-if="StoneCrackDetect.success">
-            <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
-              :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
-              <template #error>
-                    <div class="image-slot">NULL</div>
-                  </template>
-            </el-image>
-            <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
-          </a>
-        </el-col>
+              <el-row>
+                x: {{ StoneCrackDetect.des.x }}&emsp;
+                y: {{ StoneCrackDetect.des.y }}&emsp;
+                z: {{ StoneCrackDetect.des.z }}
+              </el-row>
+            </el-col>
+            <el-col :span="8">
+              <p class="text_2">旋转锚框⽬标检测结果</p>
+              <a v-if="StoneCrackDetect.success">
+                <el-row>
 
-      </el-row>
-    </el-card>
-
-    <p class="text_2">
-      查看幕墙块裂缝检测和测量结果（编号与分割结果⼀⼀对应）
-      <el-select v-model="StoneCrackDetect.onshow.no" multiple collapse-tags collapse-tags-tooltip
-        :max-collapse-tags="3" placeholder="Select" style="width: 260px">
-        <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
-          :value="item.value" />
-      </el-select>
-      <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示所有有损伤的分割块</el-button>
-    </p>
-
-
-    <div v-if="StoneCrackDetect.onshow.no[0]">
-          <el-scrollbar  height="500px">
-            <el-row :gutter="20"> <!-- 设置栅格间距 -->
-              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->
-                <el-card style="border-radius: 20px; width: 220px; height: 420px; overflow: auto;">
-                  <!-- 卡片内容 -->
-                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
-                  <el-row>
-                  <el-col :span="16">
-                    <el-row>
-                      <el-image
-                        style="width: 180px; height: auto;"
-                        :src="StoneCrackDetect.block_data[block].block_seg_image_path"
-                        :zoom-rate="1.2"
-                        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
-                        :initial-index="4"
-                        fit="contain"
-                      >
-                        <template #error>
+                  <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
+                    :preview-src-list="[StoneCrackDetect.detect_path]" :initial-index="4" fit="cover">
+                    <template #error>
                           <div class="image-slot">NULL</div>
                         </template>
-                      </el-image>
-                    </el-row>
-                    <el-row style="margin-top: 1%;">
-                      <el-image
-                        style="width: 180px; height: auto;"
-                        :src="StoneCrackDetect.block_data[block].block_detect_image_path"
-                        :zoom-rate="1.2"
-                        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
-                        :initial-index="4"
-                        fit="contain"
-                      >
-                        <template #error>
-                          <div class="image-slot">NULL</div>
-                        </template>
-                      </el-image>
-                    </el-row>
-                  </el-col>
+                  </el-image>
                 </el-row>
-                  <el-row style="width: 800px;">
-                    <el-col :span="7" style="margin-left: 1%;width: 800px;">
+              </a>
+            </el-col>
+            <el-col :span="8">
+              <p class="text_2">幕墙块语义分割结果</p>
+              <a v-if="StoneCrackDetect.success">
+                <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
+                  :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
+                  <template #error>
+                        <div class="image-slot">NULL</div>
+                      </template>
+                </el-image>
+                <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
+              </a>
+            </el-col>
+
+          </el-row>
+        </el-card>
+        <p class="text_2">
+          查看幕墙块裂缝检测和测量结果（编号与分割结果⼀⼀对应）
+          <el-select v-model="StoneCrackDetect.onshow.no" multiple collapse-tags collapse-tags-tooltip
+            :max-collapse-tags="3" placeholder="Select" style="width: 260px">
+            <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
+              :value="item.value" />
+          </el-select>
+          <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示所有有损伤的分割块</el-button>
+        </p>
+        <div v-if="StoneCrackDetect.onshow.no[0]">
+            <el-scrollbar  height="500px">
+              <el-row :gutter="20"> <!-- 设置栅格间距 -->
+                <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->
+                  <el-card style="border-radius: 20px; width: 220px; height: 420px; overflow: auto;">
+                    <!-- 卡片内容 -->
+                    <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num }}</el-row>
+                    <el-row>
+                    <el-col :span="16">
                       <el-row>
-                        存在裂缝：
-                        <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
-                        <a v-else>否</a>
+                        <el-image
+                          style="width: 180px; height: auto;"
+                          :src="StoneCrackDetect.block_data[block].block_seg_image_path"
+                          :zoom-rate="1.2"
+                          :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
+                          :initial-index="4"
+                          fit="contain"
+                        >
+                          <template #error>
+                            <div class="image-slot">NULL</div>
+                          </template>
+                        </el-image>
                       </el-row>
-                      <a v-if="StoneCrackDetect.block_data[block].has_crack">
-                        <el-row>所有裂缝像素⾯积和：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
-                        <el-row>裂痕实际面积：{{ StoneCrackDetect.block_data[block].crack_data.actualArea}}</el-row>
-                        <el-row>所有裂缝像素⻓度和：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
-                        <el-row>裂痕实际长度：{{ StoneCrackDetect.block_data[block].crack_data.actualLength }}</el-row>
-                        <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
-                        <el-row>裂痕实际平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualAverageWidth }}</el-row>
-                        <el-row>裂缝（可能多条）像素最⼤宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
-                        <el-row>裂痕实际最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualMaxWidth }}</el-row>
-                      </a>
+                      <el-row style="margin-top: 1%;">
+                        <el-image
+                          style="width: 180px; height: auto;"
+                          :src="StoneCrackDetect.block_data[block].block_detect_image_path"
+                          :zoom-rate="1.2"
+                          :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
+                          :initial-index="4"
+                          fit="contain"
+                        >
+                          <template #error>
+                            <div class="image-slot">NULL</div>
+                          </template>
+                        </el-image>
+                      </el-row>
                     </el-col>
                   </el-row>
-                </el-card>
-              </el-col>
-            </el-row>
+                    <el-row style="width: 800px;">
+                      <el-col :span="7" style="margin-left: 1%;width: 800px;">
+                        <el-row>
+                          存在裂缝：
+                          <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
+                          <a v-else>否</a>
+                        </el-row>
+                        <a v-if="StoneCrackDetect.block_data[block].has_crack">
+                          <el-row>所有裂缝像素⾯积和：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                          <el-row>裂痕实际面积：{{ StoneCrackDetect.block_data[block].crack_data.actualArea}}</el-row>
+                          <el-row>所有裂缝像素⻓度和：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                          <el-row>裂痕实际长度：{{ StoneCrackDetect.block_data[block].crack_data.actualLength }}</el-row>
+                          <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
+                          <el-row>裂痕实际平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualAverageWidth }}</el-row>
+                          <el-row>裂缝（可能多条）像素最⼤宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
+                          <el-row>裂痕实际最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualMaxWidth }}</el-row>
+                        </a>
+                      </el-col>
+                    </el-row>
+                  </el-card>
+                </el-col>
+              </el-row>
 
 
-          </el-scrollbar>
+            </el-scrollbar>
         </div>
-
-
-
-  </div>
-
-
-
+      </div>
+    </div>
 
     <br><br><br>
   </div>

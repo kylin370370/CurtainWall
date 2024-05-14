@@ -577,13 +577,13 @@ export default {
       .map((block, index) => block.has_crack ? this.StoneCrackDetect.onshow.options[index].value : null)
       .filter(value => value !== null);
     },
-    changePage() {
-      this.pageoption = !this.pageoption;
-      if(this.pageoption === '0'){
+    changePage(newOption) {
+      if (newOption === 0) {
         this.$router.push('/about/QuakeEngMuseum')
-      }
-      else{
+      } else if (newOption === 1) {
         this.$router.push('/about/Office')
+      } else if (newOption === 2) {
+        this.$router.push('/about/Composite')
       }
     },
     openVideo() {
@@ -653,15 +653,19 @@ export default {
     <div class="some-text">
       <el-icon><Location /></el-icon>
       地震工程馆三维幕墙裂缝检测展示系统
-      <el-button color="#DBD4CC" style="color:black" @click="changePage()" round>
+      <el-button color="#DBD4CC" style="color:black" @click="changePage(1)" round>
         切换政府大楼
+      </el-button>
+      <el-button color="#DBD4CC" style="color:black" @click="changePage(2)" round>
+        切换衷和楼
       </el-button>
       <el-button color="#DBD4CC" style="color:black"  @click="openVideo" round>
         观看教程
       </el-button>
     </div>
+
     <div class="select-wrapper" style="background-color: #DBD4CC;">
-      <el-button color="#B29F82"  style="color:white" @click="handleClick_setting" round>
+      <el-button color="#B29F82" style="color:white" @click="handleClick_setting" round>
         <el-icon><Setting/></el-icon>
         <p v-if="this.setting_is_open">隐藏便捷控制台</p>
         <p v-else>显示便捷控制台</p>
@@ -709,195 +713,210 @@ export default {
     <div class="setting_and_model">
       <el-card v-if="setting_is_open" class="setting_wrapper">
         <el-tabs v-model="setting_type" @tab-click="handleClick_type">
-                 <el-tab-pane name="camera" >
+          <el-tab-pane name="camera" >
             <template #label>
               <span class="custom-tabs-label">
                 <el-icon color="#463929"><VideoCamera /></el-icon>
                 <span style="color:#463929">便捷控制台</span>
               </span>
             </template>
-<a>
-<!--  <el-checkbox v-model="is_keyboard" label="启用键盘控制" size="large"  />-->
-<!--  <br>-->
-<!--  <el-checkbox v-model="is_mouse" label="启用鼠标控制" size="large" />-->
-<!--  <br>-->
-  <a class="text_2" v-if="false">
-    移动方式：
-    <el-row :span="24" style="margin-top: -5%;">
-      <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode" >
-        <el-radio label="0" size="large">靠近</el-radio>
-        <el-radio label="1" size="large">降落</el-radio>
-      </el-radio-group>
-    </el-row>
-  </a>
-  <a class="text_2">
-    旋转：
-    <el-button @click="handleClick_rotating(0)">
-      <el-icon>
-        <RefreshRight />
-      </el-icon>&ensp;90°
-    </el-button>
-    <el-button @click="handleClick_rotating(1)">
-      <el-icon>
-        <RefreshLeft />
-      </el-icon>&ensp;90°
-    </el-button>
-    <br>
-  </a>
-  <a class="text_2">
-    调整：
-    <el-button @click="handleClick_size(1)">
-      <el-icon>
-        <ZoomIn />
-      </el-icon>放大
-    </el-button>
-    <el-button @click="handleClick_size(0)">
-      <el-icon>
-        <ZoomOut />
-      </el-icon>缩小
-    </el-button>
-    <br>
-  </a>
-  <a class="text_2">
-    快捷选择：
-    <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
-      <el-button @click="handleClick_quick('A')">
-        <el-icon>
-          <Place />
-        </el-icon>&ensp;A
-      </el-button>
-      <el-button @click="handleClick_quick('B')">
-        <el-icon>
-          <Place />
-        </el-icon>&ensp;B
-      </el-button>
-      <el-button @click="handleClick_quick('C')">
-        <el-icon>
-          <Place />
-        </el-icon>&ensp;C
-      </el-button>
-    </el-row>
-  </a>
+            <a>
+            <!--  <el-checkbox v-model="is_keyboard" label="启用键盘控制" size="large"  />-->
+            <!--  <br>-->
+            <!--  <el-checkbox v-model="is_mouse" label="启用鼠标控制" size="large" />-->
+            <!--  <br>-->
+              <a class="text_2" v-if="false">
+                移动方式：
+                <el-row :span="24" style="margin-top: -5%;">
+                  <el-radio-group v-model="setting_camera.modeSelection" class="ml-4" @change="handleClick_mode" >
+                    <el-radio label="0" size="large">靠近</el-radio>
+                    <el-radio label="1" size="large">降落</el-radio>
+                  </el-radio-group>
+                </el-row>
+              </a>
+              <a class="text_2">
+                旋转：
+                <el-button @click="handleClick_rotating(0)">
+                  <el-icon>
+                    <RefreshRight />
+                  </el-icon>&ensp;90°
+                </el-button>
+                <el-button @click="handleClick_rotating(1)">
+                  <el-icon>
+                    <RefreshLeft />
+                  </el-icon>&ensp;90°
+                </el-button>
+                <br>
+              </a>
+              <a class="text_2">
+                调整：
+                <el-button @click="handleClick_size(1)">
+                  <el-icon>
+                    <ZoomIn />
+                  </el-icon>放大
+                </el-button>
+                <el-button @click="handleClick_size(0)">
+                  <el-icon>
+                    <ZoomOut />
+                  </el-icon>缩小
+                </el-button>
+                <br>
+              </a>
+              <a class="text_2">
+                快捷选择：
+                <el-row :span="24" style="margin-top: -2%; margin-bottom: 3%;">
+                  <el-button @click="handleClick_quick('A')">
+                    <el-icon>
+                      <Place />
+                    </el-icon>&ensp;A
+                  </el-button>
+                  <el-button @click="handleClick_quick('B')">
+                    <el-icon>
+                      <Place />
+                    </el-icon>&ensp;B
+                  </el-button>
+                  <el-button @click="handleClick_quick('C')">
+                    <el-icon>
+                      <Place />
+                    </el-icon>&ensp;C
+                  </el-button>
+                </el-row>
+              </a>
 
-  <el-row style="margin-top: 2%; margin-bottom: 1%">
-    <el-button type="danger" @click="selectAllRisk(2)">
-      &ensp;高危幕墙&ensp;
-    </el-button>
-    <el-button type="warning" @click="selectAllRisk(1)">
-      &ensp;中危幕墙&ensp;
-    </el-button>
-  <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
-  </el-row>
-
-  <!--当快捷选择中的高危/中危被按下，显示一个下拉栏，栏内内容为this.risk_data数据-->
-
-  <a v-if="this.risk_setting.risk_select">
-    <el-select-v2
-      v-model="this.risk_setting.risk_selected"
-      :options="this.risk_setting.risk_data"
-      placeholder="Please select"
-      size="middle"
-      @change="selectRisk()"
-    />
-  </a>
-  <!--              <a class="text_2">-->
-  <!--                <a> 夜景模式：-->
-  <!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
-  <!--                </a>-->
-  <!--              </a>-->
-
-</a>
-<!--<el-row style="margin-top: 5%; margin-bottom: 5%">
-  <el-button @click="handleClick_info" size="small" round>
-    <el-icon>
-      <InfoFilled />
-    </el-icon>
-  </el-button>
-</el-row>-->
-  <a v-if="!setting_camera.is_info" class="text_info">
-    <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;" body-style="padding:1px;">
-      <el-scrollbar height="270px">
-        <div style="padding:5px 10px;width:100%">
-        <li>键盘控制：</li>
-        <a class="text_3">
-          <el-row>
-            <el-col :span="9">
-              <br>&emsp;启用键盘后，使用
-            </el-col>
-            <el-col :span="8.5">
-              <el-row justify="center">
-                <el-tag>W</el-tag>
+              <el-row style="margin-top: 2%; margin-bottom: 1%">
+                <el-button type="danger" @click="selectAllRisk(2)">
+                  &ensp;高危幕墙&ensp;
+                </el-button>
+                <el-button type="warning" @click="selectAllRisk(1)">
+                  &ensp;中危幕墙&ensp;
+                </el-button>
+                <el-button color="#B29F82" style="color:white" @click="handleClick_reset" :dark="isDark">重置</el-button>
+                <el-button @click="handleClick_info" size="small" round>
+                  <el-icon>
+                    <InfoFilled />
+                  </el-icon>
+                </el-button>
               </el-row>
-              <el-row>
-                <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
-              </el-row>
-            </el-col>
-            <br>&ensp;可移
-          </el-row>
-          <el-row>
-            动镜头,使用&ensp;
-            <el-tag>Q</el-tag><el-tag>E</el-tag>
-            &ensp;可水平旋转镜头
-          </el-row>
-        </a>
-        <li>鼠标控制：</li>
-        <a class="text_3">
-          &emsp;按住鼠标左键拖动镜头，滚轮调整镜头距离，
-          <br>按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
-        </a>
-        <li>快捷选择：</li>
-        <a class="text_3">
-          &emsp;快捷切换至所选立面
-        </a>
-        <!--当该按键被按下执行this.setting_compare.isopen=false-->
-        <li @click="this.risk_setting.risk_select=0">重置：</li>
-        <a class="text_3">
-          &emsp;可使模型位置回归初始状态
-        </a>
-      </div>
-      </el-scrollbar>
-    </el-card>
-  </a>
-</el-tab-pane>
 
-<el-tab-pane name="compare">
-  <template #label>
+              <!--当快捷选择中的高危/中危被按下，显示一个下拉栏，栏内内容为this.risk_data数据-->
+
+              <a v-if="this.risk_setting.risk_select">
+                <el-select-v2
+                  v-model="this.risk_setting.risk_selected"
+                  :options="this.risk_setting.risk_data"
+                  placeholder="Please select"
+                  size="middle"
+                  @change="selectRisk()"
+                />
+              </a>
+              <!--              <a class="text_2">-->
+              <!--                <a> 夜景模式：-->
+              <!--                  <el-switch  v-model="this.skyType"  @click="handleClick_setSky" />-->
+              <!--                </a>-->
+              <!--              </a>-->
+            </a>
+
+            <a v-if="!setting_camera.is_info" class="text_info">
+              <el-card class="box-card" header="使用说明" style="font-weight: bold;font-size: small;" body-style="padding:1px;">
+                <el-scrollbar height="270px">
+                  <div style="padding:5px 10px;width:100%">
+                  <li>键盘控制：</li>
+                  <a class="text_3">
+                    <el-row>
+                      <el-col :span="9">
+                        <br>&emsp;启用键盘后，使用
+                      </el-col>
+                      <el-col :span="8.5">
+                        <el-row justify="center">
+                          <el-tag>W</el-tag>
+                        </el-row>
+                        <el-row>
+                          <el-tag>A</el-tag><el-tag>S</el-tag><el-tag>D</el-tag>
+                        </el-row>
+                      </el-col>
+                      <br>&ensp;可移
+                    </el-row>
+                    <el-row>
+                      动镜头,使用&ensp;
+                      <el-tag>Q</el-tag><el-tag>E</el-tag>
+                      &ensp;可水平旋转镜头
+                    </el-row>
+                  </a>
+                  <li>鼠标控制：</li>
+                  <a class="text_3">
+                    &emsp;按住鼠标左键拖动镜头，滚轮调整镜头距离，
+                    <br>按住&ensp;<el-tag>Ctrl</el-tag>+鼠标左键可调整镜头视角
+                  </a>
+                  <li>快捷选择：</li>
+                  <a class="text_3">
+                    &emsp;快捷切换至所选立面
+                  </a>
+                  <!--当该按键被按下执行this.setting_compare.isopen=false-->
+                  <li @click="this.risk_setting.risk_select=0">重置：</li>
+                  <a class="text_3">
+                    &emsp;可使模型位置回归初始状态
+                  </a>
+                </div>
+                </el-scrollbar>
+              </el-card>
+            </a>
+          </el-tab-pane>
+
+          <el-tab-pane name="compare">
+            <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>
                 <span>多选</span>
               </span>
             </template>
-  <a>
-    开启多选：
-    <el-switch v-model="setting_compare.is_open" @click="handleClick_compare" />
-  </a>
-  <br>
-  <a>
-    多选数：&emsp;
-    <el-input-number v-model="setting_compare.max_num" :min="1" :max="10" :step="1"
-      :disabled="!setting_compare.is_open" />
-  </a>
-  <br>
-  <a>
-    显示坐标：
-    <el-switch v-model="setting_compare.is_show" :disabled="!setting_compare.is_open" />
-  </a>
-  <br>
-  <a>
-    显示形式：
-    <el-switch v-model="type_compare" class="ml-2" inline-prompt
-      style="--el-switch-on-color: #6A8BFF; --el-switch-off-color: #75D9D3" active-text="显示全部" inactive-text="逐个显示"
-      :disabled="!setting_compare.is_open" />
-  </a>
-  <br>
-  <el-button color="#B29F82" style="color:white" @click="handleClick_clear" :dark="isDark" :disabled="!setting_compare.is_open">
-    清空
-  </el-button>
+            <a class="text_2">
+              开启多选：
+              <el-switch
+                v-model="setting_compare.is_open"
+                style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC;"
+                @click="handleClick_compare"
+              />
+            </a>
+            <br>
+            <a class="text_2">
+              多选数：&emsp;
+              <el-input-number
+                v-model="setting_compare.max_num"
+                :min="1"
+                :max="10"
+                :step="1"
+                :disabled="!setting_compare.is_open"
+              />
+            </a>
+            <br>
+            <a class="text_2">
+              显示坐标：
+              <el-switch
+                v-model="setting_compare.is_show"
+                style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC;"
+                :disabled="!setting_compare.is_open"
+              />
+            </a>
+            <br>
+            <a class="text_2">
+              显示形式：
+              <el-switch
+                v-model="type_compare"
+                class="ml-2" inline-prompt
+                style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC; font-weight: normal;"
+                active-text="显示全部"
+                inactive-text="逐个显示"
+                :disabled="!setting_compare.is_open" />
+            </a>
+            <br>
+            <el-button color="#B29F82" style="color:white" @click="handleClick_clear" :dark="isDark" :disabled="!setting_compare.is_open">
+              清空
+            </el-button>
 
-</el-tab-pane>
+          </el-tab-pane>
 
-<el-tab-pane name="measure">
-  <template #label>
+          <el-tab-pane name="measure">
+            <template #label>
               <span class="custom-tabs-label">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">
                   <path fill-rule="evenodd" clip-rule="evenodd" d="M16.2929 1.29289C16.6834 0.902369 17.3166 0.902369 17.7071 1.29289L22.7071 6.29289C23.0976 6.68342 23.0976 7.31658 22.7071 7.70711L7.70711 22.7071C7.31658 23.0976 6.68342 23.0976 6.29289 22.7071L1.29289 17.7071C0.902369 17.3166 0.902369 16.6834 1.29289 16.2929L3.79275 13.793L13.7928 3.79303L16.2929 1.29289ZM14.5 5.91421L13.4142 7L15.7071 9.29289C16.0976 9.68342 16.0976 10.3166 15.7071 10.7071C15.3166 11.0976 14.6834 11.0976 14.2929 10.7071L12 8.41421L10.9142 9.5L12.2071 10.7929C12.5976 11.1834 12.5976 11.8166 12.2071 12.2071C11.8166 12.5976 11.1834 12.5976 10.7929 12.2071L9.5 10.9142L8.41421 12L10.7071 14.2929C11.0976 14.6834 11.0976 15.3166 10.7071 15.7071C10.3166 16.0976 9.68342 16.0976 9.29289 15.7071L7 13.4142L5.91421 14.5L7.20711 15.7929C7.59763 16.1834 7.59763 16.8166 7.20711 17.2071C6.81658 17.5976 6.18342 17.5976 5.79289 17.2071L4.5 15.9142L3.41421 17L7 20.5858L20.5858 7L17 3.41421L15.9142 4.5L17.2071 5.79289C17.5976 6.18342 17.5976 6.81658 17.2071 7.20711C16.8166 7.59763 16.1834 7.59763 15.7929 7.20711L14.5 5.91421Z" fill="black" fill-opacity="0.85"/>
@@ -906,46 +925,47 @@ export default {
               </span>
             </template>
 
-  <a>
-    开启测距：
-    <el-switch v-model="setting_measure.is_open" @click="handleClick_measure" />
-  </a>
+            <a class="text_2">
+              开启测距：
+              <el-switch
+                v-model="setting_measure.is_open"
+                style="--el-switch-on-color: #C9B79E; --el-switch-off-color: #DBD4CC;"
+                @click="handleClick_measure" />
+            </a>
 
-  <div class="measure_steps">
-    <el-steps direction="vertical" :active="Number(setting_measure.step)" finish-status="success">
-      <el-step title="选择第一个点位" />
-      <el-step title="选择第二个点位" />
-    </el-steps>
-  </div>
-  <a v-if="setting_measure.has_data">
-    <a>水平距离：{{ setting_measure.distance[0] }}</a><br>
-    <a>垂直距离：{{ setting_measure.distance[1] }}</a><br>
-    <a>直线距离：{{ setting_measure.distance[2] }}</a><br>
-  </a>
-</el-tab-pane>
+            <div class="measure_steps">
+              <el-steps direction="vertical" :active="Number(setting_measure.step)" finish-status="success">
+                <el-step title="选择第一个点位" />
+                <el-step title="选择第二个点位" />
+              </el-steps>
+            </div>
 
-</el-tabs>
-</el-card>
-<div class="model-from-unity">
-  <Model ref="unityModel" />
-</div>
-</div>
+            <a v-if="setting_measure.has_data">
+              <a>水平距离：{{ setting_measure.distance[0] }}</a><br>
+              <a>垂直距离：{{ setting_measure.distance[1] }}</a><br>
+              <a>直线距离：{{ setting_measure.distance[2] }}</a><br>
+            </a>
+          </el-tab-pane>
 
-<div class="details_and_compare">
-  <p class="text_1">当前查看：
+        </el-tabs>
+      </el-card>
 
-</p>
-  <div class="details">
-    <div class="image">
-      <el-image style="width: 266px; height: 200px" :src="url" :zoom-rate="1.2" :preview-src-list="[url]"
-        :initial-index="4" fit="cover">
-        <template #error>
-              <div class="image-slot">NULL</div>
-            </template>
-          </el-image>
+      <div class="model-from-unity">
+        <Model ref="unityModel" />
+      </div>
+    </div>
+
+    <div class="details_and_compare">
+      <p class="text_1">当前查看：</p>
+      <div class="details">
+        <div class="image">
+          <el-image style="width: 266px; height: 200px" :src="url" :zoom-rate="1.2" :preview-src-list="[url]"
+            :initial-index="4" fit="cover">
+            <template #error>
+                  <div class="image-slot">NULL</div>
+                </template>
+              </el-image>
         </div>
-
-
         <div class="info">
 
           <!--红绿灯-->
@@ -973,10 +993,6 @@ export default {
           </a>
         </div>
       </div>
-
-
-
-
       <div v-if="setting_compare.is_open" class="compare">
         <el-divider />
         <p class="text_1">最近查看：</p>
@@ -1048,166 +1064,156 @@ export default {
         </a>
       </div>
     </el-scrollbar>
-  </div>
-
-    <el-divider />
-    <p class="text_1" style="color:#463929">
-      图像处理和裂缝检测结果
-      <el-icon color="#463929" @click="handleClick_hideDivide">
-        <Hide />
-      </el-icon>
-    </p>
-  <div v-if="StoneCrackDetect.is_show" class="divide">
-
-    <el-card style="border-radius: 20px;">
-      <el-row>
-        <el-col :span="8">
-          <p class="text_2">
-            当前图片&ensp;
-            <el-button @click="handleClick_search(-1)" size="small" circle>
-              <el-icon>
-                <Search />
-              </el-icon>
-            </el-button>
-          </p>
-          <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
-            :preview-src-list="[StoneCrackDetect.raw_path]" :initial-index="4" fit="cover">
-            <template #error>
-                  <div class="image-slot">NULL</div>
-                </template>
-          </el-image>
+      </div>
+      <el-divider />
+      <p class="text_1" style="color:#463929">
+        图像处理和裂缝检测结果
+        <el-icon color="#463929" @click="handleClick_hideDivide">
+          <Hide />
+        </el-icon>
+      </p>
+      <div v-if="StoneCrackDetect.is_show" class="divide">
+        <el-card style="border-radius: 20px;">
           <el-row>
-            x: {{ StoneCrackDetect.des.x }}&emsp;
-            y: {{ StoneCrackDetect.des.y }}&emsp;
-            z: {{ StoneCrackDetect.des.z }}
-          </el-row>
-        </el-col>
-        <el-col :span="8">
-          <p class="text_2">旋转锚框⽬标检测结果</p>
-          <a v-if="StoneCrackDetect.success">
-            <el-row>
-
-              <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
-                :preview-src-list="[StoneCrackDetect.detect_path]" :initial-index="4" fit="cover">
+            <el-col :span="8">
+              <p class="text_2">
+                当前图片&ensp;
+                <el-button @click="handleClick_search(-1)" size="small" circle>
+                  <el-icon>
+                    <Search />
+                  </el-icon>
+                </el-button>
+              </p>
+              <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.raw_path" :zoom-rate="1.2"
+                :preview-src-list="[StoneCrackDetect.raw_path]" :initial-index="4" fit="cover">
                 <template #error>
                       <div class="image-slot">NULL</div>
                     </template>
               </el-image>
-            </el-row>
-          </a>
-        </el-col>
-        <el-col :span="8">
-          <p class="text_2">幕墙块语义分割结果</p>
-          <a v-if="StoneCrackDetect.success">
-            <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
-              :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
-              <template #error>
-                    <div class="image-slot">NULL</div>
-                  </template>
-            </el-image>
-            <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
-          </a>
-        </el-col>
+              <el-row>
+                x: {{ StoneCrackDetect.des.x }}&emsp;
+                y: {{ StoneCrackDetect.des.y }}&emsp;
+                z: {{ StoneCrackDetect.des.z }}
+              </el-row>
+            </el-col>
+            <el-col :span="8">
+              <p class="text_2">旋转锚框⽬标检测结果</p>
+              <a v-if="StoneCrackDetect.success">
+                <el-row>
 
-      </el-row>
-    </el-card>
+                  <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.detect_path" :zoom-rate="1.2"
+                    :preview-src-list="[StoneCrackDetect.detect_path]" :initial-index="4" fit="cover">
+                    <template #error>
+                          <div class="image-slot">NULL</div>
+                        </template>
+                  </el-image>
+                </el-row>
+              </a>
+            </el-col>
+            <el-col :span="8">
+              <p class="text_2">幕墙块语义分割结果</p>
+              <a v-if="StoneCrackDetect.success">
+                <el-image style="width: 266px; height: 200px" :src="StoneCrackDetect.seg_path" :zoom-rate="1.2"
+                  :preview-src-list="[StoneCrackDetect.seg_path]" :initial-index="4" fit="cover">
+                  <template #error>
+                        <div class="image-slot">NULL</div>
+                      </template>
+                </el-image>
+                <el-row>共分割得 &ensp;{{StoneCrackDetect.seg_count}}&ensp; 块</el-row>
+              </a>
+            </el-col>
 
-    <p class="text_2">
-      查看幕墙块裂缝检测和测量结果（编号与分割结果⼀⼀对应）
-      <el-select v-model="StoneCrackDetect.onshow.no" multiple collapse-tags collapse-tags-tooltip
-        :max-collapse-tags="3" placeholder="Select" style="width: 260px">
-        <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
-          :value="item.value" />
-      </el-select>
-      <el-tooltip content="⽆⼈机采集图像的过程中，⽆⼈机与幕墙的物理距离保持⼀致。因此，以像素点作为裂缝测量的单位，数值具有可⽐性">
-  <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示损伤幕墙块</el-button>
-</el-tooltip>
-    </p>
-
-
-    <div v-if="StoneCrackDetect.onshow.no[0]">
-          <el-scrollbar  height="500px">
-            <el-row :gutter="20"> <!-- 设置栅格间距 -->
-              <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->
-                <el-card style="border-radius: 20px; width: auto; height: 420px; overflow: auto;">
-                  <!-- 卡片内容 -->
-                  <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num+1}} 原图和检测结果</el-row>
-                  <el-row>
-  <el-col :span="16">
-    <el-row>
-      <el-tooltip content="幕墙块图像">
-      <el-image
-        style="width: 180px; height: auto;"
-        :src="StoneCrackDetect.block_data[block].block_seg_image_path"
-        :zoom-rate="1.2"
-        :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
-        :initial-index="4"
-        fit="contain"
-      >
-        <template #error>
-          <div class="image-slot">NULL</div>
-        </template>
-      </el-image>
+          </el-row>
+        </el-card>
+        <p class="text_2">
+          查看幕墙块裂缝检测和测量结果（编号与分割结果⼀⼀对应）
+          <el-select v-model="StoneCrackDetect.onshow.no" multiple collapse-tags collapse-tags-tooltip
+            :max-collapse-tags="3" placeholder="Select" style="width: 260px">
+            <el-option v-for="item in StoneCrackDetect.onshow.options" :key="item.value" :label="item.label"
+              :value="item.value" />
+          </el-select>
+          <el-tooltip content="⽆⼈机采集图像的过程中，⽆⼈机与幕墙的物理距离保持⼀致。因此，以像素点作为裂缝测量的单位，数值具有可⽐性">
+      <el-button color="#B29F82" style="color:white" @click="selectAllCracks">显示损伤幕墙块</el-button>
     </el-tooltip>
-    </el-row>
-    <el-row style="margin-top: 1%;">
-      <el-tooltip content="裂缝检测结果">
-      <el-image
-        style="width: 180px; height: auto;"
-        :src="StoneCrackDetect.block_data[block].block_detect_image_path"
-        :zoom-rate="1.2"
-        :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
-        :initial-index="4"
-        fit="contain"
-      >
-        <template #error>
-          <div class="image-slot">NULL</div>
-        </template>
-      </el-image>
-    </el-tooltip>
-    </el-row>
-  </el-col>
-</el-row>
-
-
-
-                  <el-row style="width: 800px;">
-                    <el-col :span="7" style="margin-left: 1%;width: auto;">
+        </p>
+        <div v-if="StoneCrackDetect.onshow.no[0]">
+              <el-scrollbar  height="500px">
+                <el-row :gutter="20"> <!-- 设置栅格间距 -->
+                  <el-col v-for="block in StoneCrackDetect.onshow.no" :key="block" :span="6"> <!-- 假设每张卡片占据6列 -->
+                    <el-card style="border-radius: 20px; width: auto; height: 420px; overflow: auto;">
+                      <!-- 卡片内容 -->
+                      <el-row>NO. {{ StoneCrackDetect.block_data[block].block_num+1}} 原图和检测结果</el-row>
                       <el-row>
-                        存在裂缝：
-                        <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
-                        <a v-else>否</a>
+      <el-col :span="16">
+        <el-row>
+          <el-tooltip content="幕墙块图像">
+          <el-image
+            style="width: 180px; height: auto;"
+            :src="StoneCrackDetect.block_data[block].block_seg_image_path"
+            :zoom-rate="1.2"
+            :preview-src-list="[StoneCrackDetect.block_data[block].block_seg_image_path]"
+            :initial-index="4"
+            fit="contain"
+          >
+            <template #error>
+              <div class="image-slot">NULL</div>
+            </template>
+          </el-image>
+        </el-tooltip>
+        </el-row>
+        <el-row style="margin-top: 1%;">
+          <el-tooltip content="裂缝检测结果">
+          <el-image
+            style="width: 180px; height: auto;"
+            :src="StoneCrackDetect.block_data[block].block_detect_image_path"
+            :zoom-rate="1.2"
+            :preview-src-list="[StoneCrackDetect.block_data[block].block_detect_image_path]"
+            :initial-index="4"
+            fit="contain"
+          >
+            <template #error>
+              <div class="image-slot">NULL</div>
+            </template>
+          </el-image>
+        </el-tooltip>
+        </el-row>
+      </el-col>
+    </el-row>
+
+
+
+                      <el-row style="width: 800px;">
+                        <el-col :span="7" style="margin-left: 1%;width: auto;">
+                          <el-row>
+                            存在裂缝：
+                            <a v-if="StoneCrackDetect.block_data[block].has_crack">是</a>
+                            <a v-else>否</a>
+                          </el-row>
+                          <a v-if="StoneCrackDetect.block_data[block].has_crack">
+                            <el-row>所有裂缝像素⾯积和：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
+                            <el-row>裂痕实际面积：{{ StoneCrackDetect.block_data[block].crack_data.actualArea}}</el-row>
+                            <el-row>所有裂缝像素⻓度和：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
+                            <el-row>裂痕实际长度：{{ StoneCrackDetect.block_data[block].crack_data.actualLength }}</el-row>
+                            <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
+                            <el-row>裂痕实际平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualAverageWidth }}</el-row>
+                            <el-row>裂缝（可能多条）像素最⼤宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
+                            <el-row>裂痕实际最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualMaxWidth }}</el-row>
+
+                          </a>
+                        </el-col>
                       </el-row>
-                      <a v-if="StoneCrackDetect.block_data[block].has_crack">
-                        <el-row>所有裂缝像素⾯积和：{{ StoneCrackDetect.block_data[block].crack_data.crackArea }}</el-row>
-                        <el-row>裂痕实际面积：{{ StoneCrackDetect.block_data[block].crack_data.actualArea}}</el-row>
-                        <el-row>所有裂缝像素⻓度和：{{ StoneCrackDetect.block_data[block].crack_data.crackLength}}</el-row>
-                        <el-row>裂痕实际长度：{{ StoneCrackDetect.block_data[block].crack_data.actualLength }}</el-row>
-                        <el-row>裂痕像素平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackAverageWidth }}</el-row>
-                        <el-row>裂痕实际平均宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualAverageWidth }}</el-row>
-                        <el-row>裂缝（可能多条）像素最⼤宽度：{{ StoneCrackDetect.block_data[block].crack_data.crackMaxWidth }}</el-row>
-                        <el-row>裂痕实际最大宽度：{{ StoneCrackDetect.block_data[block].crack_data.actualMaxWidth }}</el-row>
-
-                      </a>
-                    </el-col>
-                  </el-row>
-                </el-card>
-              </el-col>
-            </el-row>
+                    </el-card>
+                  </el-col>
+                </el-row>
 
 
-          </el-scrollbar>
+              </el-scrollbar>
         </div>
+      </div>
+    </div>
 
-
-
+    <br><br><br>
   </div>
-
-
-</div>
-
-<br><br><br>
-</div>
 </template>
 
 <style scope>
@@ -1220,7 +1226,6 @@ export default {
   font-size: 40px;
   font-weight: bold;
   line-height: 80px;
-
   letter-spacing:1px;
   width: 100%;
 }

@@ -3,11 +3,28 @@ import{ Search,Position,Histogram,Scissor,Moon,Pointer,Warning } from '@element-
 import { useDisabled } from 'element-plus';
 import { RouterLink, RouterView } from 'vue-router'
 
-var imageURL = ["/home/carousel_1.png","/home/carousel_2.png","/home/carousel_3.png",
-  "/home/carousel_4.png","/home/carousel_5.png","/home/carousel_6.png"];
+var imageURL_1 = [
+  "/home/carousel_1_1.png",
+  "/home/carousel_1_2.png",
+  "/home/carousel_1_3.png",
+  "/home/carousel_1_4.png",
+  "/home/carousel_1_5.png",
+  "/home/carousel_1_6.png"
+];
 
-var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carousel_2_3.png",
-  "/home/carousel_2_4.png"];
+var imageURL_2 = [
+  "/home/carousel_2_1.png",
+  "/home/carousel_2_2.png",
+  "/home/carousel_2_3.png",
+  "/home/carousel_2_4.png"
+];
+
+var imageURL_3 = [
+  "/home/carousel_3_1.png",
+  "/home/carousel_3_2.png",
+  "/home/carousel_3_3.png",
+  "/home/carousel_3_4.png"
+];
 
   export default {
   name: 'about',
@@ -21,17 +38,20 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
   },
   data(){
     return{
-      option:'0',
-      imageBox: imageURL,
+      option: '0',
+      imageBox: imageURL_1,
     }
   },
   methods: {
-    handleClick_change(){
-      if(this.option === '0'){
-        this.imageBox = imageURL;
+    handleClick_change() {
+      if (this.option === '0') {
+        this.imageBox = imageURL_1;
       }
-      else{
+      else if (this.option === '1') {
         this.imageBox = imageURL_2;
+      }
+      else {
+        this.imageBox = imageURL_3;
       }
     },
     changePage() {
@@ -51,46 +71,60 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
 
 <template>
   <div class="home">
+    <!-- 背景图片 -->
     <img class="bk_image" src="../assets/home/bk.png">
 
+    <!-- 顶部导航栏 -->
     <div class="option_wrapper">
       <div class="mb-2 flex items-center text-sm">
         <el-radio-group v-model="option" class="ml-4" @change="handleClick_change" fill="#B29F82">
           <el-radio-button label="0" size="middle">地震工程馆</el-radio-button>
           <el-radio-button label="1" size="middle">井开区政府⼤楼</el-radio-button>
-          <!--<el-radio label="2" size="middle">政府大楼</el-radio>-->
+          <el-radio-button label="2" size="middle">衷和楼</el-radio-button>
         </el-radio-group>
       </div>  
     </div>
 
+    <!-- 地震工程馆 -->
     <div v-if="option==='0'" class="quake_info">   
       <div class="text_1_1">
         <el-row style="margin-bottom: 2%">地震工程馆三维幕墙裂缝检测展示系统</el-row>
       </div>
-      <div class="text_1_2">同济大学地震⼯程馆是当前世界规模最大、由四座振动台组合而成的大型综合试验室，通体由石材幕墙作为外维护结构。使用年限十余年，表面出现不少裂缝损伤。我们通过无人机对地震馆进行三维模型数据采集和局部图像矩阵拍摄，并将局部图像进行批量裂缝检测，将检测结果映射到三维模型上，供用户查看。系统提供如下功能：<br>▪ 将局部图像中心点映射到三维模型上，并以红⻩绿三种颜色标识其损伤程度<br>▪ 查看局部图像的处理过程和检测结果<br>▪ 批量查看严重损伤幕墙块的具体情况</div>
+      <div class="text_1_2">
+        同济大学地震⼯程馆是当前世界规模最大、由四座振动台组合而成的大型综合试验室，通体由石材幕墙作为外维护结构。使用年限十余年，表面出现不少裂缝损伤。我们通过无人机对地震馆进行三维模型数据采集和局部图像矩阵拍摄，并将局部图像进行批量裂缝检测，将检测结果映射到三维模型上，供用户查看。系统提供如下功能：<br>▪ 将局部图像中心点映射到三维模型上，并以红⻩绿三种颜色标识其损伤程度<br>▪ 查看局部图像的处理过程和检测结果<br>▪ 批量查看严重损伤幕墙块的具体情况
+      </div>
+      
       <el-divider />
-        <el-row class="text_fun">
+
+      <el-row class="text_fun">
         <el-col :span="7">
           <el-icon><Search /></el-icon><br>
           浏览建筑模型
         </el-col>
+
         <el-divider direction="vertical" />
+
         <el-col :span="7">
           <el-icon><Position /></el-icon><br>
           图像处理结果
         </el-col>
+
         <el-divider direction="vertical" />
+
         <el-col :span="7">
           <el-icon><Histogram /></el-icon><br>
           损伤等级预警
         </el-col>
-      </el-row> 
+      </el-row>
+
       <div class="router_button">
         <el-button @click="changePage" size="large" color="#B29F82" style="color:white" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
       </div>
     </div>
+
+    <!-- 井开区政府大楼 -->
     <div v-if="option==='1'" class="quake_info">   
       <div class="text_1_1">
         <el-row style="margin-bottom: 2%">井开区政府大楼三维幕墙裂缝检测展示系统</el-row>
@@ -100,37 +134,69 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
       </div>
       
       <el-divider />
+
       <el-row class="text_fun">
         <el-col :span="7">
           <el-icon><Search /></el-icon><br>
           浏览建筑模型
         </el-col>
+
         <el-divider direction="vertical" />
+
         <el-col :span="7">
           <el-icon><Position /></el-icon><br>
           图像处理结果
         </el-col>
+
         <el-divider direction="vertical" />
+
         <el-col :span="7">
           <el-icon><Histogram /></el-icon><br>
           损伤等级预警
         </el-col>
-      </el-row> 
+      </el-row>
+
       <div class="router_button">
         <el-button @click="changePage" size="large" color="#B29F82" style="color:white" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
       </div>
     </div>
+
+    <!-- 衷和楼 -->
     <div v-if="option==='2'" class="quake_info">   
       <div class="text_1_1">
-        <el-row style="margin-bottom: 2%">政府大楼</el-row>
+        <el-row style="margin-bottom: 2%">衷和楼三维幕墙裂缝检测展示系统</el-row>
       </div>
       <div class="text_1_2">
+        同济大学衷和楼是一座现代化的教学综合楼，它是一座高层建筑，拥有多层楼层，为师生提供了一个舒适的学习和研究环境。该建筑的设计现代而简洁，外立面采用玻璃幕墙，⽆明显裂缝损伤。为了确保建筑的安全性和维护其外观品质，本系统利用先进的技术手段对衷和楼幕墙进行检测。
         <!-- 坐落于上海虹桥经济开发区，由常年展贸中心、上海世贸展馆、上海世贸大厦三大主体建筑构成，是一个集展示、交易、办公、资讯于一体的超级交易市场，为国内外商家及专业买主提供国际级的设施和服务。 -->
       </div>
+
       <el-divider />
+
       <el-row class="text_fun">
+        <el-col :span="7">
+          <el-icon><Search /></el-icon><br>
+          浏览建筑模型
+        </el-col>
+
+        <el-divider direction="vertical" />
+
+        <el-col :span="7">
+          <el-icon><Position /></el-icon><br>
+          图像处理结果
+        </el-col>
+
+        <el-divider direction="vertical" />
+
+        <el-col :span="7">
+          <el-icon><Histogram /></el-icon><br>
+          损伤等级预警
+        </el-col>
+      </el-row>
+
+      <!-- <el-row class="text_fun">
         <el-col :span="4">
           <el-icon><Search /></el-icon><br>
           查看幕墙
@@ -155,14 +221,16 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
           <el-icon><Moon /></el-icon><br>
           夜景模式
         </el-col>
-      </el-row> 
+      </el-row>  -->
+
       <div class="router_button">
-        <el-button @click="changePage" size="large" color="#EEFFFF" round>
+        <el-button @click="changePage" size="large" color="#B29F82" style="color:white" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
       </div>
     </div>
 
+    <!-- 右侧轮播图 -->
     <div class="carousel">
       <el-carousel :interval="3000" type="card" height="65vh" direction="vertical">
         <el-carousel-item v-for="(item, index) in imageBox" :key="index">
@@ -172,6 +240,7 @@ var imageURL_2 = ["/home/carousel_2_1.png","/home/carousel_2_2.png","/home/carou
     </div>
   </div>
 </template>
+
 <style scope>
 body{
   height: 98vh;

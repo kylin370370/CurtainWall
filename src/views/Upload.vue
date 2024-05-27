@@ -143,8 +143,8 @@ export default {
     const val = ref(0); // 设置初始进度为1%
     const isShow = ref(true); // 是否显示进度条
     const step = ref(1); // 每次自增幅度
-    const initVal = ref(1); // 初始值
-    const stopVal = ref(99); // 到一定进度停止
+    const initVal = ref(0); // 初始值
+    const stopVal = ref(100); // 到一定进度停止
     const isOk = ref(false); // 进度条继续到成功
 
     onMounted(() => {

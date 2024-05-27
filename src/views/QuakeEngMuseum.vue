@@ -656,9 +656,9 @@ export default {
       <el-button color="#DBD4CC" style="color:black" @click="changePage(1)" round>
         切换政府大楼
       </el-button>
-      <el-button color="#DBD4CC" style="color:black" @click="changePage(2)" round>
-        切换衷和楼
-      </el-button>
+<!--      <el-button color="#DBD4CC" style="color:black" @click="changePage(2)" round>-->
+<!--        切换衷和楼-->
+<!--      </el-button>-->
       <el-button color="#DBD4CC" style="color:black"  @click="openVideo" round>
         观看教程
       </el-button>

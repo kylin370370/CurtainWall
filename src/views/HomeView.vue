@@ -64,6 +64,10 @@ var imageURL_3 = [
       else if(this.option === '2'){
         this.$router.push('/about/Composite')
       }
+    },
+    navigateToUpload() {
+      // 使用router.push方法跳转到/upload路由
+      this.$router.push('/upload');
     }
   },
   }
@@ -79,21 +83,21 @@ var imageURL_3 = [
       <div class="mb-2 flex items-center text-sm">
         <el-radio-group v-model="option" class="ml-4" @change="handleClick_change" fill="#B29F82">
           <el-radio-button label="0" size="middle">地震工程馆</el-radio-button>
-          <el-radio-button label="1" size="middle">井开区政府⼤楼</el-radio-button>
+<!--          <el-radio-button label="1" size="middle">井开区政府⼤楼</el-radio-button>-->
           <el-radio-button label="2" size="middle">衷和楼</el-radio-button>
         </el-radio-group>
-      </div>  
+      </div>
     </div>
 
     <!-- 地震工程馆 -->
-    <div v-if="option==='0'" class="quake_info">   
+    <div v-if="option==='0'" class="quake_info">
       <div class="text_1_1">
         <el-row style="margin-bottom: 2%">地震工程馆三维幕墙裂缝检测展示系统</el-row>
       </div>
       <div class="text_1_2">
         同济大学地震⼯程馆是当前世界规模最大、由四座振动台组合而成的大型综合试验室，通体由石材幕墙作为外维护结构。使用年限十余年，表面出现不少裂缝损伤。我们通过无人机对地震馆进行三维模型数据采集和局部图像矩阵拍摄，并将局部图像进行批量裂缝检测，将检测结果映射到三维模型上，供用户查看。系统提供如下功能：<br>▪ 将局部图像中心点映射到三维模型上，并以红⻩绿三种颜色标识其损伤程度<br>▪ 查看局部图像的处理过程和检测结果<br>▪ 批量查看严重损伤幕墙块的具体情况
       </div>
-      
+
       <el-divider />
 
       <el-row class="text_fun">
@@ -121,18 +125,19 @@ var imageURL_3 = [
         <el-button @click="changePage" size="large" color="#B29F82" style="color:white" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
+        <el-button @click="navigateToUpload" size="large" color="#B29F82" style="color:white" round>上传模型</el-button>
       </div>
     </div>
 
     <!-- 井开区政府大楼 -->
-    <div v-if="option==='1'" class="quake_info">   
+    <div v-if="option==='1'" class="quake_info">
       <div class="text_1_1">
         <el-row style="margin-bottom: 2%">井开区政府大楼三维幕墙裂缝检测展示系统</el-row>
       </div>
       <div class="text_1_2">
         井冈山国家级经济技术开发区政府新大楼的外围护结构，由石材幕墙加玻璃幕墙混合组成。建筑整体较新，石材幕墙⽆明显裂缝损伤。为保护隐私，与井开区城市建设管理局协商，在本系统中仅展⽰政府⼤楼背面和中间的石材幕墙部分区域，可作为系统功能和泛化性的验证。
       </div>
-      
+
       <el-divider />
 
       <el-row class="text_fun">
@@ -160,11 +165,12 @@ var imageURL_3 = [
         <el-button @click="changePage" size="large" color="#B29F82" style="color:white" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
+        <el-button @click="navigateToUpload" size="large" color="#B29F82" style="color:white" round>上传模型</el-button>
       </div>
     </div>
 
     <!-- 衷和楼 -->
-    <div v-if="option==='2'" class="quake_info">   
+    <div v-if="option==='2'" class="quake_info">
       <div class="text_1_1">
         <el-row style="margin-bottom: 2%">衷和楼三维幕墙裂缝检测展示系统</el-row>
       </div>
@@ -227,7 +233,9 @@ var imageURL_3 = [
         <el-button @click="changePage" size="large" color="#B29F82" style="color:white" round>
           <el-icon><Pointer /></el-icon>前往体验
         </el-button>
+        <el-button @click="navigateToUpload" size="large" color="#B29F82" style="color:white" round>上传模型</el-button>
       </div>
+
     </div>
 
     <!-- 右侧轮播图 -->
@@ -252,8 +260,8 @@ body{
 }
 .bk_image{
   width: 50vw;
-  position: absolute; 
-  bottom: 0; 
+  position: absolute;
+  bottom: 0;
   left: 0;
 }
 .option_wrapper{
@@ -285,7 +293,7 @@ body{
   font-size: 1.8lvh;
 }
 .router_button{
-  display: flex; 
+  display: flex;
   justify-content: center;
   margin-top: 4%;
 }

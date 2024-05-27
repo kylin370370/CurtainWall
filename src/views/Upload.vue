@@ -1,4 +1,5 @@
 <template>
+<div style="background-color: #F5F5F5;">
 
   <el-upload
       ref="uploadRef"
@@ -6,31 +7,35 @@
       :before-upload="beforeUpload"
       :on-change="handleChange"
       :file-list="fileList"
+      class="upload-container"
   >
-    <el-button slot="trigger" type="primary">选择文件</el-button>
+    <el-button slot="trigger" size="large" color="#B29F82" style="color:white ;" >选择文件</el-button>
     <el-button
-        type="success"
+        size="large" color="#B29F82" style="color:white"
         @click="submitUpload"
         :disabled="fileList.length === 0"
     >
       上传文件
     </el-button>
+
+
   </el-upload>
+
   <div v-if="isShow">
     <el-progress :text-inside="true" :stroke-width="24" :percentage="val"
-                 style="margin-top: 10px;" :format="format">
+                 style="margin-top: 10px; margin-left: 50px; margin-right: 50px;" :format="format">
     </el-progress>
   </div>
 
-  <div style="margin: 20px;">
+  <div style="margin: 30px ; background-color: #DBD4CC; border-radius: 10px; ">
     <el-alert
         title="成功检测模型和矩阵拍摄文件，请选择建模参数"
         type="info"
         :closable="false"
         show-icon>
     </el-alert>
-    <el-form label-position="top" @submit.prevent="submitForm">
-      <el-form-item label="功能选择">
+    <el-form label-position="top" @submit.prevent="submitForm"  >
+      <el-form-item label="功能选择" >
         <el-checkbox-group v-model="selectedFeatures">
           <el-checkbox label="相机" value="相机" disabled>相机</el-checkbox>
           <el-checkbox label="多选" value="多选">多选</el-checkbox>
@@ -68,12 +73,18 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item>
-        <el-button type="primary" native-type="submit">确定</el-button>
+        <el-button size="large" color="#B29F82" style="color:white"  native-type="submit">确定</el-button>
       </el-form-item>
     </el-form>
+    <el-button size="large" @click="goToHome" color="#B29F82" style="color:white ;" >返回主页</el-button>
   </div>
+</div>
 </template>
 <script>
+import { useRouter } from 'vue-router';
+
+// 获取router实例
+
 import { ref, watch, onMounted } from 'vue';
 import { ElForm, ElFormItem, ElCheckbox, ElCheckboxGroup, ElRadioGroup, ElRadio, ElButton, ElProgress, ElUpload, ElAlert } from 'element-plus';
 import imageSrc1 from '@/assets/light/1.png';
@@ -97,7 +108,7 @@ export default {
       fileList.value = [file]; // 保持只有一个文件在队列中
       return false; // 阻止自动上传
     };
-
+    const router = useRouter();
     const handleChange = (file, newFileList) => {
       fileList.value = [...newFileList];
     };
@@ -136,17 +147,17 @@ export default {
     const stopVal = ref(99); // 到一定进度停止
     const isOk = ref(false); // 进度条继续到成功
 
-    // onMounted(() => {
-    //   val.value = initVal.value;
-    //   const timer = setInterval(() => {
-    //     if (val.value >= stopVal.value) {
-    //       clearInterval(timer);
-    //       console.log('Progress stopped at 99%');
-    //     } else {
-    //       val.value += step.value;
-    //     }
-    //   }, 500);
-    // });
+    onMounted(() => {
+      val.value = initVal.value;
+      const timer = setInterval(() => {
+        if (val.value >= stopVal.value) {
+          clearInterval(timer);
+          console.log('Progress stopped at 99%');
+        } else {
+          val.value += step.value;
+        }
+      }, 500);
+    });
 
     // 其他现有的数据和方法
     const selectedResolution = ref('低分辨率 (640x480)');
@@ -163,7 +174,11 @@ export default {
       };
       // 提交数据的逻辑
     };
+    const goToHome = () => {
 
+      router.push('/');
+
+    };
     // return { val, isShow, selectedFeatures, selectedResolution, selectedLightModel, isRigid, submitForm };
     // return { uploadRef, uploading, progress, fileList, submitUpload, submitForm, beforeUpload, handleChange, formatProgress };
     return {
@@ -184,14 +199,15 @@ export default {
       submitForm,
       beforeUpload,
       handleChange,
-      formatProgress
+      formatProgress,
+      goToHome
     };
 
   }
 }
 </script>
 
-<style scoped>
+<style >
 .image-size {
   width: 100px;
   height: auto;
@@ -202,15 +218,38 @@ export default {
   cursor: pointer; /* Optional: changes the cursor to indicate it's clickable */
 }
 
-/* 覆盖单选按钮选中时的颜色 */
-.el-radio__input.is-checked .el-radio__inner,
-.el-radio__input.is-checked + .el-radio__label {
-  color: #a6733a; /* 文本颜色 */
+.el-radio__inner, .el-checkbox__inner {
+  border-color: #a6733a; /* 设置边框为棕色 */
+}
+/* 给功能选择的表单项添加棕色分割线 */
+/* 给除了第一个之外的所有表单项添加顶部分割线 */
+.el-form-item:not(:first-child) {
+  border-top: 2px solid #a6733a; /* 设置分割线颜色为棕色和宽度 */
+  padding-top: 20px; /* 在分割线上方添加一些内边距 */
+  margin-top: 20px; /* 在分割线上方添加一些外边距，确保与上一个表单项有空间 */
 }
 
-.el-radio__input.is-checked .el-radio__inner::after {
-  background-color: #a6733a;
+/* 给第一个表单项添加顶部分割线 */
+.el-form-item:first-child {
+  border-top: 2px solid #a6733a; /* 设置顶部分割线颜色为棕色和宽度 */
+  padding-top: 20px; /* 在顶部分割线上方添加一些内边距 */
+  margin-top: 20px; /* 在顶部分割线上方添加一些外边距 */
 }
+
+/* 单选和多选按钮选中状态下的颜色调整 */
+.el-radio__input.is-checked .el-radio__inner,
+.el-checkbox__input.is-checked .el-checkbox__inner,
+.el-radio__input.is-checked + .el-radio__label,
+.el-checkbox__input.is-checked + .el-checkbox__label {
+  color: #a6733a; /* 文本颜色改为棕色 */
+  background-color: #DBD4CC;
+}
+
+.el-radio__input.is-checked .el-radio__inner::after,
+.el-checkbox__input.is-checked .el-checkbox__inner::after {
+  background-color: #fff; /* 选中时内部小圆点或勾的颜色改为白色 */
+}
+
 /* 悬浮状态 */
 .el-radio__input:hover .el-radio__inner {
   border-color: #a6733a; /* 悬浮时也使用棕色外圈 */
@@ -224,7 +263,9 @@ export default {
 .box-card {
   box-shadow: 0 2px 12px 0 rgba(166, 115, 58, 0.3);
 }
-
+.el-progress-bar__inner {
+  background-image: linear-gradient(to right, #d8a876, #a6733a); /* 从深棕色渐变到浅棕色 */
+}
 .image-size {
   width: 100px;
   height: auto;
@@ -235,4 +276,5 @@ export default {
   text-align: center;
   cursor: pointer; /* 可选: 改变光标以指示它是可点击的 */
 }
+
 </style>

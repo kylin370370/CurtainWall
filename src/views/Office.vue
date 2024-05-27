@@ -63,7 +63,7 @@ export default {
       is_keyboard: true,         //是否允许使用键盘
       is_mouse: true,            //是否允许使用鼠标
 
-      
+
       skyType: true ,         //false白天，true为晚间
 
       setting_compare:{
@@ -566,9 +566,9 @@ export default {
       <el-button color="#DBD4CC" style="color:black" @click="changePage(0)" round>
         切换地震工程馆
       </el-button>
-      <el-button color="#DBD4CC" style="color:black" @click="changePage(2)" round>
-        切换衷和楼
-      </el-button>
+<!--      <el-button color="#DBD4CC" style="color:black" @click="changePage(2)" round>-->
+<!--        切换衷和楼-->
+<!--      </el-button>-->
       <el-button color="#DBD4CC" style="color:black"  @click="openVideo" round>
         观看教程
       </el-button>

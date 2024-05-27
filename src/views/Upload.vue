@@ -10,18 +10,18 @@
       class="upload-container"
   >
     <el-button slot="trigger" size="large" color="#B29F82" style="color:white ;" >选择文件</el-button>
-    <el-button
-        size="large" color="#B29F82" style="color:white"
-        @click="submitUpload"
-        :disabled="fileList.length === 0"
-    >
-      上传文件
-    </el-button>
+<!--    <el-button-->
+<!--        size="large" color="#B29F82" style="color:white"-->
+<!--        @click="submitUpload"-->
+<!--        :disabled="fileList.length === 0"-->
+<!--    >-->
+<!--      上传文件-->
+<!--    </el-button>-->
 
 
   </el-upload>
 
-  <div v-if="isShow">
+  <div v-if="showAlert">
     <el-progress :text-inside="true" :stroke-width="24" :percentage="val"
                  style="margin-top: 10px; margin-left: 50px; margin-right: 50px;" :format="format">
     </el-progress>
@@ -29,12 +29,18 @@
 
   <div style="margin: 30px ; background-color: #DBD4CC; border-radius: 10px; ">
     <el-alert
-        title="成功检测模型和矩阵拍摄文件，请选择建模参数"
+        v-if="showAlert"
+        title="成功检测模型和矩阵拍摄文件，文件正在上传"
         type="info"
         :closable="false"
         show-icon>
     </el-alert>
+    <div v-if="!showAlert">
+    <h3 class="form-title">请输入建模参数</h3>
     <el-form label-position="top" @submit.prevent="submitForm"  >
+      <el-form-item label="请输入模型名称">
+        <el-input v-model="modelName" placeholder="模型名称"></el-input>
+      </el-form-item>
       <el-form-item label="功能选择" >
         <el-checkbox-group v-model="selectedFeatures">
           <el-checkbox label="相机" value="相机" disabled>相机</el-checkbox>
@@ -76,6 +82,7 @@
         <el-button size="large" color="#B29F82" style="color:white"  native-type="submit">确定</el-button>
       </el-form-item>
     </el-form>
+    </div>
     <el-button size="large" @click="goToHome" color="#B29F82" style="color:white ;" >返回主页</el-button>
   </div>
 </div>
@@ -100,6 +107,8 @@ export default {
       image2: imageSrc2,
       image3: imageSrc3
     };
+    const modelName = ref('');
+    const showAlert = ref(false);
     const uploadRef = ref(null);
     const uploading = ref(false);
     const progress = ref(0);
@@ -158,13 +167,18 @@ export default {
     //     }
     //   }, 500);
     // });
-    watch(fileList, (newFileList) => {
-      if (newFileList.length > 0) {
-        console.log('检测到文件，开始进度条');
-        startProgress(); // 文件列表非空时启动进度条
+    // watch(fileList, (newFileList) => {
+    //   if (newFileList.length > 0) {
+    //     console.log('检测到文件，开始进度条');
+    //     startProgress(); // 文件列表非空时启动进度条
+    //   }
+    // });
+    watch(showAlert, (newVal) => {
+      if (newVal) {
+        console.log('显示警告，开始进度条');
+        startProgress();
       }
     });
-
     const startProgress = () => {
       // progress.value = 0; // 初始化进度
       // let counter = 0;
@@ -202,16 +216,27 @@ export default {
         lightModel: selectedLightModel.value,
         rigid: isRigid.value
       };
+      showAlert.value = true;
+      // 显示弹窗
+      await ElMessageBox.alert(
+          '文件已开始上传，请不要关闭本页面！\n查询进度请查看进度条',
+          '警告',
+          {
+            confirmButtonText: '确定',
+            type: 'warning'
+          }
+      );
       // 提交数据的逻辑
     };
     const goToHome = () => {
-
-      router.push('/');
+      window.open('/', '_blank');
+      // router.push('/');
 
     };
     // return { val, isShow, selectedFeatures, selectedResolution, selectedLightModel, isRigid, submitForm };
     // return { uploadRef, uploading, progress, fileList, submitUpload, submitForm, beforeUpload, handleChange, formatProgress };
     return {
+      showAlert,//文件上传提示
       lightModelImages,
       // 原有数据
       val,
@@ -225,6 +250,7 @@ export default {
       uploading,
       progress,
       fileList,
+      modelName,
       submitUpload,
       submitForm,
       beforeUpload,
@@ -307,5 +333,9 @@ export default {
   text-align: center;
   cursor: pointer; /* 可选: 改变光标以指示它是可点击的 */
 }
-
+.form-title {
+  color: #a6733a; /* 设置字体颜色为棕色 */
+  text-align: center; /* 设置文字居中 */
+  font-size: 24px; /* 设置大号字体 */
+}
 </style>

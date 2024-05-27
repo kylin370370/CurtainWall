@@ -747,7 +747,7 @@ export default {
 
           </el-tab-pane>
 
-          <el-tab-pane name="compare">
+          <el-tab-pane name="compare" v-if="false">
             <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>

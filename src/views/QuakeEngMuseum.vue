@@ -862,7 +862,7 @@ export default {
             </a>
           </el-tab-pane>
 
-          <el-tab-pane name="compare">
+          <el-tab-pane name="compare" v-if="false">
             <template #label>
               <span class="custom-tabs-label">
                 <el-icon><Histogram /></el-icon>
@@ -915,7 +915,7 @@ export default {
 
           </el-tab-pane>
 
-          <el-tab-pane name="measure">
+          <el-tab-pane name="measure" v-if="false">
             <template #label>
               <span class="custom-tabs-label">
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none">

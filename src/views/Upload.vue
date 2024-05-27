@@ -147,7 +147,36 @@ export default {
     const stopVal = ref(100); // 到一定进度停止
     const isOk = ref(false); // 进度条继续到成功
 
-    onMounted(() => {
+    // onMounted(() => {
+    //   val.value = initVal.value;
+    //   const timer = setInterval(() => {
+    //     if (val.value >= stopVal.value) {
+    //       clearInterval(timer);
+    //       console.log('Progress stopped at 99%');
+    //     } else {
+    //       val.value += step.value;
+    //     }
+    //   }, 500);
+    // });
+    watch(fileList, (newFileList) => {
+      if (newFileList.length > 0) {
+        console.log('检测到文件，开始进度条');
+        startProgress(); // 文件列表非空时启动进度条
+      }
+    });
+
+    const startProgress = () => {
+      // progress.value = 0; // 初始化进度
+      // let counter = 0;
+      // const interval = setInterval(() => {
+      //   if (counter >= 100) {
+      //     clearInterval(interval);
+      //     console.log('上传完成');
+      //   } else {
+      //     counter += 10;
+      //     progress.value = counter;
+      //   }
+      // }, 300); // 每300ms更新进度
       val.value = initVal.value;
       const timer = setInterval(() => {
         if (val.value >= stopVal.value) {
@@ -156,8 +185,9 @@ export default {
         } else {
           val.value += step.value;
         }
-      }, 500);
-    });
+      }, 50000);
+    };
+
 
     // 其他现有的数据和方法
     const selectedResolution = ref('低分辨率 (640x480)');
@@ -200,7 +230,8 @@ export default {
       beforeUpload,
       handleChange,
       formatProgress,
-      goToHome
+      goToHome,
+      startProgress
     };
 
   }

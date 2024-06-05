@@ -20,7 +20,34 @@
 
 
   </el-upload>
+  <div v-if="!showAlert" style="display: flex; align-items: center;">
+    <img :src="upload.image0" alt="上传示例" style="width: 500px; height: auto; margin-right: 20px;">
+    <div>
+      <p>仅支持DJ Terra无人机拍摄后一键导出的压缩包（.zip)文件</p>
+      <p>请确保您上传的文件包含建模(.osgb)文件与示例的定位信息：</p>
 
+      <ul>
+        <li>拍照时刻飞行器机体的Roll欧拉角:FlightRolIDegree</li>
+        <li>拍照时刻飞行器机体的Yaw欧拉角: FlightYawDegree</li>
+        <li>拍照时刻飞行器机体的Pitch欧拉角: FlightPitchDegree</li>
+      </ul>
+      <ul>
+        <li>定位标准差(经度方向):RtkStdLon</li>
+        <li> 定位标准差(纬度方向):RtkStdLat</li>
+        <li> 定位标准差（高程方向)：RtkStdHgt</li>
+      </ul>
+      <ul>
+        <li>飞行器拍摄目标距离：LRFTargetDistance</li>
+      </ul>
+      <ul>
+        <li>飞行器拍摄目标经度：LRFTargetLon</li>
+        <li>飞行器拍摄目标纬度：LRFTargetLat</li>
+        <li>飞行器拍摄目标相对海拔：LRFTargetAlt</li>
+
+        <!-- 更多信息项 -->
+      </ul>
+    </div>
+  </div>
   <div v-if="showAlert">
     <el-progress :text-inside="true" :stroke-width="24" :percentage="val"
                  style="margin-top: 10px; margin-left: 50px; margin-right: 50px;" :format="format">
@@ -97,6 +124,7 @@ import { ElForm, ElFormItem, ElCheckbox, ElCheckboxGroup, ElRadioGroup, ElRadio,
 import imageSrc1 from '@/assets/light/1.png';
 import imageSrc2 from '@/assets/light/2.png';
 import imageSrc3 from '@/assets/light/3.png';
+import imageSrc0 from '@/assets/picture/dj.png';
 export default {
   components: {
     ElForm, ElFormItem, ElCheckbox, ElCheckboxGroup, ElRadioGroup, ElRadio, ElButton, ElProgress, ElUpload, ElAlert
@@ -106,6 +134,10 @@ export default {
       image1: imageSrc1,
       image2: imageSrc2,
       image3: imageSrc3
+    };
+    const upload = {
+      image0: imageSrc0,
+
     };
     const modelName = ref('');
     const showAlert = ref(false);
@@ -237,6 +269,7 @@ export default {
     // return { uploadRef, uploading, progress, fileList, submitUpload, submitForm, beforeUpload, handleChange, formatProgress };
     return {
       showAlert,//文件上传提示
+      upload,
       lightModelImages,
       // 原有数据
       val,

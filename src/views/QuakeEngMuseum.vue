@@ -2,8 +2,7 @@
 import{ Location,Setting,Search,Delete,QuestionFilled,InfoFilled,VideoCamera,Histogram,Switch,
   RefreshLeft,RefreshRight,ZoomIn,ZoomOut,Place,Scissor,Hide,More } from '@element-plus/icons-vue';
 import axios  from "axios";
-//import Model from '@/components/model_1.vue';
-import Model from '@/components/model.vue';
+import Model from '@/components/model_1.vue';
 import data_A from '@/assets/imageCSV_1/new_A.csv';
 import data_B from '@/assets/imageCSV_1/new_B.csv';
 import data_C from '@/assets/imageCSV_1/new_C.csv';
@@ -265,9 +264,7 @@ export default {
       SCD.success = false;
       if(path){         // /DZGCG/Pictures/A/a_004.JPG
         SCD.path = path.split("/DZGCG/source_image/")[1];
- // console.log( SCD.path)
         SCD.raw_path = "https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/source_image/"+SCD.path;
-
         SCD.seg_path =  SCD.raw_path.replace('.JPG',"/segment_whole.png");
         SCD.seg_path =  SCD.seg_path.replace('source_image',"segment_image");
         SCD.detect_path="https://stone-wall.obs.cn-east-3.myhuaweicloud.com/DZGCG/detect_image/"+SCD.path;
@@ -276,9 +273,6 @@ export default {
         SCD.path= SCD.path.replace('.JPG','')
         console.log(SCD.path)
         var  urlList=that. urlList;
-        // alert(SCD.path);
-        //alert(that.StoneCrackDetect.path);    //  A/a_004.JPG
-        //console.log('请求的URL:', `http://localhost:8443/api/image/${SCD.path}`);
           axios
               .get(`http://localhost:8443/api/image/${SCD.path}`)
               // .get(`http://120.46.136.85:8443/api/image/${SCD.path}`)

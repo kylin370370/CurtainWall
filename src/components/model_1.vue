@@ -2,12 +2,12 @@
 import Unity from "vue-unity-webgl";
 
   export default {
-    name: 'UnityModel',
+    name: 'UnityModel1',
     methods:{
       sendOrders(order){
         //this.$refs.unityIframe.contentWindow.sendOrders(order);
       },
-      draw_des(des){        
+      draw_des(des){
         //alert('draw'+ des);
         this.$refs.unityIframe.contentWindow.draw_des(des);
       },
@@ -59,15 +59,15 @@ import Unity from "vue-unity-webgl";
 
 <template>
     <div>
-      <iframe id="unity-iframe" 
+      <iframe id="unity-iframe"
         ref="unityIframe"
-        src="/unityModel_1/index.html" 
-        width="1000" 
+        src="/unityModel_1/index.html"
+        width="1000"
         height="660">
       </iframe>
     </div>
 </template>
-  
+
 <style scoped>
   div {
     width: 1000px;

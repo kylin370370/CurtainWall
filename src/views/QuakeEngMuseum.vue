@@ -505,16 +505,19 @@ export default {
       //console.log('请求的URL:', `${coloruId}`);
 
       that.searchColorData(coloruId);
+      console.log("********",imageURL, mess.x, mess.y, mess.z, that.info[3].data)
       that.add_points(imageURL, mess.x, mess.y, mess.z, that.info[3].data);        ////加入对比列表并在模型上显示
     },
     updatePicture(){            //接收unity信息后更新显示
       var that = this;                              //"52.12,13.28,85.74,/DZGCG/Pictures/A/a_004.JPG\r"
       var des_url = that.unityMessage.split(',');   //["52.12","13.28","85.74","/DZGCG/Pictures/A/a_004.JPG\r"]
+      console.log("des_url", des_url)
       that.info[0].data = des_url[0] - 0;
       that.info[1].data = des_url[1] - 0;
       that.info[2].data = des_url[2] - 0;
 
       var imageURL = des_url[3].split('\r')[0];
+      console.log("imageURL",imageURL)
       //handleClick_divide(imageURL,that.info);
       that.info[3].data = imageURL.replace('/DZGCG/Pictures', '');
       //修改为OBS读取
@@ -524,8 +527,10 @@ export default {
       //console.log('请求的info:', `${that.info[3].data}`);
       //上面输出/C/g_035.JPG
       //修改格式
-      var coloruId = that.info[3].data.split("/")[1]+"_"+that.info[3].data.split("/")[2].replace('.JPG','').replace('/','_');
-      that.searchColorData(coloruId);
+      if (that.info[3].data !== "") {
+        var coloruId = that.info[3].data.split("/")[1]+"_"+that.info[3].data.split("/")[2].replace('.JPG','').replace('/','_');
+        that.searchColorData(coloruId);
+      }
       // console.log("打印")
       // console.log(imageURL)
       that.url = imageURL;
